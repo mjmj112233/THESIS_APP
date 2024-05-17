@@ -24,6 +24,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.example.thesis_app.ui.theme.BlueGreen
 import com.example.thesis_app.ui.theme.DarkGreen
 import com.example.thesis_app.ui.theme.DirtyWhite
@@ -33,7 +34,7 @@ import com.example.thesis_app.ui.theme.captionFont
 import com.example.thesis_app.ui.theme.titleFont
 
 @Composable
-fun fourthPage() {
+fun fourthPage(navController: NavController) {
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
