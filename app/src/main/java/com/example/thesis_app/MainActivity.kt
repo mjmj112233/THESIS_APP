@@ -19,7 +19,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-//            com.example.thesis_app.secondPage()
+//            com.example.thesis_app.firstPage()
             Navigation()
         }
     }
@@ -37,13 +37,7 @@ fun Navigation(startDestination: String = "first") {
             loadingScreen(navController)
         }
         composable("third") {
-            firstPage(navController)
-        }
-        composable("fourth") {
-            secondPage(navController)
-        }
-        composable("fifth") {
-            thirdPage()
+            fifthPage()
         }
 
     }
