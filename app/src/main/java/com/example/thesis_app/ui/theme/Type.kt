@@ -17,6 +17,10 @@ val captionFont = FontFamily(
     Font(R.font.montserrat_light, FontWeight.Light)
 )
 
+val alt = FontFamily(
+    Font(R.font.mont_bold, FontWeight.Bold)
+)
+
 // Set of Material typography styles to start with
 val AppTypography = Typography(
     bodyLarge = TextStyle(

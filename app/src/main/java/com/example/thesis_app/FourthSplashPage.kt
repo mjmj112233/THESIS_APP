@@ -5,16 +5,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.Button
@@ -27,7 +20,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
@@ -36,11 +28,12 @@ import com.example.thesis_app.ui.theme.BlueGreen
 import com.example.thesis_app.ui.theme.DarkGreen
 import com.example.thesis_app.ui.theme.DirtyWhite
 import com.example.thesis_app.ui.theme.Slime
+import com.example.thesis_app.ui.theme.alt
 import com.example.thesis_app.ui.theme.captionFont
 import com.example.thesis_app.ui.theme.titleFont
 
 @Composable
-fun fifthPage() {
+fun fourthPage() {
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -74,7 +67,7 @@ fun fifthPage() {
             // text
             Text(
                 text = buildAnnotatedString {
-                    append("Whether you're a seasoned gym-goer or a complete novice, ")
+                    append("Whether you're a seasoned gym-goer or a complete beginner, ")
                     withStyle(style = SpanStyle(color = Slime, fontFamily = titleFont, fontSize = 20.sp)) {
                         append("Spot")
                     }
@@ -99,7 +92,20 @@ fun fifthPage() {
                     .padding(start = 30.dp, bottom = 50.dp, end = 30.dp)
                     .fillMaxWidth()
             ) {
-                Text("Let's get fit!", color = DarkGreen, fontFamily = titleFont, fontSize = 28.sp)
+                Text(
+                    text = buildAnnotatedString {
+                        append("Let")
+                        withStyle(style = SpanStyle(fontFamily = alt)) {
+                            append("'")
+                        }
+                        append("s Get Fit")
+                        withStyle(style = SpanStyle(fontFamily = alt)) {
+                            append("!")
+                        }
+                    },
+                    color = DarkGreen,
+                    fontFamily = titleFont,
+                    fontSize = 28.sp)
             }
 
         }

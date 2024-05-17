@@ -37,9 +37,17 @@ fun Navigation(startDestination: String = "first") {
             loadingScreen(navController)
         }
         composable("third") {
-            fifthPage()
+            firstPage(navController)
         }
-
+        composable("fourth") {
+            secondPage(navController)
+        }
+        composable("fifth") {
+            thirdPage(navController)
+        }
+        composable("sixth") {
+            fourthPage()
+        }
     }
 }
 
