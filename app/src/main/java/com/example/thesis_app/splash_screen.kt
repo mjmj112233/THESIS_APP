@@ -10,6 +10,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -19,6 +20,7 @@ import com.example.thesis_app.ui.theme.Slime
 import com.example.thesis_app.ui.theme.captionFont
 import com.example.thesis_app.ui.theme.titleFont
 import kotlinx.coroutines.delay
+
 
 @Composable
 fun splashScreen(navController: NavController) {
@@ -30,9 +32,9 @@ fun splashScreen(navController: NavController) {
         verticalArrangement = Arrangement.Center
     ) {
         Image(
-            painter = painterResource(id = R.drawable.sample_logo),
-            contentDescription = "Test Logo",
-            modifier = Modifier.size(128.dp)
+            painter = painterResource(id = R.drawable.spot_logo),
+            contentDescription = "Spot Logo",
+            modifier = Modifier.size(100.dp)
         )
 
         Spacer(modifier = Modifier.height(16.dp))

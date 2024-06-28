@@ -12,6 +12,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.Button
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -32,6 +33,7 @@ import com.example.thesis_app.ui.theme.Slime
 import com.example.thesis_app.ui.theme.alt
 import com.example.thesis_app.ui.theme.captionFont
 import com.example.thesis_app.ui.theme.titleFont
+import kotlinx.coroutines.delay
 
 @Composable
 fun fourthPage(navController: NavController) {
@@ -87,7 +89,7 @@ fun fourthPage(navController: NavController) {
 
             // Button
             Button(
-                onClick = { /* Handle button click */ },
+                onClick = { navController.navigate("main") },
                 colors = ButtonDefaults.buttonColors(Slime),
                 modifier = Modifier
                     .padding(start = 30.dp, bottom = 50.dp, end = 30.dp)
@@ -111,4 +113,5 @@ fun fourthPage(navController: NavController) {
 
         }
     }
+
 }

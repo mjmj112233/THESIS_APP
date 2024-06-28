@@ -52,6 +52,10 @@ fun Navigation(startDestination: String = "first") {
             fourthPage(navController)
         }
 
+        composable("main") {
+            mainPage()
+        }
+
     }
 }
 
