@@ -89,7 +89,7 @@ fun fourthPage(navController: NavController) {
 
             // Button
             Button(
-                onClick = { navController.navigate("main") },
+                onClick = { navController.navigate("signup") },
                 colors = ButtonDefaults.buttonColors(Slime),
                 modifier = Modifier
                     .padding(start = 30.dp, bottom = 50.dp, end = 30.dp)
@@ -97,11 +97,7 @@ fun fourthPage(navController: NavController) {
             ) {
                 Text(
                     text = buildAnnotatedString {
-                        append("Let")
-                        withStyle(style = SpanStyle(fontFamily = alt)) {
-                            append("'")
-                        }
-                        append("s Get Fit")
+                        append("Sign up here")
                         withStyle(style = SpanStyle(fontFamily = alt)) {
                             append("!")
                         }

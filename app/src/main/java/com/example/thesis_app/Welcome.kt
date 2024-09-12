@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -24,9 +25,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -35,75 +39,72 @@ import com.example.thesis_app.ui.theme.BlueGreen
 import com.example.thesis_app.ui.theme.DarkGreen
 import com.example.thesis_app.ui.theme.DirtyWhite
 import com.example.thesis_app.ui.theme.Slime
+import com.example.thesis_app.ui.theme.alt
 import com.example.thesis_app.ui.theme.captionFont
 import com.example.thesis_app.ui.theme.titleFont
 
 @Composable
-fun firstPage(navController: NavController) {
+fun Welcome(navController: NavController) {
     Box(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
+            .background(BlueGreen)
     ) {
-        // Background image
-        Image(
-            painter = painterResource(id = R.drawable.b1),
-            contentDescription = "Background Image",
-            modifier = Modifier.fillMaxSize()
-        )
-
-        // Gradient overlay
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(
-                    brush = Brush.verticalGradient(
-                        colors = listOf(Color.Transparent, BlueGreen),
-                        startY = 0f,
-                        endY = 1500f
-                    )
-                )
-        )
-
         // Content
         Column(
             modifier = Modifier
                 .fillMaxSize(),
             horizontalAlignment = Alignment.Start,
-            verticalArrangement = Arrangement.Bottom
+            verticalArrangement = Arrangement.Center
         ) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(start = 30.dp, bottom = 15.dp),
                 horizontalArrangement = Arrangement.Start,
-                verticalAlignment = Alignment.Bottom
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Introducing,",
+                    text = "Welcome to",
                     style = TextStyle(
                         fontFamily = captionFont,
-                        fontSize = 35.sp,
+                        fontSize = 30.sp,
                         color = DirtyWhite
                     )
                 )
 
                 Spacer(modifier = Modifier.width(8.dp))
 
-                Text(
-                    text = "Spot.",
-                    style = TextStyle(
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = buildAnnotatedString {
+                            append("Spot")
+                            withStyle(style = SpanStyle(fontFamily = alt)) {
+                                append("!")
+                            }
+                        },
+                        color = Slime,
                         fontFamily = titleFont,
-                        fontSize = 35.sp,
-                        color = Slime
+                        fontSize = 33.sp
                     )
-                )
-            }
 
-            Spacer(modifier = Modifier.height(0.dp))
+                    Image(
+                        painter = painterResource(id = R.drawable.spot_avatar),
+                        contentDescription = "Spot logo",
+                        modifier = Modifier
+                            .size(80.dp)
+                            .offset(y = (-23).dp )
+                    )
+                }
+            }
 
             // Additional text
             Text(
-                text = "An innovative smart fitness app designed to " +
-                        "empower beginners with confidence and knowledge.",
+                text = "Upon continuing your account creation, you will be asked multiple questions about your physical attributes to be analyzed by our Physical Therapist-verified algorithm. \n" +
+                        "\n" +
+                        "Once accomplished, a personalized list of equipment alongside its exercises will be recommended for you.",
                 style = TextStyle(
                     fontFamily = captionFont,
                     fontSize = 16.sp,
@@ -111,13 +112,13 @@ fun firstPage(navController: NavController) {
                     textAlign = TextAlign.Justify,
                     color = DirtyWhite
                 ),
-                modifier = Modifier.padding(start = 30.dp, end = 35.dp, bottom = 40.dp)
+                modifier = Modifier.padding(top = 20.dp, start = 30.dp, end = 35.dp, bottom = 50.dp)
             )
 
             // Button
             Button(
                 onClick = {
-                    navController.navigate("fourth")
+                    navController.navigate("bmi")
                 },
                 colors = ButtonDefaults.buttonColors(Slime),
                 modifier = Modifier
@@ -126,7 +127,7 @@ fun firstPage(navController: NavController) {
             ) {
                 Text("Continue", color = DarkGreen, fontFamily = titleFont, fontSize = 28.sp)
             }
-
         }
     }
 }
+

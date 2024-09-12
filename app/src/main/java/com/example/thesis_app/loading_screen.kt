@@ -52,7 +52,7 @@ fun loadingScreen(navController: NavController) {
     }
 
     LaunchedEffect(Unit) {
-        delay(10000)
+        delay(1000)
         navController.navigate("third")
     }
 }

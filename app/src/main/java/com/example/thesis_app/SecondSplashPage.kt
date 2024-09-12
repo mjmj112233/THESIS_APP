@@ -72,9 +72,9 @@ fun secondPage(navController: NavController) {
                 text = buildAnnotatedString {
                     append("With ")
                     withStyle(style = SpanStyle(color = Slime, fontFamily = titleFont, fontSize = 20.sp)) {
-                        append("Spot")
+                        append("Spot’s")
                     }
-                    append(" , all you need to do is point your mobile phone at any gym equipment, and instantly access necessary information — from proper usage instructions to targeted muscle groups and safety precautions!")
+                    append(" algorithm, all you need to do is provide your BMI to know what exercises best fit you!  ")
                 },
                 style = TextStyle(
                     fontFamily = captionFont,

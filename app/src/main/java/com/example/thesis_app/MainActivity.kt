@@ -26,13 +26,13 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun Navigation(startDestination: String = "first") {
+fun Navigation(startDestination: String = "second") {
     val navController = rememberNavController()
 
     NavHost(navController = navController, startDestination = startDestination) {
-        composable("first") {
-            splashScreen(navController)
-        }
+//        composable("first") {
+//            splashScreen(navController)
+//        }
         composable("second") {
             loadingScreen(navController)
         }
@@ -52,9 +52,36 @@ fun Navigation(startDestination: String = "first") {
             fourthPage(navController)
         }
 
-        composable("main") {
-            mainPage()
+        composable("signup") {
+            signupPage(navController)
         }
+
+        composable("login") {
+            loginPage(navController)
+        }
+
+        composable("welcome") {
+            Welcome(navController)
+        }
+
+        composable("bmi") {
+            BMIScreen(navController)
+        }
+
+        composable("sex") {
+            SexScreen(navController)
+        }
+
+        composable("main") {
+            mainPage(navController)
+        }
+
+        composable("workout/{equipmentName}") { backStackEntry ->
+            val equipmentName = backStackEntry.arguments?.getString("equipmentName")
+            Workout(equipmentName)
+        }
+
+
 
     }
 }
