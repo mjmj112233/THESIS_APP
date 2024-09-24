@@ -50,6 +50,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.example.thesis_app.ui.theme.Ash
 import com.example.thesis_app.ui.theme.BlueGreen
 import com.example.thesis_app.ui.theme.DarkGreen
@@ -58,10 +59,9 @@ import com.example.thesis_app.ui.theme.Slime
 import com.example.thesis_app.ui.theme.captionFont
 import com.example.thesis_app.ui.theme.titleFont
 
-@Preview
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Workout(equipmentName: String? = null) {
+fun Workout(navController: NavController, equipmentName: String? = null) {
     val categories = listOf("All", "Leg", "Chest", "Arm")
     var expanded by remember { mutableStateOf(false) }
     var selectedCategory by remember { mutableStateOf(categories[0]) }
@@ -240,7 +240,7 @@ fun Workout(equipmentName: String? = null) {
             contentAlignment = Alignment.BottomCenter
         ) {
             FloatingActionButton(
-                onClick = { /* Handle button click */ },
+                onClick = { navController.navigate("main") },
                 shape = CircleShape,
                 containerColor = DirtyWhite,
                 modifier = Modifier
@@ -258,6 +258,7 @@ fun Workout(equipmentName: String? = null) {
     }
 }
 
+/*
 @Composable
 fun WorkoutItem(workout: String) {
     Box(
@@ -266,7 +267,9 @@ fun WorkoutItem(workout: String) {
             .fillMaxWidth()
             .height(140.dp)
             .background(DirtyWhite, RoundedCornerShape(8.dp))
-            .clickable { /* Handle item click */ }
+            .clickable { */
+/* Handle item click *//*
+ }
             .padding(16.dp)
     ) {
         Text(
@@ -277,6 +280,7 @@ fun WorkoutItem(workout: String) {
         )
     }
 }
+*/
 
 
 

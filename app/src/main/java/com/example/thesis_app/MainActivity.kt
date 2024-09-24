@@ -68,8 +68,12 @@ fun Navigation(startDestination: String = "second") {
             BMIScreen(navController)
         }
 
-        composable("sex") {
-            SexScreen(navController)
+        composable("workoutType") {
+            workoutTypeScreen(navController)
+        }
+
+        composable("muscleGroup") {
+            muscleGroupScreen(navController)
         }
 
         composable("main") {
@@ -78,10 +82,8 @@ fun Navigation(startDestination: String = "second") {
 
         composable("workout/{equipmentName}") { backStackEntry ->
             val equipmentName = backStackEntry.arguments?.getString("equipmentName")
-            Workout(equipmentName)
+            Workout(navController, equipmentName)
         }
-
-
 
     }
 }

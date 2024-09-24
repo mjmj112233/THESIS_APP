@@ -13,17 +13,26 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -34,6 +43,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
@@ -50,13 +60,12 @@ import com.example.thesis_app.ui.theme.titleFont
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun mainPage(navController: NavController) {
-    // Define the equipment list with names and placeholder icons
-    val equipmentList = listOf(
-        Equipment("Dumbbell", R.drawable.weights),
-        Equipment("Exercise Bike", R.drawable.bike),
-        Equipment("Treadmill", R.drawable.treadmill),
-        Equipment("Bench Press", R.drawable.bench)
-    )
+    val equipmentList = listOf("Dumbbell", "Barbell", "Exercise Bike", "Lat Pull", "Chest Press", "Bench Press", "Leg Press", "Treadmill")
+    var expanded by remember { mutableStateOf(false) }
+    var selectedEquipment by remember { mutableStateOf(equipmentList[0]) }
+
+    // List of workouts
+    val workouts = listOf("Workout 1", "Workout 2", "Workout 3", "Workout 4")
 
     Box(modifier = Modifier.fillMaxSize()) {
         Scaffold(
@@ -95,39 +104,94 @@ fun mainPage(navController: NavController) {
                         .fillMaxSize()
                         .background(BlueGreen)
                         .padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
-                    contentAlignment = Alignment.TopCenter
+                    contentAlignment = Alignment.TopStart
                 ) {
-                    Box(
+                    Column(
                         modifier = Modifier
-                            .padding(top = 80.dp, start = 20.dp, end = 20.dp)
-                            .clip(RoundedCornerShape(30.dp))
-                            .background(DirtyWhite)
                             .fillMaxWidth()
-                            .height(40.dp),
-                        contentAlignment = Alignment.Center
+                            .padding(top = 60.dp)
                     ) {
-                        Text(
-                            text = "Recommended Equipment",
-                            fontFamily = titleFont,
-                            textAlign = TextAlign.Center,
-                            color = DarkGreen,
-                            fontSize = 20.sp
-                        )
-                    }
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(bottom = 16.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            // Equipment Dropdown
+                            ExposedDropdownMenuBox(
+                                expanded = expanded,
+                                onExpandedChange = { expanded = !expanded }
+                            ) {
+                                TextField(
+                                    readOnly = true,
+                                    value = selectedEquipment,
+                                    onValueChange = { },
 
-                    // Display equipment icons and labels in a grid
-                    LazyVerticalGrid(
-                        columns = GridCells.Fixed(2), // Set the number of columns
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(top = 160.dp) // Adjust padding as needed
-                    ) {
-                        items(equipmentList) { equipment ->
-                            EquipmentItem(equipment, navController)
+                                    modifier = Modifier
+                                        .menuAnchor()
+                                        .clip(RoundedCornerShape(8.dp))
+                                        .height(40.dp)
+                                        .width(150.dp) // Adjust width as needed
+                                        .wrapContentHeight(),
+
+                                    textStyle = TextStyle(
+                                        fontFamily = titleFont,
+                                        color = DarkGreen,
+                                        fontSize = 16.sp
+                                    ),
+
+                                    colors = TextFieldDefaults.textFieldColors(
+                                        containerColor = Slime
+                                    ),
+
+                                    trailingIcon = {
+                                        Icon(Icons.Filled.ArrowDropDown, contentDescription = null)
+                                    }
+                                )
+
+                                ExposedDropdownMenu(
+                                    expanded = expanded,
+                                    onDismissRequest = { expanded = false }
+                                ) {
+                                    equipmentList.forEach { equipment ->
+                                        DropdownMenuItem(
+                                            text = {
+                                                Text(
+                                                    text = equipment,
+                                                    fontFamily = titleFont,
+                                                    color = DarkGreen,
+                                                    modifier = Modifier
+                                                        .padding(vertical = 8.dp) // Adjust vertical padding as needed
+                                                        .wrapContentHeight()
+                                                )
+                                            },
+                                            onClick = {
+                                                selectedEquipment = equipment
+                                                expanded = false
+                                            },
+                                            modifier = Modifier
+                                                .background(Slime)
+                                                .height(200.dp) // Increase height here
+                                                .wrapContentHeight()
+                                        )
+                                    }
+                                }
+
+                            }
+                        }
+
+                        // Display workouts in a LazyColumn
+                        LazyColumn(
+                            modifier = Modifier.fillMaxSize(),
+                            contentPadding = PaddingValues(bottom = 100.dp) // Add bottom padding to avoid overlap with FAB
+                        ) {
+                            items(workouts) { workout ->
+                                WorkoutItem(workout)
+                            }
                         }
                     }
                 }
-
             },
 
             bottomBar = {
@@ -138,6 +202,7 @@ fun mainPage(navController: NavController) {
             }
         )
 
+        // Logo and FloatingActionButton
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -163,9 +228,9 @@ fun mainPage(navController: NavController) {
 
         Box(
             modifier = Modifier
-                .fillMaxSize() // Use fillMaxSize to ensure it takes the whole screen space
-                .padding(bottom = 16.dp), // Add some padding to ensure it is not too close to the edge
-            contentAlignment = Alignment.BottomCenter // Align content to the bottom center
+                .fillMaxSize()
+                .padding(bottom = 16.dp),
+            contentAlignment = Alignment.BottomCenter
         ) {
             FloatingActionButton(
                 onClick = { /* Handle button click */ },
@@ -183,73 +248,9 @@ fun mainPage(navController: NavController) {
                 )
             }
         }
-
-
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .offset(y = (-130).dp)
-                .align(Alignment.BottomCenter)
-                .padding(start = 110.dp)
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(50.dp)
-                    .clip(shape = RoundedCornerShape(50.dp))
-                    .background(DirtyWhite)
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.spot_avatar),
-                    contentDescription = "Spot Logo",
-                    modifier = Modifier
-                        .size(30.dp)
-                        .align(Alignment.Center)
-                )
-            }
-        }
     }
 }
 
-// Data class for equipment items
-data class Equipment(val name: String, val iconRes: Int)
-
-@Composable
-fun EquipmentItem(equipment: Equipment, navController: NavController) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .padding(start = 40.dp, end = 40.dp, bottom = 16.dp, top = 16.dp)
-            .fillMaxWidth()
-    ) {
-        Box(
-            modifier = Modifier
-                .size(100.dp)
-                .clip(CircleShape)
-                .background(Slime)
-                .padding(8.dp)
-                .clickable(onClick = {navController.navigate("workout/${equipment.name}")}),
-            contentAlignment = Alignment.Center
-        ) {
-            Image(
-                painter = painterResource(id = equipment.iconRes),
-                contentDescription = equipment.name,
-                modifier = Modifier
-                    .size(80.dp) // Set size to 64x64 dp to fit within the circle
-                    .clip(CircleShape) // Ensure image is clipped to the circle
-                    .background(DirtyWhite), // Optional: background color if needed
-                contentScale = ContentScale.Crop // Ensure image scales properly
-            )
-        }
-        Spacer(modifier = Modifier.height(16.dp))
-        Text(
-            text = equipment.name,
-            fontSize = 16.sp,
-            fontFamily = titleFont,
-            color = DirtyWhite,
-            textAlign = TextAlign.Center
-        )
-    }
-}
 
 
 @Composable
@@ -292,6 +293,26 @@ fun ClickableContainer(
                 content()
             }
         }
+    }
+}
+
+@Composable
+fun WorkoutItem(workout: String) {
+    Box(
+        modifier = Modifier
+            .padding(vertical = 10.dp)
+            .fillMaxWidth()
+            .height(140.dp)
+            .background(Slime, RoundedCornerShape(8.dp))
+            .clickable { /* Handle item click */ }
+            .padding(16.dp)
+    ) {
+        Text(
+            text = workout,
+            fontFamily = titleFont,
+            fontSize = 16.sp,
+            color = DarkGreen
+        )
     }
 }
 

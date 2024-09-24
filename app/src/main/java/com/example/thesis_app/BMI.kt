@@ -5,16 +5,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.ClickableText
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Text
-import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.runtime.Composable
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -30,21 +22,18 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.thesis_app.ui.theme.Blackk
-import com.example.thesis_app.ui.theme.BlueGreen
-import com.example.thesis_app.ui.theme.DarkGreen
-import com.example.thesis_app.ui.theme.DirtyWhite
-import com.example.thesis_app.ui.theme.Slime
-import com.example.thesis_app.ui.theme.alt
-import com.example.thesis_app.ui.theme.captionFont
-import com.example.thesis_app.ui.theme.titleFont
+import com.example.thesis_app.ui.theme.*
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BMIScreen(navController: NavController) {
-    val weightLevel = "Obese"
+    var heightInput by remember { mutableStateOf("") }
+    var weightInput by remember { mutableStateOf("") }
+    var bmiResult by remember { mutableStateOf("") }
+    var isBmiCalculated by remember { mutableStateOf(false) }
 
-    // Image
+    // Image Background
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -53,29 +42,24 @@ fun BMIScreen(navController: NavController) {
         Image(
             painter = painterResource(id = R.drawable.body2),
             contentDescription = "body",
-            contentScale = ContentScale.Fit,  // Maintain aspect ratio, without stretching
+            contentScale = ContentScale.Fit,
             modifier = Modifier
-                .size(800.dp) // Keep the size at least 700.dp
-                .offset(x = (-60.dp), y = (130).dp)
+                .size(800.dp)
+                .offset(x = (-60).dp, y = (130).dp)
         )
     }
 
-    // Header
+    // Header with Circle Logo
     Box(
         modifier = Modifier
             .padding(start = 30.dp, end = 30.dp, top = 40.dp)
     ) {
         Box(
-            contentAlignment = Alignment.CenterStart, // Align circle to the start of the Box
-            modifier = Modifier
-                .fillMaxWidth()
+            contentAlignment = Alignment.CenterStart,
+            modifier = Modifier.fillMaxWidth()
         ) {
-
-            Box(
-                modifier = Modifier
-                    .padding(start = 20.dp)
-            ) {
-                // Text container
+            Box(modifier = Modifier.padding(start = 20.dp)) {
+                // Text Container
                 Box(
                     contentAlignment = Alignment.Center,
                     modifier = Modifier
@@ -95,235 +79,147 @@ fun BMIScreen(navController: NavController) {
                 }
             }
 
-            // Circle
+            // Circle Logo
             Box(
                 modifier = Modifier
-                    .size(100.dp) // Set the size of the circle
-                    .clip(shape = RoundedCornerShape(50.dp)) // Make it circular
-                    .background(Slime) // Same background color as the text container
-                    .align(Alignment.CenterStart) // Align circle to the start
+                    .size(100.dp)
+                    .clip(shape = RoundedCornerShape(50.dp))
+                    .background(Slime)
+                    .align(Alignment.CenterStart)
             ) {
                 Image(
-                    painter = painterResource(id = R.drawable.spot_logo_white), // Replace with your image resource
+                    painter = painterResource(id = R.drawable.spot_logo_white),
                     contentDescription = "Logo",
-                    contentScale = ContentScale.Fit, // Ensures the image fits within the circle
+                    contentScale = ContentScale.Fit,
                     modifier = Modifier
-                        .size(70.dp) // Make the image smaller
+                        .size(70.dp)
                         .align(Alignment.Center)
                 )
             }
         }
     }
 
-    // Input fields
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-    ) {
+    // Input Fields for Height and Weight
+    Box(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
-                .padding(start = 40.dp, bottom = 390.dp)
+                .padding(start = 40.dp, top = 200.dp, end = 40.dp, bottom = 100.dp)
                 .fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            // Label height
-            Box(modifier = Modifier
-                .offset(y = (105).dp)) {
+            Box(
+                modifier = Modifier
+                    .offset(y =(-72).dp, x = 24.dp)
+            ){
+                // Height Input
+                InputField(
+                    label = "Height (cm)",
+                    inputValue = heightInput,
+                    onInputChange = { heightInput = it },
+
+                    )
+            }
+
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            Box(
+                modifier = Modifier
+                    .offset(x = 80.dp, y = (-40).dp)
+            ){
+                InputField(
+                    label = "Weight (kg)",
+                    inputValue = weightInput,
+                    onInputChange = { weightInput = it }
+                )
+            }
+            
+
+            Spacer(modifier = Modifier.height(40.dp))
+
+            if (!isBmiCalculated) {
+                // Calculate Button
+                Button(
+                    onClick = {
+                        val height = heightInput.trim().toFloatOrNull()?.div(100) // Convert cm to meters
+                        val weight = weightInput.trim().toFloatOrNull()
+
+                        if (height != null && weight != null && height > 0) {
+                            val bmi = weight / (height * height)
+                            bmiResult = String.format("%.2f", bmi)
+                            isBmiCalculated = true
+                        } else {
+                            println("Invalid input. Height: $height, Weight: $weight")
+                        }
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Slime
+                    ),
+                    modifier = Modifier
+                        .height(56.dp)
+                        .fillMaxWidth()
+                        .clip(CircleShape)
+                ) {
+                    Text(
+                        text = "Calculate",
+                        style = TextStyle(fontSize = 20.sp, color = DirtyWhite, fontFamily = titleFont),
+                        textAlign = TextAlign.Center
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                /*Box(
+                    modifier = Modifier
+                        .background(Slime)
+                        .padding(20.dp)
+                ){
+                    Text(
+                        text = "Re-calculate your BMI.",
+                        style = TextStyle(fontSize = 16.sp, color = DirtyWhite, fontFamily = alt),
+                        modifier = Modifier
+
+                    )
+                }*/
+
+
+            } else {
+                // BMI Result Display
                 Box(
-                    contentAlignment = Alignment.Center,
                     modifier = Modifier
                         .clip(shape = CircleShape)
                         .background(Slime)
-                        .height(33.dp)
-                        .width(155.dp)
+                        .height(56.dp)
+                        .fillMaxWidth(),
+                    contentAlignment = Alignment.Center
                 ) {
                     Text(
                         text = buildAnnotatedString {
-                            append("Height")
-                            withStyle(style = SpanStyle(fontFamily = alt)) {
-                                append(" (")
-                            }
-                            append("m")
-                            withStyle(style = SpanStyle(fontFamily = alt)) {
-                                append(")")
+                            append("Your BMI is ")
+                            withStyle(style = SpanStyle(color = DirtyWhite, fontFamily = alt)) {
+                                append(bmiResult)
                             }
                         },
-                        color = DirtyWhite,
-                        style = TextStyle(fontFamily = titleFont, fontSize = 15.sp),
+                        style = TextStyle(fontSize = 20.sp, color = DarkGreen, fontFamily = alt),
                         textAlign = TextAlign.Center
                     )
                 }
-            }
 
-            // Input height
-            Box(
-                modifier = Modifier
-                    .clip(CircleShape) // Clip to a circle
-                    .background(DirtyWhite) // Set background color
-                    .height(75.dp)
-                    .width(75.dp) // Increased width to accommodate the "m" beside the input field
-                    .padding(8.dp) // Add padding inside the Box
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(horizontal = 8.dp, vertical = 10.dp),
-                    verticalAlignment = Alignment.CenterVertically, // Align items vertically
-                    horizontalArrangement = Arrangement.Center // Center items horizontally
-                ) {
-                    // Input field for height
-                    TextField(
-                        value = "",
-                        onValueChange = {},
-                        modifier = Modifier
-                            .width(20.dp) // Shorten width to fit in the circle
-                            .height(30.dp)
-                            .offset(y = (-10).dp),
-                        textStyle = TextStyle(fontSize = 18.sp, color = DarkGreen), // Text color and size
-                        colors = TextFieldDefaults.textFieldColors(
-                            containerColor = Color.Transparent, // Transparent background for TextField
-                            focusedIndicatorColor = BlueGreen,  // Color when focused
-                            unfocusedIndicatorColor = BlueGreen // Color when not focused
-                        )
-                    )
 
-                    // Text beside the input field
-                    Text(
-                        text = "m",
-                        style = TextStyle(fontSize = 15.sp, color = DarkGreen, fontFamily = titleFont), // Font size and color for the "m"
-                        modifier = Modifier.padding(start = 4.dp) // Small padding between the input and "m"
-                    )
-                }
             }
         }
 
-        // Weight input
-        Column(
-            modifier = Modifier
-                .padding(start = 180.dp, bottom = 50.dp)
-                .fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            // Label weight
-            Box(modifier = Modifier
-                .offset(y = (105).dp)) {
-                Box(
-                    contentAlignment = Alignment.Center,
-                    modifier = Modifier
-                        .clip(shape = CircleShape)
-                        .background(Slime)
-                        .height(33.dp)
-                        .width(155.dp)
-                ) {
-                    Text(
-                        text = buildAnnotatedString {
-                            append("Weight")
-                            withStyle(style = SpanStyle(fontFamily = alt)) {
-                                append(" (")
-                            }
-                            append("kg")
-                            withStyle(style = SpanStyle(fontFamily = alt)) {
-                                append(")")
-                            }
-                        },
-                        color = DirtyWhite,
-                        style = TextStyle(fontFamily = titleFont, fontSize = 15.sp),
-                        textAlign = TextAlign.Center
-                    )
-                }
-            }
-
-            // Input weight
-            Box(
-                modifier = Modifier
-                    .clip(CircleShape) // Clip to a circle
-                    .background(DirtyWhite) // Set background color
-                    .height(75.dp)
-                    .width(75.dp) // Increased width to accommodate the "kg" beside the input field
-                    .padding(8.dp) // Add padding inside the Box
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(horizontal = 8.dp, vertical = 10.dp)
-                        .offset(x = (0).dp), // Adjust padding as needed
-                    verticalAlignment = Alignment.CenterVertically, // Align items vertically
-                    horizontalArrangement = Arrangement.Center // Center items horizontally
-                ) {
-                    // Input field for weight
-                    TextField(
-                        value = "",
-                        onValueChange = {},
-                        modifier = Modifier
-                            .width(20.dp) // Shorten width to fit in the circle
-                            .height(30.dp)
-                            .offset(y = (-10).dp),
-                        textStyle = TextStyle(fontSize = 18.sp, color = DarkGreen), // Text color and size
-                        colors = TextFieldDefaults.textFieldColors(
-                            containerColor = Color.Transparent, // Transparent background for TextField
-                            focusedIndicatorColor = BlueGreen,  // Color when focused
-                            unfocusedIndicatorColor = BlueGreen // Color when not focused
-                        )
-                    )
-
-                    // Text beside the input field
-                    Text(
-                        text = "kg",
-                        style = TextStyle(fontSize = 15.sp, color = DarkGreen, fontFamily = titleFont), // Font size and color for the "kg"
-                        modifier = Modifier.padding(start = 4.dp) // Small padding between the input and "kg"
-                    )
-                }
-            }
-        }
-
-        // Display result
-        Column(
-            modifier = Modifier
-                .padding(bottom = 180.dp, start = 20.dp, end = 20.dp)
-                .fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Bottom
-        ) {
-            // Result text
-            Box(
-                modifier = Modifier
-                    .clip(shape = CircleShape)
-                    .background(Slime)
-                    .height(56.dp)
-                    .width(300.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(horizontal = 8.dp, vertical = 10.dp),
-                    verticalAlignment = Alignment.CenterVertically, // Align items vertically
-                    horizontalArrangement = Arrangement.Center // Center items horizontally
-                ) {
-                    Text(
-                        text = buildAnnotatedString {
-                            append("You are ")
-                            withStyle(style = SpanStyle(color = DirtyWhite)) {
-                                append("$weightLevel")
-                            }
-                        },
-                        style = TextStyle(fontSize = 20.sp, color = DarkGreen, fontFamily = titleFont),
-                        textAlign = TextAlign.Center
-                    )
-                }
-            }
-        }
-
+        Spacer(modifier = Modifier.height(32.dp))
+        // Floating Action Button to proceed to the next screen
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(bottom = 60.dp), // Adjusted padding to position the FAB below the result text
+                .padding(bottom = 60.dp),
             contentAlignment = Alignment.BottomCenter
         ) {
             FloatingActionButton(
-                onClick = { navController.navigate("sex") },
+                onClick = { navController.navigate("workoutType") },
                 containerColor = Slime,
                 contentColor = DarkGreen,
                 modifier = Modifier.size(60.dp)
@@ -336,3 +232,59 @@ fun BMIScreen(navController: NavController) {
         }
     }
 }
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun InputField(label: String, inputValue: String, onInputChange: (String) -> Unit) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+
+        // Input Box (Increased size)
+        Box(
+            modifier = Modifier
+                .clip(CircleShape)
+                .background(DirtyWhite)
+                .height(120.dp) // Increased height
+                .width(120.dp) // Increased width
+                .padding(8.dp)
+        ) {
+            TextField(
+                value = inputValue,
+                onValueChange = onInputChange,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 8.dp), // Reduced vertical padding to give more space for text
+                textStyle = TextStyle(fontSize = 18.sp, color = DarkGreen, fontFamily = titleFont),
+                maxLines = 1, // Ensure it stays as a single line
+                singleLine = true, // Ensure it's a single line input
+                colors = TextFieldDefaults.textFieldColors(
+                    containerColor = Color.Transparent,
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent
+                )
+            )
+        }
+
+        Spacer(modifier = Modifier.height(10.dp))
+
+        // Label Box
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier
+                .clip(CircleShape)
+                .background(Slime)
+                .height(33.dp)
+                .width(140.dp)
+        ) {
+            Text(
+                text = label,
+                color = DirtyWhite,
+                style = TextStyle(fontFamily = alt, fontSize = 15.sp),
+                textAlign = TextAlign.Center
+            )
+        }
+
+
+    }
+}
+
+
