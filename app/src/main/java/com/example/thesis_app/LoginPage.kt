@@ -70,6 +70,7 @@ fun loginPage(navController: NavController) {
                     // State for text field values and focus
                     var username by remember { mutableStateOf("") }
                     var password by remember { mutableStateOf("") }
+                    var showError by remember { mutableStateOf(false) } // State to control error message visibility
                     var isUsernameFocused by remember { mutableStateOf(false) }
                     var isPasswordFocused by remember { mutableStateOf(false) }
                     val usernameFocusRequester = remember { FocusRequester() }
@@ -98,7 +99,8 @@ fun loginPage(navController: NavController) {
                         // Username TextField with animated label
                         TextField(
                             value = username,
-                            onValueChange = { newValue -> username = newValue },
+                            onValueChange = { newValue -> username = newValue
+                                showError = false },
                             label = {
                                 val labelOffset by animateDpAsState(if (isUsernameFocused || username.isNotEmpty()) 16.dp else 0.dp)
                                 val labelFontSize by animateFloatAsState(if (isUsernameFocused || username.isNotEmpty()) 10f else 16f)
@@ -135,7 +137,8 @@ fun loginPage(navController: NavController) {
                         // Password TextField with animated label and password masking
                         TextField(
                             value = password,
-                            onValueChange = { newValue -> password = newValue },
+                            onValueChange = { newValue -> password = newValue
+                                showError = false },
                             label = {
                                 val labelOffset by animateDpAsState(if (isPasswordFocused || password.isNotEmpty()) 16.dp else 0.dp)
                                 val labelFontSize by animateFloatAsState(if (isPasswordFocused || password.isNotEmpty()) 10f else 16f)
@@ -168,6 +171,17 @@ fun loginPage(navController: NavController) {
                                 .onFocusChanged { focusState -> isPasswordFocused = focusState.isFocused }
                         )
 
+                        if (showError) {
+                            Text(
+                                text = "Please enter both username and password",
+                                color = Color.Red,
+                                fontSize = 14.sp,
+                                modifier = Modifier
+                                    .align(Alignment.CenterHorizontally)
+                                    .padding(top = 8.dp)
+                            )
+                        }
+
                         Box(
                             modifier = Modifier
                                 .height(160.dp),
@@ -178,7 +192,14 @@ fun loginPage(navController: NavController) {
                                 verticalArrangement = Arrangement.Center
                             ) {
                                 Button(
-                                    onClick = { navController.navigate("main") },
+                                    onClick = {
+                                        if (username.isEmpty() || password.isEmpty()) {
+                                        showError = true // Show error if either field is empty
+                                    } else {
+                                        showError = false // Hide error if fields are filled
+                                        navController.navigate("main")
+                                    }
+                                    },
                                     colors = ButtonDefaults.buttonColors(Slime),
                                     modifier = Modifier
                                         .padding(start = 0.dp, bottom = 10.dp, end = 0.dp)

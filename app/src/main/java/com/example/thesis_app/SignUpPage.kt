@@ -63,7 +63,9 @@ fun signupPage(navController: NavController) {
                     // State for text field values
                     var username by remember { mutableStateOf("") }
                     var password by remember { mutableStateOf("") }
-                    var confirmPassword by remember { mutableStateOf("") }
+                    var confirmPassword by remember { mutableStateOf("")}
+                    var errorMessage by remember { mutableStateOf("") } // State for specific error messages
+
 
                     Column(
                         modifier = Modifier
@@ -86,7 +88,8 @@ fun signupPage(navController: NavController) {
                         AnimatedTextField(
                             label = "Username",
                             value = username,
-                            onValueChange = { username = it }
+                            onValueChange = { username = it
+                                errorMessage = "" }
                         )
 
                         Spacer(modifier = Modifier.height(17.dp))
@@ -95,7 +98,8 @@ fun signupPage(navController: NavController) {
                         AnimatedTextField(
                             label = "Password",
                             value = password,
-                            onValueChange = { password = it }
+                            onValueChange = { password = it
+                                errorMessage = "" }
                         )
 
                         Spacer(modifier = Modifier.height(17.dp))
@@ -104,10 +108,24 @@ fun signupPage(navController: NavController) {
                         AnimatedTextField(
                             label = "Confirm Password",
                             value = confirmPassword,
-                            onValueChange = { confirmPassword = it }
+                            onValueChange = { confirmPassword = it
+                                errorMessage = "" }
                         )
 
                         Spacer(modifier = Modifier.height(20.dp))
+
+                        // Display the error message if not empty
+                        if (errorMessage.isNotEmpty()) {
+                            Text(
+                                text = errorMessage,  // Display the dynamic error message
+                                color = Color.Red,
+                                fontSize = 14.sp,
+                                modifier = Modifier
+                                    .align(Alignment.CenterHorizontally)
+                                    .padding(top = 8.dp)
+                            )
+                        }
+
 
                         // FloatingActionButton and login text
                         Box(
@@ -119,8 +137,22 @@ fun signupPage(navController: NavController) {
                                 horizontalAlignment = Alignment.CenterHorizontally,
                                 verticalArrangement = Arrangement.Center
                             ) {
-                                FloatingActionButton(
-                                    onClick = { navController.navigate("welcome") },
+                                FloatingActionButton( onClick =
+                                {
+                                    if (username.isEmpty()) {
+                                    errorMessage = "Username cannot be empty"
+
+                                } else if (password.isEmpty() || confirmPassword.isEmpty()) {
+                                    errorMessage = "Password fields cannot be empty"
+
+                                } else if (password != confirmPassword) {
+                                    errorMessage = "Passwords do not match"
+
+                                } else {
+                                    // Navigate only if there are no validation errors
+                                    navController.navigate("welcome")
+                                }
+                                },
                                     containerColor = Slime,
                                     contentColor = DarkGreen,
                                     modifier = Modifier.size(60.dp)
@@ -153,7 +185,8 @@ fun signupPage(navController: NavController) {
                                                 append("Login here.")
                                             }
                                         },
-                                        onClick = { navController.navigate("login") },
+                                        onClick = {navController.navigate("login")
+                                        },
                                         style = TextStyle(
                                             fontFamily = titleFont,
                                             fontSize = 13.sp
@@ -199,7 +232,7 @@ fun AnimatedTextField(
     var isFocused by remember { mutableStateOf(false) }
     val isLabelSmall = isFocused || value.isNotEmpty()
     val focusRequester = remember { FocusRequester() }
-
+    var showError by remember { mutableStateOf(false) }
     // Animated properties for label based on focus or if text is present
     val labelOffset by animateDpAsState(if (isLabelSmall) 16.dp else 0.dp)
     val labelFontSize by animateFloatAsState(if (isLabelSmall) 10f else 16f)
@@ -208,6 +241,7 @@ fun AnimatedTextField(
         value = value,
         onValueChange = { newValue ->
             onValueChange(newValue)
+            showError = false
         },
         label = {
             // Animated label
