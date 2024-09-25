@@ -89,6 +89,28 @@ fun muscleGroupScreen(navController: NavController) {
                             .align(Alignment.Center)
                     )
                 }
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 95.dp, start = 80.dp, ), // Adjust spacing above the circles
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    repeat(6) {
+                        Box(
+                            modifier = Modifier
+                                .padding(horizontal = 3.dp) // Space between circles
+                        ){
+
+                        }
+                        Box(
+                            modifier = Modifier
+                                .width(30.dp) // Adjust the size for smaller circles
+                                .height(4.dp)
+                                .background(if (it == 1) Slime else DirtyWhite) // Highlight first circle
+                        )
+                    }
+                }
             }
         }
 
@@ -120,7 +142,7 @@ fun muscleGroupScreen(navController: NavController) {
                         contentAlignment = Alignment.Center
                     ) {
                         Image(
-                            painter = painterResource(id = R.drawable.upper),
+                            painter = painterResource(id = R.drawable.upper2),
                             contentDescription = null,
                             modifier = Modifier
                                 .size(80.dp) // Set size to fit within the circle
@@ -192,14 +214,14 @@ fun muscleGroupScreen(navController: NavController) {
         ) {
             // Button
             Button(
-                onClick = { navController.navigate("main") },
+                onClick = { navController.navigate("pushup") },
                 colors = ButtonDefaults.buttonColors(Slime),
                 modifier = Modifier
                     .padding(start = 40.dp, bottom = 50.dp, end = 40.dp)
                     .fillMaxWidth()
             ) {
                 Text(
-                    text = "Finish",
+                    text = "Next",
                     color = DarkGreen,
                     fontFamily = titleFont,
                     fontSize = 28.sp

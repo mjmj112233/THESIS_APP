@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -35,6 +36,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
@@ -54,18 +56,29 @@ import com.example.thesis_app.ui.theme.BlueGreen
 import com.example.thesis_app.ui.theme.DarkGreen
 import com.example.thesis_app.ui.theme.DirtyWhite
 import com.example.thesis_app.ui.theme.Slime
+import com.example.thesis_app.ui.theme.alt
 import com.example.thesis_app.ui.theme.captionFont
 import com.example.thesis_app.ui.theme.titleFont
 
+data class WorkoutDay(val day: String, val workouts: List<String>?, val isRestDay: Boolean)
+
+@Preview
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun mainPage(navController: NavController) {
-    val equipmentList = listOf("Dumbbell", "Barbell", "Exercise Bike", "Lat Pull", "Chest Press", "Bench Press", "Leg Press", "Treadmill")
-    var expanded by remember { mutableStateOf(false) }
-    var selectedEquipment by remember { mutableStateOf(equipmentList[0]) }
-
+fun mainPage() {
     // List of workouts
+
     val workouts = listOf("Workout 1", "Workout 2", "Workout 3", "Workout 4")
+    val workoutDays = listOf(
+        WorkoutDay("DAY 1", listOf("Workout 1", "Workout 2", "Workout 3", "Workout 4"), false),
+        WorkoutDay("DAY 2", null, true), // Rest day
+        WorkoutDay("DAY 3", listOf("Workout 1", "Workout 2", "Workout 3", "Workout 4"), false),
+        WorkoutDay("DAY 4", null, true), // Rest day
+        WorkoutDay("DAY 5", listOf("Workout 1", "Workout 2", "Workout 3", "Workout 4"), false),
+        WorkoutDay("DAY 6", listOf("Workout 1", "Workout 2", "Workout 3", "Workout 4"), false),
+        WorkoutDay("DAY 7", null, true) // Rest day
+    )
+
 
     Box(modifier = Modifier.fillMaxSize()) {
         Scaffold(
@@ -81,7 +94,7 @@ fun mainPage(navController: NavController) {
                             .padding(horizontal = 16.dp)
                             .fillMaxWidth()
                             .height(80.dp)
-                    ){
+                    ) {
                         Spacer(modifier = Modifier.weight(1f))
                         Icon(
                             painter = painterResource(R.drawable.menu),
@@ -96,104 +109,35 @@ fun mainPage(navController: NavController) {
                     }
                 }
             },
-
             content = { innerPadding ->
                 Box(
                     modifier = Modifier
                         .padding(innerPadding)
                         .fillMaxSize()
                         .background(BlueGreen)
-                        .padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
+                        .padding(start = 32.dp, end = 32.dp, bottom = 28.dp),
                     contentAlignment = Alignment.TopStart
                 ) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 60.dp)
+
+                    LazyColumn(modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 100.dp)
                     ) {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(bottom = 16.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            // Equipment Dropdown
-                            ExposedDropdownMenuBox(
-                                expanded = expanded,
-                                onExpandedChange = { expanded = !expanded }
-                            ) {
-                                TextField(
-                                    readOnly = true,
-                                    value = selectedEquipment,
-                                    onValueChange = { },
-
-                                    modifier = Modifier
-                                        .menuAnchor()
-                                        .clip(RoundedCornerShape(8.dp))
-                                        .height(40.dp)
-                                        .width(150.dp) // Adjust width as needed
-                                        .wrapContentHeight(),
-
-                                    textStyle = TextStyle(
-                                        fontFamily = titleFont,
-                                        color = DarkGreen,
-                                        fontSize = 16.sp
-                                    ),
-
-                                    colors = TextFieldDefaults.textFieldColors(
-                                        containerColor = Slime
-                                    ),
-
-                                    trailingIcon = {
-                                        Icon(Icons.Filled.ArrowDropDown, contentDescription = null)
-                                    }
-                                )
-
-                                ExposedDropdownMenu(
-                                    expanded = expanded,
-                                    onDismissRequest = { expanded = false }
-                                ) {
-                                    equipmentList.forEach { equipment ->
-                                        DropdownMenuItem(
-                                            text = {
-                                                Text(
-                                                    text = equipment,
-                                                    fontFamily = titleFont,
-                                                    color = DarkGreen,
-                                                    modifier = Modifier
-                                                        .padding(vertical = 8.dp) // Adjust vertical padding as needed
-                                                        .wrapContentHeight()
-                                                )
-                                            },
-                                            onClick = {
-                                                selectedEquipment = equipment
-                                                expanded = false
-                                            },
-                                            modifier = Modifier
-                                                .background(Slime)
-                                                .height(200.dp) // Increase height here
-                                                .wrapContentHeight()
-                                        )
-                                    }
-                                }
-
-                            }
-                        }
-
-                        // Display workouts in a LazyColumn
-                        LazyColumn(
-                            modifier = Modifier.fillMaxSize(),
-                            contentPadding = PaddingValues(bottom = 100.dp) // Add bottom padding to avoid overlap with FAB
-                        ) {
-                            items(workouts) { workout ->
-                                WorkoutItem(workout)
-                            }
+                        items(workoutDays) { workoutDay ->
+                            daysContainer(workoutDay = workoutDay, containerOpacity = 0.2f)
                         }
                     }
+
+
+
+                    Text(
+                        text = "Your Personalized Workout Routine",
+                        color = DirtyWhite,
+                        style = TextStyle(fontFamily = titleFont, fontSize = 20.sp),
+                        modifier = Modifier.padding(top = 60.dp)
+                    )
                 }
             },
-
             bottomBar = {
                 BottomAppBar(
                     containerColor = Slime,
@@ -213,7 +157,7 @@ fun mainPage(navController: NavController) {
             Box(
                 modifier = Modifier
                     .size(100.dp)
-                    .clip(shape = RoundedCornerShape(50.dp))
+                    .clip(RoundedCornerShape(50.dp))
                     .background(BlueGreen)
             ) {
                 Image(
@@ -238,7 +182,7 @@ fun mainPage(navController: NavController) {
                 containerColor = DirtyWhite,
                 modifier = Modifier
                     .size(100.dp)
-                    .offset(y = (-20).dp) // Adjust this offset to move it up or down as needed
+                    .offset(y = (-20).dp)
             ) {
                 Icon(
                     painter = painterResource(R.drawable.scan),
@@ -251,8 +195,6 @@ fun mainPage(navController: NavController) {
     }
 }
 
-
-
 @Composable
 fun ClickableContainer(
     backgroundImage: Painter,
@@ -264,18 +206,16 @@ fun ClickableContainer(
         modifier = Modifier
             .fillMaxWidth()
             .height(200.dp)
-            .clip(shape = androidx.compose.foundation.shape.RoundedCornerShape(cornerRadius))
+            .clip(RoundedCornerShape(cornerRadius))
             .clickable(onClick = onClick)
     ) {
-        Box(
-            modifier = Modifier.fillMaxSize()
-        ) {
+        Box(modifier = Modifier.fillMaxSize()) {
             Image(
                 painter = backgroundImage,
                 contentDescription = null,
                 modifier = Modifier.fillMaxSize(),
                 alignment = Alignment.Center,
-                contentScale = androidx.compose.ui.layout.ContentScale.Crop
+                contentScale = ContentScale.Crop
             )
             Box(
                 modifier = Modifier
@@ -297,22 +237,111 @@ fun ClickableContainer(
 }
 
 @Composable
-fun WorkoutItem(workout: String) {
+fun daysContainer(workoutDay: WorkoutDay, containerOpacity: Float = 1f) {
     Box(
         modifier = Modifier
             .padding(vertical = 10.dp)
             .fillMaxWidth()
-            .height(140.dp)
-            .background(Slime, RoundedCornerShape(8.dp))
+            .height(250.dp) // Adjusted height for horizontal scrolling
+            .background(DirtyWhite.copy(alpha = containerOpacity), RoundedCornerShape(8.dp))
             .clickable { /* Handle item click */ }
             .padding(16.dp)
     ) {
+        Column {
+            // Header for the day
+            Box(
+                modifier = Modifier
+                    .clip(shape = RoundedCornerShape(12.dp))
+                    .background(Slime)
+                    .width(75.dp)
+                    .padding(horizontal = 12.dp, vertical = 8.dp)
+            ) {
+                Text(
+                    text = workoutDay.day,
+                    fontFamily = alt,
+                    fontSize = 16.sp,
+                    color = DarkGreen
+                )
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            if (workoutDay.isRestDay) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 48.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "Rest Day",
+                        fontFamily = alt,
+                        fontSize = 32.sp,
+                        color = DirtyWhite,
+                    )
+                }
+            } else {
+                // Workouts displayed in a horizontal scrollable row
+                LazyRow(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentPadding = PaddingValues(horizontal = 0.dp)
+                ) {
+                    workoutDay.workouts?.let { workouts ->
+                        items(workouts) { workout ->
+                            workoutBox(workout, containerOpacity = 0.3f)
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+
+@Composable
+fun workoutBox(workout: String, containerOpacity: Float = 1f) {
+    Box(
+        modifier = Modifier
+            .padding(8.dp)
+            .clip(RoundedCornerShape(12.dp))
+            .background(DirtyWhite.copy(alpha = containerOpacity), RoundedCornerShape(8.dp))
+            .width(100.dp)
+            .height(200.dp)
+            .clickable { /* Handle workout click */ }
+            .padding(12.dp)
+    ) {
+        // Center the icon in the box
+        Box(
+            modifier = Modifier
+                .align(Alignment.TopCenter) // Position the icon at the top center
+                .clip(shape = CircleShape)
+                .background(BlueGreen)
+                .height(80.dp)
+                .width(80.dp)
+        ) {
+            Icon(
+                painter = painterResource(R.drawable.baseline_directions_run_24),
+                contentDescription = null,
+                modifier = Modifier
+                    .size(60.dp)
+                    .align(Alignment.Center),
+                tint = Slime
+            )
+        }
         Text(
             text = workout,
-            fontFamily = titleFont,
-            fontSize = 16.sp,
-            color = DarkGreen
+            fontFamily = alt,
+            fontSize = 12.sp,
+            color = Color.White,
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(bottom = 20.dp)
         )
     }
 }
+
+
+
+
 

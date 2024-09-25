@@ -68,16 +68,28 @@ fun Navigation(startDestination: String = "second") {
             BMIScreen(navController)
         }
 
-        composable("workoutType") {
-            workoutTypeScreen(navController)
-        }
-
         composable("muscleGroup") {
             muscleGroupScreen(navController)
         }
 
+        composable("pushup") {
+            pushUp(navController)
+        }
+
+        composable("plank") {
+            plank(navController)
+        }
+
+        composable("pullup") {
+            pullup(navController)
+        }
+
+        composable("squat") {
+            squat(navController)
+        }
+
         composable("main") {
-            mainPage(navController)
+            mainPage(/*navController*/)
         }
 
         composable("workout/{equipmentName}") { backStackEntry ->

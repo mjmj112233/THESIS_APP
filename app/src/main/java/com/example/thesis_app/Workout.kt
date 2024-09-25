@@ -258,7 +258,7 @@ fun Workout(navController: NavController, equipmentName: String? = null) {
     }
 }
 
-/*
+
 @Composable
 fun WorkoutItem(workout: String) {
     Box(
@@ -267,8 +267,7 @@ fun WorkoutItem(workout: String) {
             .fillMaxWidth()
             .height(140.dp)
             .background(DirtyWhite, RoundedCornerShape(8.dp))
-            .clickable { */
-/* Handle item click *//*
+            .clickable {
  }
             .padding(16.dp)
     ) {
@@ -280,7 +279,7 @@ fun WorkoutItem(workout: String) {
         )
     }
 }
-*/
+
 
 
 

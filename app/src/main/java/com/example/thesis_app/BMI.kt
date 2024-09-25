@@ -24,7 +24,6 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.thesis_app.ui.theme.*
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BMIScreen(navController: NavController) {
@@ -97,7 +96,30 @@ fun BMIScreen(navController: NavController) {
                 )
             }
         }
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 95.dp, start = 80.dp, ), // Adjust spacing above the circles
+            horizontalArrangement = Arrangement.Center
+        ) {
+            repeat(6) {
+                Box(
+                    modifier = Modifier
+                        .padding(horizontal = 3.dp) // Space between circles
+                ){
+
+                }
+                Box(
+                    modifier = Modifier
+                        .width(30.dp) // Adjust the size for smaller circles
+                        .height(4.dp)
+                        .background(if (it == 0) Slime else DirtyWhite) // Highlight first circle
+                )
+            }
+        }
     }
+
 
     // Input Fields for Height and Weight
     Box(modifier = Modifier.fillMaxSize()) {
@@ -110,7 +132,7 @@ fun BMIScreen(navController: NavController) {
         ) {
             Box(
                 modifier = Modifier
-                    .offset(y =(-72).dp, x = 24.dp)
+                    .offset(y =(-70).dp, x = 24.dp)
             ){
                 // Height Input
                 InputField(
@@ -168,21 +190,6 @@ fun BMIScreen(navController: NavController) {
                     )
                 }
 
-                Spacer(modifier = Modifier.height(10.dp))
-
-                /*Box(
-                    modifier = Modifier
-                        .background(Slime)
-                        .padding(20.dp)
-                ){
-                    Text(
-                        text = "Re-calculate your BMI.",
-                        style = TextStyle(fontSize = 16.sp, color = DirtyWhite, fontFamily = alt),
-                        modifier = Modifier
-
-                    )
-                }*/
-
 
             } else {
                 // BMI Result Display
@@ -206,30 +213,72 @@ fun BMIScreen(navController: NavController) {
                     )
                 }
 
+                Spacer(modifier = Modifier.height(4.dp))
 
+                Box(
+
+                ){
+                    Text(
+                        text = "Press the reload button to re-calculate your BMI.",
+                        style = TextStyle(fontSize = 12.sp, color = DirtyWhite, fontFamily = captionFont),
+                        modifier = Modifier
+                    )
+                }
             }
         }
 
         Spacer(modifier = Modifier.height(32.dp))
-        // Floating Action Button to proceed to the next screen
+
+// Row to hold two Floating Action Buttons
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(bottom = 60.dp),
             contentAlignment = Alignment.BottomCenter
         ) {
-            FloatingActionButton(
-                onClick = { navController.navigate("workoutType") },
-                containerColor = Slime,
-                contentColor = DarkGreen,
-                modifier = Modifier.size(60.dp)
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(16.dp), // Space between the buttons
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(
-                    painter = painterResource(R.drawable.baseline_arrow_forward),
-                    contentDescription = null
-                )
+                // First FAB
+                FloatingActionButton(
+                    onClick = {
+                        val height = heightInput.trim().toFloatOrNull()?.div(100) // Convert cm to meters
+                        val weight = weightInput.trim().toFloatOrNull()
+
+                        if (height != null && weight != null && height > 0) {
+                            val bmi = weight / (height * height)
+                            bmiResult = String.format("%.2f", bmi)
+                            isBmiCalculated = true
+                        } else {
+                            println("Invalid input. Height: $height, Weight: $weight")
+                        }
+                    },
+                    containerColor = Slime,
+                    contentColor = DarkGreen,
+                    modifier = Modifier.size(60.dp)
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.baseline_autorenew_24),
+                        contentDescription = null
+                    )
+                }
+
+                // Second FAB
+                FloatingActionButton(
+                    onClick = { navController.navigate("muscleGroup") },
+                    containerColor = Slime,
+                    contentColor = DarkGreen,
+                    modifier = Modifier.size(60.dp)
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.baseline_arrow_forward),
+                        contentDescription = null
+                    )
+                }
             }
         }
+
     }
 }
 
@@ -253,7 +302,7 @@ fun InputField(label: String, inputValue: String, onInputChange: (String) -> Uni
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(horizontal = 8.dp), // Reduced vertical padding to give more space for text
-                textStyle = TextStyle(fontSize = 18.sp, color = DarkGreen, fontFamily = titleFont),
+                textStyle = TextStyle(fontSize = 18.sp, color = DarkGreen, fontFamily = alt),
                 maxLines = 1, // Ensure it stays as a single line
                 singleLine = true, // Ensure it's a single line input
                 colors = TextFieldDefaults.textFieldColors(
