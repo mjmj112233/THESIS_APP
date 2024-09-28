@@ -89,13 +89,27 @@ fun Navigation(startDestination: String = "second") {
         }
 
         composable("main") {
-            mainPage(/*navController*/)
+            mainPage(navController)
         }
 
-        composable("workout/{equipmentName}") { backStackEntry ->
-            val equipmentName = backStackEntry.arguments?.getString("equipmentName")
-            Workout(navController, equipmentName)
+        composable("workoutDay/{dayName}/{workouts}") { backStackEntry ->
+            val dayName = backStackEntry.arguments?.getString("dayName")
+            val workoutsString = backStackEntry.arguments?.getString("workouts")
+            val workouts = workoutsString?.split(",") ?: emptyList()
+            WorkoutDayPage(navController, dayName, workouts)
         }
+
+
+        composable("workoutInfo/{workoutName}/{reps}/{sets}/{weight}") { backStackEntry ->
+            val workoutName = backStackEntry.arguments?.getString("workoutName") ?: "Unknown"
+            val reps = backStackEntry.arguments?.getString("reps")?.toInt() ?: 0
+            val sets = backStackEntry.arguments?.getString("sets")?.toInt() ?: 0
+            val weight = backStackEntry.arguments?.getString("weight")?.toDouble() ?: 0.0
+
+            WorkoutInfo(navController, workoutName, reps, sets, weight)
+        }
+
+
 
     }
 }

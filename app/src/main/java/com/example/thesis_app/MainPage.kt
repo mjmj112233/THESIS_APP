@@ -62,21 +62,19 @@ import com.example.thesis_app.ui.theme.titleFont
 
 data class WorkoutDay(val day: String, val workouts: List<String>?, val isRestDay: Boolean)
 
-@Preview
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun mainPage() {
+fun mainPage(navController: NavController) {
     // List of workouts
 
-    val workouts = listOf("Workout 1", "Workout 2", "Workout 3", "Workout 4")
     val workoutDays = listOf(
-        WorkoutDay("DAY 1", listOf("Workout 1", "Workout 2", "Workout 3", "Workout 4"), false),
-        WorkoutDay("DAY 2", null, true), // Rest day
-        WorkoutDay("DAY 3", listOf("Workout 1", "Workout 2", "Workout 3", "Workout 4"), false),
-        WorkoutDay("DAY 4", null, true), // Rest day
-        WorkoutDay("DAY 5", listOf("Workout 1", "Workout 2", "Workout 3", "Workout 4"), false),
-        WorkoutDay("DAY 6", listOf("Workout 1", "Workout 2", "Workout 3", "Workout 4"), false),
-        WorkoutDay("DAY 7", null, true) // Rest day
+        WorkoutDay("DAY 1", listOf("Lat Pulldown", "Chest Press Machine", "Workout 3", "Workout 4", "Workout 5", "Workout 6"), false),
+        WorkoutDay("DAY 2", listOf("Cardio 1"), true), // Rest day
+        WorkoutDay("DAY 3", listOf("Workout 1", "Workout 2", "Workout 3", "Workout 4", "Workout 5", "Workout 6"), false),
+        WorkoutDay("DAY 4", listOf("Cardio 1"), true), // Rest day
+        WorkoutDay("DAY 5", listOf("Workout 1", "Workout 2", "Workout 3", "Workout 4", "Workout 5", "Workout 6"), false),
+        WorkoutDay("DAY 6", listOf("Workout 1", "Workout 2", "Workout 3", "Workout 4", "Workout 5", "Workout 6"), false),
+        WorkoutDay("DAY 7", listOf("Cardio 1"), true) // Rest day
     )
 
 
@@ -124,7 +122,7 @@ fun mainPage() {
                         .padding(top = 100.dp)
                     ) {
                         items(workoutDays) { workoutDay ->
-                            daysContainer(workoutDay = workoutDay, containerOpacity = 0.2f)
+                            daysContainer(navController = navController, workoutDay = workoutDay, workouts = workoutDay.workouts ?: emptyList(), containerOpacity = 0.2f)
                         }
                     }
 
@@ -237,14 +235,16 @@ fun ClickableContainer(
 }
 
 @Composable
-fun daysContainer(workoutDay: WorkoutDay, containerOpacity: Float = 1f) {
+fun daysContainer(navController: NavController, workoutDay: WorkoutDay, workouts: List<String>, containerOpacity: Float = 1f) {
     Box(
         modifier = Modifier
             .padding(vertical = 10.dp)
             .fillMaxWidth()
             .height(250.dp) // Adjusted height for horizontal scrolling
             .background(DirtyWhite.copy(alpha = containerOpacity), RoundedCornerShape(8.dp))
-            .clickable { /* Handle item click */ }
+            .clickable {
+                navController.navigate("workoutDay/${workoutDay.day}/${workouts.joinToString(",")}")
+            }
             .padding(16.dp)
     ) {
         Column {
@@ -267,21 +267,37 @@ fun daysContainer(workoutDay: WorkoutDay, containerOpacity: Float = 1f) {
             Spacer(modifier = Modifier.height(8.dp))
 
             if (workoutDay.isRestDay) {
-                Box(
+                Row(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 48.dp),
-                    contentAlignment = Alignment.Center
+                        .fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically // Align items vertically in the center
                 ) {
+                    // LazyRow for workouts
+                    LazyRow(
+                        modifier = Modifier
+                            .weight(1f) // Take remaining space
+                            .fillMaxHeight(), // Fill the height of the Row
+                        contentPadding = PaddingValues(horizontal = 0.dp)
+                    ) {
+                        workoutDay.workouts?.let { workouts ->
+                            items(workouts) { workout ->
+                                workoutBox(workout, containerOpacity = 0.3f)
+                            }
+                        }
+                    }
+
+                    // Text for Rest Day
                     Text(
                         text = "Rest Day",
                         fontFamily = alt,
                         fontSize = 32.sp,
                         color = DirtyWhite,
+                        modifier = Modifier
+                            .offset(y = (-20).dp) // Use smaller padding for closer alignment
+                            .wrapContentHeight() // Ensure height wraps the content
                     )
                 }
             } else {
-                // Workouts displayed in a horizontal scrollable row
                 LazyRow(
                     modifier = Modifier.fillMaxWidth(),
                     contentPadding = PaddingValues(horizontal = 0.dp)
@@ -296,6 +312,7 @@ fun daysContainer(workoutDay: WorkoutDay, containerOpacity: Float = 1f) {
         }
     }
 }
+
 
 
 
