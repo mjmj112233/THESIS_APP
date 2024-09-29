@@ -325,7 +325,6 @@ fun workoutBox(workout: String, containerOpacity: Float = 1f) {
             .background(DirtyWhite.copy(alpha = containerOpacity), RoundedCornerShape(8.dp))
             .width(100.dp)
             .height(200.dp)
-            .clickable { /* Handle workout click */ }
             .padding(12.dp)
     ) {
         // Center the icon in the box
