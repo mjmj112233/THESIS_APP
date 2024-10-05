@@ -1,17 +1,14 @@
 package com.example.thesis_app
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -22,6 +19,7 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
@@ -29,35 +27,46 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.model.LoginRequest
+import com.example.model.LoginResponse
+import com.example.repository.AuthRepository
 import com.example.thesis_app.ui.theme.*
+import com.example.util.TokenManager
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun loginPage(navController: NavController) {
+    // Add a coroutine scope for handling API calls
+    val coroutineScope = rememberCoroutineScope()
+    val authRepository = AuthRepository() // Assuming AuthRepository is set up as shown earlier
+    val context = LocalContext.current // To show Toast messages
+
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(BlueGreen) // Background color for the entire screen
+            .background(BlueGreen)
     ) {
-        // Column to vertically center content
         Column(
             modifier = Modifier
                 .fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            // Box containing the circle and the login container
             Box(
                 contentAlignment = Alignment.TopCenter,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(480.dp)
             ) {
-                // Login container
                 Box(
                     modifier = Modifier
                         .clip(shape = RoundedCornerShape(20.dp))
@@ -67,7 +76,6 @@ fun loginPage(navController: NavController) {
                         .height(400.dp)
                         .align(Alignment.BottomCenter)
                 ) {
-                    // State for text field values and focus
                     var username by remember { mutableStateOf("") }
                     var password by remember { mutableStateOf("") }
                     var isUsernameFocused by remember { mutableStateOf(false) }
@@ -75,13 +83,11 @@ fun loginPage(navController: NavController) {
                     val usernameFocusRequester = remember { FocusRequester() }
                     val passwordFocusRequester = remember { FocusRequester() }
 
-                    // Column for text and text fields
                     Column(
                         modifier = Modifier
                             .fillMaxSize()
                             .padding(top = 8.dp)
                     ) {
-                        // Login text
                         Text(
                             text = "Login",
                             color = DarkGreen,
@@ -92,10 +98,9 @@ fun loginPage(navController: NavController) {
                                 .padding(top = 40.dp, bottom = 10.dp)
                         )
 
-                        // Spacer to create space between the text and the TextField
                         Spacer(modifier = Modifier.height(20.dp))
 
-                        // Username TextField with animated label
+                        // Username TextField
                         TextField(
                             value = username,
                             onValueChange = { newValue -> username = newValue },
@@ -132,7 +137,7 @@ fun loginPage(navController: NavController) {
 
                         Spacer(modifier = Modifier.height(17.dp))
 
-                        // Password TextField with animated label and password masking
+                        // Password TextField
                         TextField(
                             value = password,
                             onValueChange = { newValue -> password = newValue },
@@ -160,7 +165,7 @@ fun loginPage(navController: NavController) {
                                 containerColor = Ash
                             ),
                             shape = RoundedCornerShape(20.dp),
-                            visualTransformation = PasswordVisualTransformation(), // Masked input for password
+                            visualTransformation = PasswordVisualTransformation(),
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(horizontal = 2.dp)
@@ -168,6 +173,7 @@ fun loginPage(navController: NavController) {
                                 .onFocusChanged { focusState -> isPasswordFocused = focusState.isFocused }
                         )
 
+                        // Login button and functionality
                         Box(
                             modifier = Modifier
                                 .height(160.dp),
@@ -178,7 +184,12 @@ fun loginPage(navController: NavController) {
                                 verticalArrangement = Arrangement.Center
                             ) {
                                 Button(
-                                    onClick = { navController.navigate("main") },
+                                    onClick = {
+                                        coroutineScope.launch {
+                                            // Call login function when button is clicked
+                                            handleLogin(username, password, authRepository, context, navController)
+                                        }
+                                    },
                                     colors = ButtonDefaults.buttonColors(Slime),
                                     modifier = Modifier
                                         .padding(start = 0.dp, bottom = 10.dp, end = 0.dp)
@@ -229,11 +240,10 @@ fun loginPage(navController: NavController) {
                 Box(
                     modifier = Modifier
                         .size(80.dp)
-                        .clip(shape = RoundedCornerShape(50.dp)) // Circle shape
+                        .clip(shape = RoundedCornerShape(50.dp))
                         .background(Slime)
                         .align(Alignment.TopCenter)
                 ) {
-                    // Image inside the circle
                     Image(
                         painter = painterResource(id = R.drawable.spot_logo_white),
                         contentDescription = "Logo",
@@ -248,5 +258,39 @@ fun loginPage(navController: NavController) {
     }
 }
 
+suspend fun handleLogin(
+    username: String,
+    password: String,
+    authRepository: AuthRepository,
+    context: android.content.Context,
+    navController: NavController
+) {
+    // Prepare User data
+    val loginRequest = LoginRequest(username, password)
 
+    // Make the API call
+    withContext(Dispatchers.IO) {
+        authRepository.loginUser(loginRequest).enqueue(object : Callback<LoginResponse> {
+            override fun onResponse(call: Call<LoginResponse>, response: Response<LoginResponse>) {
+                if (response.isSuccessful) {
+                    // Save token using TokenManager (assume you have this implemented)
+                    val tokenManager = TokenManager(context)
+                    val token = response.body()?.token
+                    token?.let {
+                        tokenManager.saveToken(it)
+                    }
+                    // Navigate to main screen
+                    navController.navigate("main")
+                } else {
+                    // Show login failed message
+                    Toast.makeText(context, "Login failed", Toast.LENGTH_SHORT).show()
+                }
+            }
 
+            override fun onFailure(call: Call<LoginResponse>, t: Throwable) {
+                // Show error message
+                Toast.makeText(context, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
+            }
+        })
+    }
+}

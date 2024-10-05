@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="true">192.168.100.4</domain>
+        <base-config cleartextTrafficPermitted="true" /><!-- Replace with your machine's IPv4 address -->
+    </domain-config>
+</network-security-config>

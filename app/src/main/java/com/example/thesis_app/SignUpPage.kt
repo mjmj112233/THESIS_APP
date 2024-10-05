@@ -8,8 +8,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -20,21 +18,32 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.thesis_app.ui.theme.*
+import android.widget.Toast
+import com.example.api.RetrofitInstance
+import com.example.model.RegistrationRequest
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun signupPage(navController: NavController) {
+    // Rest of your code ...
+
+    // Handle user registration via API call
+    val context = LocalContext.current
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -120,7 +129,31 @@ fun signupPage(navController: NavController) {
                                 verticalArrangement = Arrangement.Center
                             ) {
                                 FloatingActionButton(
-                                    onClick = { navController.navigate("welcome") },
+                                    onClick = {
+                                        // Check if passwords match
+                                        if (password != confirmPassword) {
+                                            Toast.makeText(context, "Passwords do not match", Toast.LENGTH_SHORT).show()
+                                            return@FloatingActionButton
+                                        }
+
+                                        // Make registration API call
+                                        val registrationRequest = RegistrationRequest(username, password)
+                                        RetrofitInstance.authService.registerUser(registrationRequest)
+                                            .enqueue(object : Callback<Void> {
+                                                override fun onResponse(call: Call<Void>, response: Response<Void>) {
+                                                    if (response.isSuccessful) {
+                                                        Toast.makeText(context, "Registration successful", Toast.LENGTH_SHORT).show()
+                                                        navController.navigate("login")
+                                                    } else {
+                                                        Toast.makeText(context, "Registration failed", Toast.LENGTH_SHORT).show()
+                                                    }
+                                                }
+
+                                                override fun onFailure(call: Call<Void>, t: Throwable) {
+                                                    Toast.makeText(context, "API call failed", Toast.LENGTH_SHORT).show()
+                                                }
+                                            })
+                                    },
                                     containerColor = Slime,
                                     contentColor = DarkGreen,
                                     modifier = Modifier.size(60.dp)

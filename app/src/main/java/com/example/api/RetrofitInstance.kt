@@ -1,11 +1,11 @@
 package com.example.api
 
- retrofit2.Retrofit
+import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitInstance {
 
-    private const val BASE_URL = "http://your-backend-url:8080/"  // Replace with your Spring Boot server URL
+    private const val BASE_URL = "http://192.168.100.4:8080/"  // Replace with your Spring Boot server URL
 
     val retrofit: Retrofit by lazy {
         Retrofit.Builder()
@@ -17,4 +17,9 @@ object RetrofitInstance {
     val authService: AuthService by lazy {
         retrofit.create(AuthService::class.java)
     }
+
+    val profileService: ProfileService by lazy {
+        retrofit.create(ProfileService::class.java)
+    }
+
 }

@@ -1,6 +1,6 @@
 package com.example.model
 
-data class User(
+data class LoginRequest(
     val username: String,
     val password: String
 )
