@@ -1,5 +1,6 @@
 package com.example.thesis_app
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -18,18 +19,20 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.thesis_app.ui.theme.*
 
+@SuppressLint("DefaultLocale")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BMIScreen(navController: NavController) {
     var heightInput by remember { mutableStateOf("") }
     var weightInput by remember { mutableStateOf("") }
     var bmiResult by remember { mutableStateOf("") }
+    var bmiCategory by remember { mutableStateOf("") }
+    var fitnessGoal by remember { mutableStateOf("") }
     var isBmiCalculated by remember { mutableStateOf(false) }
 
     // Image Background
@@ -100,14 +103,14 @@ fun BMIScreen(navController: NavController) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 95.dp, start = 80.dp, ), // Adjust spacing above the circles
+                .padding(top = 95.dp, start = 80.dp), // Adjust spacing above the circles
             horizontalArrangement = Arrangement.Center
         ) {
             repeat(6) {
                 Box(
                     modifier = Modifier
                         .padding(horizontal = 3.dp) // Space between circles
-                ){
+                ) {
 
                 }
                 Box(
@@ -120,7 +123,6 @@ fun BMIScreen(navController: NavController) {
         }
     }
 
-
     // Input Fields for Height and Weight
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
@@ -132,31 +134,28 @@ fun BMIScreen(navController: NavController) {
         ) {
             Box(
                 modifier = Modifier
-                    .offset(y =(-70).dp, x = 24.dp)
-            ){
+                    .offset(y = (-70).dp, x = 24.dp)
+            ) {
                 // Height Input
                 InputField(
                     label = "Height (cm)",
                     inputValue = heightInput,
-                    onInputChange = { heightInput = it },
-
-                    )
+                    onInputChange = { heightInput = it }
+                )
             }
-
 
             Spacer(modifier = Modifier.height(20.dp))
 
             Box(
                 modifier = Modifier
                     .offset(x = 80.dp, y = (-40).dp)
-            ){
+            ) {
                 InputField(
                     label = "Weight (kg)",
                     inputValue = weightInput,
                     onInputChange = { weightInput = it }
                 )
             }
-            
 
             Spacer(modifier = Modifier.height(40.dp))
 
@@ -171,13 +170,16 @@ fun BMIScreen(navController: NavController) {
                             val bmi = weight / (height * height)
                             bmiResult = String.format("%.2f", bmi)
                             isBmiCalculated = true
+
+                            // Calculate BMI Category and Fitness Goal (cast bmi to Double)
+                            bmiCategory = getBMICategory(bmi.toDouble())
+                            fitnessGoal = determineFitnessGoal(bmiCategory)
                         } else {
                             println("Invalid input. Height: $height, Weight: $weight")
                         }
+
                     },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Slime
-                    ),
+                    colors = ButtonDefaults.buttonColors(containerColor = Slime),
                     modifier = Modifier
                         .height(56.dp)
                         .fillMaxWidth()
@@ -189,7 +191,6 @@ fun BMIScreen(navController: NavController) {
                         textAlign = TextAlign.Center
                     )
                 }
-
 
             } else {
                 // BMI Result Display
@@ -215,9 +216,7 @@ fun BMIScreen(navController: NavController) {
 
                 Spacer(modifier = Modifier.height(4.dp))
 
-                Box(
-
-                ){
+                Box {
                     Text(
                         text = "Press the reload button to re-calculate your BMI.",
                         style = TextStyle(fontSize = 12.sp, color = DirtyWhite, fontFamily = captionFont),
@@ -229,7 +228,7 @@ fun BMIScreen(navController: NavController) {
 
         Spacer(modifier = Modifier.height(32.dp))
 
-// Row to hold two Floating Action Buttons
+        // Row to hold two Floating Action Buttons
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -250,9 +249,14 @@ fun BMIScreen(navController: NavController) {
                             val bmi = weight / (height * height)
                             bmiResult = String.format("%.2f", bmi)
                             isBmiCalculated = true
+
+                            // Calculate BMI Category and Fitness Goal (cast bmi to Double)
+                            bmiCategory = getBMICategory(bmi.toDouble())
+                            fitnessGoal = determineFitnessGoal(bmiCategory)
                         } else {
                             println("Invalid input. Height: $height, Weight: $weight")
                         }
+
                     },
                     containerColor = Slime,
                     contentColor = DarkGreen,
@@ -266,7 +270,14 @@ fun BMIScreen(navController: NavController) {
 
                 // Second FAB
                 FloatingActionButton(
-                    onClick = { navController.navigate("muscleGroup") },
+                    onClick = {
+                        if (isBmiCalculated) {
+                            navController.navigate("muscleGroup?height=${heightInput}&weight=${weightInput}&bmiCategory=${bmiCategory}&fitnessGoal=${fitnessGoal}") {
+                                popUpTo("bmi") { inclusive = true }  // Remove BMI screen from backstack
+                                launchSingleTop = true
+                            }
+                        }
+                    },
                     containerColor = Slime,
                     contentColor = DarkGreen,
                     modifier = Modifier.size(60.dp)
@@ -276,6 +287,7 @@ fun BMIScreen(navController: NavController) {
                         contentDescription = null
                     )
                 }
+
             }
         }
 
@@ -332,8 +344,25 @@ fun InputField(label: String, inputValue: String, onInputChange: (String) -> Uni
             )
         }
 
-
     }
 }
 
+// Helper Functions
+
+private fun getBMICategory(bmi: Double): String {
+    return when {
+        bmi < 18.5 -> "Underweight"
+        bmi < 24.9 -> "Normal"
+        bmi < 29.9 -> "Overweight"
+        else -> "Obese"
+    }
+}
+
+private fun determineFitnessGoal(bmiCategory: String): String {
+    return when (bmiCategory) {
+        "Underweight", "Normal" -> "Muscle Building"
+        "Overweight", "Obese" -> "Weight Loss"
+        else -> "Unknown"
+    }
+}
 

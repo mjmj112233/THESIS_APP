@@ -1,5 +1,7 @@
 package com.example.thesis_app
 
+import android.content.Context
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -12,38 +14,111 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.api.RetrofitInstance
+import com.example.api.UserProfileService
+import com.example.api.WorkoutRoutineService
+import com.example.model.UserProfileRequest
+import com.example.model.WorkoutRoutineRequest
 import com.example.thesis_app.ui.theme.*
+import com.google.gson.Gson
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import kotlin.coroutines.coroutineContext
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun squat(navController: NavController) {
-    var timeLeft by remember { mutableStateOf(10) }  // Timer starting at 60 seconds
-    var started by remember { mutableStateOf(false) } // Control if the timer has started
-    var showDialog by remember { mutableStateOf(false) } // Control the visibility of the dialog
-    var showInputField by remember { mutableStateOf(false) } // Control visibility of the input field
-    var pushUpsCount by remember { mutableStateOf("") } // Store the number of push-ups
+fun SquatScreen(
+    navController: NavController,
+    height: Double,
+    weight: Double,
+    bmiCategory: String,
+    fitnessGoal: String,
+    muscleGroup: String,
+    fitnessScore: Int // Total fitness score accumulated from previous assessments
+) {
+    var timeLeft by remember { mutableStateOf(10) }
+    var started by remember { mutableStateOf(false) }
+    var showDialog by remember { mutableStateOf(false) }
+    var showInputField by remember { mutableStateOf(false) }
+    var squatCount by remember { mutableStateOf("") } // Store squat count entered by user
+    var squatScore by remember { mutableStateOf(0) }
+    var isLoading by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf("") }
+    val coroutineScope = rememberCoroutineScope()
+    val context = LocalContext.current
 
-    // Countdown logic
+    // Function to submit user profile and generate workouts
+    suspend fun submitUserProfile() {
+        try {
+            isLoading = true
+            val request = UserProfileRequest(
+                height = height,
+                weight = weight,
+                BMICategory = bmiCategory,
+                fitnessGoal = fitnessGoal,
+                fitnessScore = fitnessScore + squatScore,
+                muscleGroup = muscleGroup
+            )
+
+            // Log the request to check its content
+            println("UserProfileRequest: ${Gson().toJson(request)}")
+            Log.d("UserProfileRequest", Gson().toJson(request))
+
+            // Call the API to create user profile
+            RetrofitInstance.UserProfileService(context).createUserProfile(request).enqueue(object : Callback<Void> {
+                override fun onResponse(call: Call<Void>, response: Response<Void>) {
+                    if (response.isSuccessful) {
+                        // Navigate to the main screen if the API call was successful
+                        navController.navigate("workoutRoutine") {
+                            popUpTo("plank") { inclusive = true }  // Remove Plank screen from backstack
+                            launchSingleTop = true
+                        }
+                    } else {
+                        // Handle error if response is not successful
+                        errorMessage = response.errorBody()?.string() ?: "Error creating profile"
+                        println("Error creating profile: $errorMessage") // Log the error message
+                    }
+                }
+
+                override fun onFailure(call: Call<Void>, t: Throwable) {
+                    errorMessage = "Error creating profile: ${t.message}"
+                    println("Exception creating profile: ${t.message}") // Log the exception
+                }
+            })
+        } catch (e: Exception) {
+            errorMessage = "Error creating profile: ${e.message}"
+            println("Exception creating profile: ${e.message}") // Log the exception
+        } finally {
+            isLoading = false
+        }
+    }
+
+
+
+    // Countdown logic for the squat test
     LaunchedEffect(key1 = started, key2 = timeLeft) {
         if (started && timeLeft > 0) {
             delay(1000L) // 1 second delay
             timeLeft -= 1
         }
         if (timeLeft == 0) {
-            started = false // Stop the timer
-            showDialog = false // Close the dialog
-            showInputField = true // Show the input field when the timer hits 0
+            started = false
+            showDialog = false
+            showInputField = true
         }
     }
 
@@ -62,13 +137,9 @@ fun squat(navController: NavController) {
             // Header Section (Logo + Text)
             Box(
                 contentAlignment = Alignment.CenterStart,
-                modifier = Modifier
-                    .fillMaxWidth()
+                modifier = Modifier.fillMaxWidth()
             ) {
-                Box(
-                    modifier = Modifier
-                        .padding(start = 20.dp)
-                ) {
+                Box(modifier = Modifier.padding(start = 20.dp)) {
                     // Text container
                     Box(
                         contentAlignment = Alignment.Center,
@@ -110,19 +181,19 @@ fun squat(navController: NavController) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 95.dp, start = 80.dp), // Adjust spacing above the circles
+                        .padding(top = 95.dp, start = 80.dp),
                     horizontalArrangement = Arrangement.Center
                 ) {
                     repeat(6) {
                         Box(
                             modifier = Modifier
-                                .padding(horizontal = 3.dp) // Space between circles
+                                .padding(horizontal = 3.dp)
                         ) {
                             Box(
                                 modifier = Modifier
-                                    .width(30.dp) // Adjust the size for smaller circles
+                                    .width(30.dp)
                                     .height(4.dp)
-                                    .background(if (it == 5) Slime else DirtyWhite) // Highlight first circle
+                                    .background(if (it == 5) Slime else DirtyWhite)
                             )
                         }
                     }
@@ -166,7 +237,7 @@ fun squat(navController: NavController) {
             // Start Timer Button
             if (!started) {
                 Button(
-                    onClick = { showDialog = true }, // Open the dialog when the button is clicked
+                    onClick = { showDialog = true },
                     colors = ButtonDefaults.buttonColors(Slime),
                     modifier = Modifier
                         .fillMaxWidth()
@@ -185,16 +256,14 @@ fun squat(navController: NavController) {
         // Timer Dialog
         if (showDialog) {
             AlertDialog(
-                onDismissRequest = { /* Optionally handle dismiss if needed */ },
+                onDismissRequest = { /* Handle dismiss */ },
                 confirmButton = {
                     Button(
                         onClick = {
-                            started = true // Start the timer
-                            // Do not close the dialog here
+                            started = true
                         },
                         colors = ButtonDefaults.buttonColors(Slime),
-                        modifier = Modifier
-                            .fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth()
                     ) {
                         Text("Start Timer", color = DarkGreen, fontFamily = alt, fontSize = 16.sp)
                     }
@@ -230,20 +299,7 @@ fun squat(navController: NavController) {
             )
         }
 
-// Countdown logic
-        LaunchedEffect(key1 = started, key2 = timeLeft) {
-            if (started && timeLeft > 0) {
-                delay(1000L) // 1 second delay
-                timeLeft -= 1
-            }
-            if (timeLeft == 0) {
-                started = false // Stop the timer
-                showInputField = true // Show the input field when the timer hits 0
-                showDialog = false // Close the dialog only when the timer hits 0
-            }
-        }
-
-        // Show input field after timer hits 0
+        // Show input field after stopping the timer
         if (showInputField) {
             Box(
                 modifier = Modifier
@@ -257,7 +313,7 @@ fun squat(navController: NavController) {
                         .fillMaxWidth()
                         .padding(start = 30.dp, bottom = 50.dp, end = 30.dp)
                 ) {
-                    // Push-Ups Count Input
+                    // Squat Count Input
                     Box(
                         modifier = Modifier
                             .clip(shape = RoundedCornerShape(20.dp))
@@ -265,14 +321,14 @@ fun squat(navController: NavController) {
                             .padding(20.dp)
                     ) {
                         TextField(
-                            value = pushUpsCount,
-                            onValueChange = { pushUpsCount = it },
+                            value = squatCount,
+                            onValueChange = { squatCount = it },
                             label = { Text("How many squats did you do?", fontFamily = alt, color = DarkGreen) },
                             modifier = Modifier.fillMaxWidth(),
                             colors = TextFieldDefaults.textFieldColors(
                                 containerColor = DirtyWhite,
-                                focusedIndicatorColor = DarkGreen, // Optional: Customize the focused indicator
-                                unfocusedIndicatorColor = Color.Transparent // Optional: Remove the underline
+                                focusedIndicatorColor = DarkGreen,
+                                unfocusedIndicatorColor = Color.Transparent
                             )
                         )
                     }
@@ -280,7 +336,7 @@ fun squat(navController: NavController) {
             }
         }
 
-        // Next button
+        // Finish and submit button
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -288,7 +344,21 @@ fun squat(navController: NavController) {
             contentAlignment = Alignment.BottomCenter
         ) {
             Button(
-                onClick = {  navController.navigate("main")  },
+                onClick = {
+                    val squats = squatCount.trim().toIntOrNull()
+                    squatScore = when {
+                        squats != null && squats >= 30 -> 3
+                        squats != null && squats in 15..29 -> 2
+                        squats != null && squats < 15 -> 1
+                        else -> 0
+                    }
+
+                    if (squatScore != 0) {
+                        coroutineScope.launch {
+                            submitUserProfile() // Call the API to submit the profile
+                        }
+                    }
+                },
                 colors = ButtonDefaults.buttonColors(Slime),
                 modifier = Modifier
                     .padding(start = 40.dp, bottom = 50.dp, end = 40.dp)
@@ -302,5 +372,17 @@ fun squat(navController: NavController) {
                 )
             }
         }
+
+        // Loading and error handling
+        if (isLoading) {
+            CircularProgressIndicator()
+        }
+        if (errorMessage.isNotEmpty()) {
+            Text(text = errorMessage, color = Color.Red)
+        }
     }
 }
+
+
+
+

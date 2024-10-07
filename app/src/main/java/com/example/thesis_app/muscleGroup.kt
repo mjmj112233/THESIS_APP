@@ -1,16 +1,16 @@
 package com.example.thesis_app
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
-import androidx.compose.material3.Button
-import androidx.compose.material3.Icon
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -19,25 +19,36 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.thesis_app.ui.theme.BlueGreen
-import com.example.thesis_app.ui.theme.DarkGreen
-import com.example.thesis_app.ui.theme.DirtyWhite
-import com.example.thesis_app.ui.theme.Slime
-import com.example.thesis_app.ui.theme.titleFont
+import com.example.thesis_app.ui.theme.*
 
 @Composable
-fun muscleGroupScreen(navController: NavController) {
+fun muscleGroupScreen(
+    navController: NavController,
+    height: Double,
+    weight: Double,
+    bmiCategory: String,
+    fitnessGoal: String,
+    onMuscleGroupSelected: (String) -> Unit
+) {
+    var selectedUpper by remember { mutableStateOf(false) }
+    var selectedLower by remember { mutableStateOf(false) }
 
+    // Automatically assign if fitness goal is Weight Loss
+    var muscleGroup by remember {
+        mutableStateOf(
+            if (fitnessGoal == "Weight Loss") "Weight Loss" else ""
+        )
+    }
+
+    // UI
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(BlueGreen)
     ) {
-
         // Header
         Box(
             modifier = Modifier
@@ -45,13 +56,9 @@ fun muscleGroupScreen(navController: NavController) {
         ) {
             Box(
                 contentAlignment = Alignment.CenterStart,
-                modifier = Modifier
-                    .fillMaxWidth()
+                modifier = Modifier.fillMaxWidth()
             ) {
-                Box(
-                    modifier = Modifier
-                        .padding(start = 20.dp)
-                ) {
+                Box(modifier = Modifier.padding(start = 20.dp)) {
                     // Text container
                     Box(
                         contentAlignment = Alignment.Center,
@@ -72,7 +79,7 @@ fun muscleGroupScreen(navController: NavController) {
                     }
                 }
 
-                // Circle
+                // Circle Logo
                 Box(
                     modifier = Modifier
                         .size(100.dp)
@@ -89,132 +96,121 @@ fun muscleGroupScreen(navController: NavController) {
                             .align(Alignment.Center)
                     )
                 }
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 95.dp, start = 80.dp, ), // Adjust spacing above the circles
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    repeat(6) {
-                        Box(
-                            modifier = Modifier
-                                .padding(horizontal = 3.dp) // Space between circles
-                        ){
-
-                        }
-                        Box(
-                            modifier = Modifier
-                                .width(30.dp) // Adjust the size for smaller circles
-                                .height(4.dp)
-                                .background(if (it == 1) Slime else DirtyWhite) // Highlight first circle
-                        )
-                    }
-                }
             }
         }
 
-        // Centered Row for the two circle containers
-        Box(
-            contentAlignment = Alignment.Center, // This ensures that the row is centered
-            modifier = Modifier
-                .fillMaxSize() // This takes up the whole screen
-        ) {
-            Row(
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 16.dp)
+        // Centered Row for Muscle Selection (only if fitnessGoal != Weight Loss)
+        if (fitnessGoal != "Weight Loss") {
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier.fillMaxSize()
             ) {
-                // First Circle (Weight Loss)
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp)
+                Row(
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    Box(
-                        modifier = Modifier
-                            .size(100.dp)
-                            .clip(CircleShape)
-                            .background(Slime)
-                            .padding(8.dp),
-                        contentAlignment = Alignment.Center
+                    // Upper Body Selection
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier.padding(horizontal = 16.dp)
                     ) {
-                        Image(
-                            painter = painterResource(id = R.drawable.upper2),
-                            contentDescription = null,
+                        Box(
                             modifier = Modifier
-                                .size(80.dp) // Set size to fit within the circle
+                                .size(100.dp)
                                 .clip(CircleShape)
-                                .background(DirtyWhite),
-                            contentScale = ContentScale.Crop
+                                .background(if (selectedUpper) Color.Gray else Slime)
+                                .clickable {
+                                    selectedUpper = !selectedUpper
+                                    updateMuscleGroup(selectedUpper, selectedLower) { updatedGroup ->
+                                        muscleGroup = updatedGroup
+                                    }
+                                },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Image(
+                                painter = painterResource(id = R.drawable.upper2),
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .size(80.dp)
+                                    .clip(CircleShape)
+                                    .background(DirtyWhite),
+                                contentScale = ContentScale.Crop
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = "Upper Muscles",
+                            fontSize = 16.sp,
+                            fontFamily = titleFont,
+                            color = Slime,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.padding(top = 24.dp)
                         )
                     }
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = "Upper Muscles",
-                        fontSize = 16.sp,
-                        fontFamily = titleFont,
-                        color = Slime,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier
-                            .padding(top = 24.dp)
 
-                    )
-                }
+                    Spacer(modifier = Modifier.width(32.dp))
 
-                // Spacer to add space between the two containers
-                Spacer(modifier = Modifier.width(32.dp)) // Adjust width as needed
-
-                // Second Circle (Strength Training - example)
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp)
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .size(100.dp)
-                            .clip(CircleShape)
-                            .background(Slime)
-                            .padding(8.dp),
-                        contentAlignment = Alignment.Center
+                    // Lower Body Selection
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier.padding(horizontal = 16.dp)
                     ) {
-                        Image(
-                            painter = painterResource(id = R.drawable.lower), // Example drawable
-                            contentDescription = null,
+                        Box(
                             modifier = Modifier
-                                .size(80.dp)
+                                .size(100.dp)
                                 .clip(CircleShape)
-                                .background(DirtyWhite),
-                            contentScale = ContentScale.Crop
+                                .background(if (selectedLower) Color.Gray else Slime)
+                                .clickable {
+                                    selectedLower = !selectedLower
+                                    updateMuscleGroup(selectedUpper, selectedLower) { updatedGroup ->
+                                        muscleGroup = updatedGroup
+                                    }
+                                },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Image(
+                                painter = painterResource(id = R.drawable.lower),
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .size(80.dp)
+                                    .clip(CircleShape)
+                                    .background(DirtyWhite),
+                                contentScale = ContentScale.Crop
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = "Lower Muscles",
+                            fontSize = 16.sp,
+                            fontFamily = titleFont,
+                            color = Slime,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.padding(top = 24.dp)
                         )
                     }
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = "Lower Muscles",
-                        fontSize = 16.sp,
-                        fontFamily = titleFont,
-                        color = Slime,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier
-                            .padding(top = 24.dp)
-                    )
                 }
             }
         }
 
-        // Finish button
+        // Finish Button
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(bottom = 60.dp),
             contentAlignment = Alignment.BottomCenter
         ) {
-            // Button
+            // Inside your muscleGroupScreen where you handle the button click
             Button(
-                onClick = { navController.navigate("pushup") },
+                onClick = {
+                    // Ensure muscleGroup is valid
+                    if (muscleGroup.isNotEmpty()) {
+                        // Log the values before navigating
+                        Log.d("MuscleGroupScreen", "Navigating to PushupScreen with Height: $height, Weight: $weight")
+                        // Proceed to the next screen, passing all necessary parameters
+                        onMuscleGroupSelected(muscleGroup)
+                    }
+                },
                 colors = ButtonDefaults.buttonColors(Slime),
                 modifier = Modifier
                     .padding(start = 40.dp, bottom = 50.dp, end = 40.dp)
@@ -227,10 +223,18 @@ fun muscleGroupScreen(navController: NavController) {
                     fontSize = 28.sp
                 )
             }
+
         }
     }
 }
 
-
-
+// Helper function to determine the muscle group based on user selection
+fun updateMuscleGroup(selectedUpper: Boolean, selectedLower: Boolean, onUpdate: (String) -> Unit) {
+    when {
+        selectedUpper && selectedLower -> onUpdate("Both")
+        selectedUpper -> onUpdate("Upper")
+        selectedLower -> onUpdate("Lower")
+        else -> onUpdate("") // No selection
+    }
+}
 

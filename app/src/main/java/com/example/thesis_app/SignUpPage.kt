@@ -28,21 +28,26 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.thesis_app.ui.theme.*
-import android.widget.Toast
 import com.example.api.RetrofitInstance
 import com.example.model.RegistrationRequest
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import android.widget.Toast
+import com.example.thesis_app.ui.theme.Ash
+import com.example.thesis_app.ui.theme.Blackk
+import com.example.thesis_app.ui.theme.BlueGreen
+import com.example.thesis_app.ui.theme.DarkGreen
+import com.example.thesis_app.ui.theme.DarkerAsh
+import com.example.thesis_app.ui.theme.DirtyWhite
+import com.example.thesis_app.ui.theme.Slime
+import com.example.thesis_app.ui.theme.captionFont
+import com.example.thesis_app.ui.theme.titleFont
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun signupPage(navController: NavController) {
-    // Rest of your code ...
-
-    // Handle user registration via API call
-    val context = LocalContext.current
+    val context = LocalContext.current // To show Toast messages
 
     Box(
         modifier = Modifier
@@ -69,7 +74,6 @@ fun signupPage(navController: NavController) {
                         .height(500.dp)
                         .align(Alignment.BottomCenter)
                 ) {
-                    // State for text field values
                     var username by remember { mutableStateOf("") }
                     var password by remember { mutableStateOf("") }
                     var confirmPassword by remember { mutableStateOf("") }
@@ -120,8 +124,7 @@ fun signupPage(navController: NavController) {
 
                         // FloatingActionButton and login text
                         Box(
-                            modifier = Modifier
-                                .fillMaxSize(),
+                            modifier = Modifier.fillMaxSize(),
                             contentAlignment = Alignment.Center
                         ) {
                             Column(
@@ -138,7 +141,9 @@ fun signupPage(navController: NavController) {
 
                                         // Make registration API call
                                         val registrationRequest = RegistrationRequest(username, password)
-                                        RetrofitInstance.authService.registerUser(registrationRequest)
+
+                                        // Call the registerUser method from AuthService
+                                        RetrofitInstance.AuthService(context).registerUser(registrationRequest)
                                             .enqueue(object : Callback<Void> {
                                                 override fun onResponse(call: Call<Void>, response: Response<Void>) {
                                                     if (response.isSuccessful) {
@@ -150,7 +155,7 @@ fun signupPage(navController: NavController) {
                                                 }
 
                                                 override fun onFailure(call: Call<Void>, t: Throwable) {
-                                                    Toast.makeText(context, "API call failed", Toast.LENGTH_SHORT).show()
+                                                    Toast.makeText(context, "API call failed: ${t.message}", Toast.LENGTH_SHORT).show()
                                                 }
                                             })
                                     },
@@ -221,7 +226,6 @@ fun signupPage(navController: NavController) {
         }
     }
 }
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AnimatedTextField(
@@ -239,9 +243,7 @@ fun AnimatedTextField(
 
     TextField(
         value = value,
-        onValueChange = { newValue ->
-            onValueChange(newValue)
-        },
+        onValueChange = { newValue -> onValueChange(newValue) },
         label = {
             // Animated label
             AnimatedVisibility(
@@ -268,8 +270,6 @@ fun AnimatedTextField(
             .fillMaxWidth()
             .padding(horizontal = 2.dp)
             .focusRequester(focusRequester)
-            .onFocusChanged { focusState ->
-                isFocused = focusState.isFocused
-            }
+            .onFocusChanged { focusState -> isFocused = focusState.isFocused }
     )
 }

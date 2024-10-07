@@ -15,7 +15,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
@@ -28,7 +27,6 @@ import com.example.thesis_app.ui.theme.DarkGreen
 import com.example.thesis_app.ui.theme.DirtyWhite
 import com.example.thesis_app.ui.theme.Slime
 import com.example.thesis_app.ui.theme.alt
-import com.example.thesis_app.ui.theme.captionFont
 import com.example.thesis_app.ui.theme.titleFont
 import kotlinx.coroutines.launch
 
@@ -44,18 +42,17 @@ fun mainPage(navController: NavController) {
     // State to control the visibility of the alert dialog
     var showDialog by remember { mutableStateOf(true) }
 
-    // Empty list for testing
-    val workoutDays = listOf<WorkoutDay>()
+    // Sample workout days for demonstration purposes
+    var workoutDays by remember { mutableStateOf<List<WorkoutDay>>(emptyList()) }
 
-//    val workoutDays = listOf(
-//        WorkoutDay("DAY 1", listOf("Lat Pulldown", "Chest Press Machine", "Workout 3", "Workout 4", "Workout 5", "Workout 6"), false),
-//        WorkoutDay("DAY 2", listOf("Cardio 1"), true), // Rest day
-//        WorkoutDay("DAY 3", listOf("Workout 1", "Workout 2", "Workout 3", "Workout 4", "Workout 5", "Workout 6"), false),
-//        WorkoutDay("DAY 4", listOf("Cardio 1"), true), // Rest day
-//        WorkoutDay("DAY 5", listOf("Workout 1", "Workout 2", "Workout 3", "Workout 4", "Workout 5", "Workout 6"), false),
-//        WorkoutDay("DAY 6", listOf("Workout 1", "Workout 2", "Workout 3", "Workout 4", "Workout 5", "Workout 6"), false),
-//        WorkoutDay("DAY 7", listOf("Cardio 1"), true) // Rest day
-//    )
+    // Sample data to demonstrate functionality
+    if (workoutDays.isEmpty()) {
+        workoutDays = listOf(
+            WorkoutDay("DAY 1", listOf("Lat Pulldown", "Chest Press Machine", "Workout 3", "Workout 4"), false),
+            WorkoutDay("DAY 2", listOf("Cardio 1"), true), // Rest day
+            WorkoutDay("DAY 3", listOf("Workout 1", "Workout 2"), false)
+        )
+    }
 
     if (workoutDays.isEmpty() && showDialog) {
         AlertDialog(
@@ -92,7 +89,7 @@ fun mainPage(navController: NavController) {
                     onClick = { showDialog = false },
                     modifier = Modifier.background(Slime, shape = RoundedCornerShape(16.dp))
                 ) {
-                    Text("Proceed", color = DarkGreen, fontFamily = titleFont,)
+                    Text("Proceed", color = DarkGreen, fontFamily = titleFont)
                 }
             }
         )
@@ -194,8 +191,6 @@ fun mainPage(navController: NavController) {
                                 .background(BlueGreen)
                                 .padding(32.dp)
                         ) {
-
-                            //check if workout is empty, to show button
                             if (workoutDays.isEmpty()) {
                                 if (!showDialog) {
                                     Box(
@@ -203,7 +198,7 @@ fun mainPage(navController: NavController) {
                                         contentAlignment = Alignment.Center
                                     ) {
                                         Button(
-                                            onClick = { navController.navigate("bmi") },
+                                            onClick = { /* Handle start user assessment */ },
                                             colors = ButtonDefaults.buttonColors(containerColor = Slime),
                                             modifier = Modifier
                                                 .padding(vertical = 20.dp)
@@ -213,12 +208,12 @@ fun mainPage(navController: NavController) {
                                     }
                                 }
                             } else {
-
                                 Text(
                                     text = "Your Personalized Workout Routine",
                                     color = DirtyWhite,
                                     style = TextStyle(fontFamily = titleFont, fontSize = 20.sp),
-                                    modifier = Modifier.padding(top = 30.dp))
+                                    modifier = Modifier.padding(top = 30.dp)
+                                )
 
                                 LazyColumn(
                                     modifier = Modifier
@@ -330,15 +325,13 @@ fun daysContainer(navController: NavController, workoutDay: WorkoutDay, workouts
 
             if (workoutDay.isRestDay) {
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically // Align items vertically in the center
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // LazyRow for workouts
                     LazyRow(
                         modifier = Modifier
-                            .weight(1f) // Take remaining space
-                            .fillMaxHeight(), // Fill the height of the Row
+                            .weight(1f)
+                            .fillMaxHeight(),
                         contentPadding = PaddingValues(horizontal = 0.dp)
                     ) {
                         workoutDay.workouts?.let { workouts ->
@@ -348,15 +341,14 @@ fun daysContainer(navController: NavController, workoutDay: WorkoutDay, workouts
                         }
                     }
 
-                    // Text for Rest Day
                     Text(
                         text = "Rest Day",
                         fontFamily = alt,
                         fontSize = 32.sp,
                         color = DirtyWhite,
                         modifier = Modifier
-                            .offset(y = (-20).dp) // Use smaller padding for closer alignment
-                            .wrapContentHeight() // Ensure height wraps the content
+                            .offset(y = (-20).dp)
+                            .wrapContentHeight()
                     )
                 }
             } else {
@@ -367,13 +359,13 @@ fun daysContainer(navController: NavController, workoutDay: WorkoutDay, workouts
                     workoutDay.workouts?.let { workouts ->
                         items(workouts) { workout ->
                             workoutBox(workout, containerOpacity = 0.3f)
-                        }}
+                        }
+                    }
                 }
             }
         }
     }
 }
-
 
 @Composable
 fun workoutBox(workout: String, containerOpacity: Float = 1f) {
@@ -386,10 +378,9 @@ fun workoutBox(workout: String, containerOpacity: Float = 1f) {
             .height(200.dp)
             .padding(12.dp)
     ) {
-        // Center the icon in the box
         Box(
             modifier = Modifier
-                .align(Alignment.TopCenter) // Position the icon at the top center
+                .align(Alignment.TopCenter)
                 .clip(shape = CircleShape)
                 .background(BlueGreen)
                 .height(80.dp)
@@ -415,10 +406,3 @@ fun workoutBox(workout: String, containerOpacity: Float = 1f) {
         )
     }
 }
-
-
-
-
-
-
-

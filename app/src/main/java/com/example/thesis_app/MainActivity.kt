@@ -1,15 +1,14 @@
 package com.example.thesis_app
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -19,23 +18,16 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-//            com.example.thesis_app.firstPage()
             Navigation()
         }
     }
 }
 
 @Composable
-fun Navigation(startDestination: String = "third") {
+fun Navigation(startDestination: String = "third") {  // Change to the correct starting screen if needed
     val navController = rememberNavController()
 
     NavHost(navController = navController, startDestination = startDestination) {
-//        composable("first") {
-//            splashScreen(navController)
-//        }
-//        composable("second") {
-//            loadingScreen(navController)
-//        }
 
         composable("third") {
             firstPage(navController)
@@ -66,52 +58,142 @@ fun Navigation(startDestination: String = "third") {
         }
 
         composable("bmi") {
-            BMIScreen(navController)
+            BMIScreen(navController)  // Pass the NavController
         }
 
-        composable("muscleGroup") {
-            muscleGroupScreen(navController)
+        composable("muscleGroup?fitnessGoal={fitnessGoal}&height={height}&weight={weight}&bmiCategory={bmiCategory}") { backStackEntry ->
+            val fitnessGoal = backStackEntry.arguments?.getString("fitnessGoal") ?: "Unknown"
+            val height = backStackEntry.arguments?.getString("height")?.toDouble() ?: 0.0
+            val weight = backStackEntry.arguments?.getString("weight")?.toDouble() ?: 0.0
+            val bmiCategory = backStackEntry.arguments?.getString("bmiCategory") ?: "Unknown"
+
+            // Log the height and weight for debugging
+            Log.d("MuscleGroupScreen", "Height: $height, Weight: $weight")
+
+            muscleGroupScreen(
+                navController = navController,
+                height = height,
+                weight = weight,
+                bmiCategory = bmiCategory,
+                fitnessGoal = fitnessGoal,
+                onMuscleGroupSelected = { muscleGroup ->
+                    // Pass height and weight when navigating to the pushup screen
+                    navController.navigate("pushup?height=$height&weight=$weight&bmiCategory=$bmiCategory&fitnessGoal=$fitnessGoal&muscleGroup=$muscleGroup") {
+                        popUpTo("muscleGroup") { inclusive = true }  // Remove Muscle Group screen from backstack
+                    }
+                }
+            )
         }
 
-        composable("pushup") {
-            pushUp(navController)
+
+        composable("pushup?height={height}&weight={weight}&bmiCategory={bmiCategory}&fitnessGoal={fitnessGoal}&muscleGroup={muscleGroup}") { backStackEntry ->
+            val height = backStackEntry.arguments?.getString("height")?.toDouble() ?: 0.0
+            val weight = backStackEntry.arguments?.getString("weight")?.toDouble() ?: 0.0
+            val bmiCategory = backStackEntry.arguments?.getString("bmiCategory") ?: "Unknown"
+            val fitnessGoal = backStackEntry.arguments?.getString("fitnessGoal") ?: "Unknown"
+            val muscleGroup = backStackEntry.arguments?.getString("muscleGroup") ?: "Unknown"
+
+            Log.d("Pushups", "Height: $height, Weight: $weight")
+
+            pushUp(
+                navController = navController,
+                height = height,
+                weight = weight,
+                bmiCategory = bmiCategory,
+                fitnessGoal = fitnessGoal,
+                muscleGroup = muscleGroup,
+                onPushUpScore = { pushUpScore ->
+                    navController.navigate("plank?height=$height&weight=$weight&bmiCategory=$bmiCategory&fitnessGoal=$fitnessGoal&muscleGroup=$muscleGroup&pushUpScore=$pushUpScore")
+                }
+            )
         }
 
-        composable("plank") {
-            plank(navController)
+        composable("plank?height={height}&weight={weight}&bmiCategory={bmiCategory}&fitnessGoal={fitnessGoal}&muscleGroup={muscleGroup}&pushUpScore={pushUpScore}") { backStackEntry ->
+            val height = backStackEntry.arguments?.getString("height")?.toDouble() ?: 0.0
+            val weight = backStackEntry.arguments?.getString("weight")?.toDouble() ?: 0.0
+            val bmiCategory = backStackEntry.arguments?.getString("bmiCategory") ?: "Unknown"
+            val fitnessGoal = backStackEntry.arguments?.getString("fitnessGoal") ?: "Unknown"
+            val muscleGroup = backStackEntry.arguments?.getString("muscleGroup") ?: "Unknown"
+            val pushUpScore = backStackEntry.arguments?.getString("pushUpScore")?.toInt() ?: 0
+
+            Log.d("Plank", "Height: $height, Weight: $weight")
+
+            plank(
+                navController = navController,
+                height = height,
+                weight = weight,
+                bmiCategory = bmiCategory,
+                fitnessGoal = fitnessGoal,
+                muscleGroup = muscleGroup,
+                pushUpScore = pushUpScore,
+                onPlankScore = { plankScore ->
+                    navController.navigate("pullup?height=$height&weight=$weight&bmiCategory=$bmiCategory&fitnessGoal=$fitnessGoal&muscleGroup=$muscleGroup&pushUpScore=$pushUpScore&plankScore=$plankScore")
+                }
+            )
         }
 
-        composable("pullup") {
-            pullup(navController)
+
+        composable("pullup?height={height}&weight={weight}&bmiCategory={bmiCategory}&fitnessGoal={fitnessGoal}&muscleGroup={muscleGroup}&pushUpScore={pushUpScore}&plankScore={plankScore}") { backStackEntry ->
+            val height = backStackEntry.arguments?.getString("height")?.toDouble() ?: 0.0
+            val weight = backStackEntry.arguments?.getString("weight")?.toDouble() ?: 0.0
+            val bmiCategory = backStackEntry.arguments?.getString("bmiCategory") ?: "Unknown"
+            val fitnessGoal = backStackEntry.arguments?.getString("fitnessGoal") ?: "Unknown"
+            val muscleGroup = backStackEntry.arguments?.getString("muscleGroup") ?: "Unknown"
+            val pushUpScore = backStackEntry.arguments?.getString("pushUpScore")?.toInt() ?: 0
+            val plankScore = backStackEntry.arguments?.getString("plankScore")?.toInt() ?: 0
+
+            Log.d("Pullup", "Height: $height, Weight: $weight")
+
+            pullup(
+                navController = navController,
+                height = height,
+                weight = weight,
+                bmiCategory = bmiCategory,
+                fitnessGoal = fitnessGoal,
+                muscleGroup = muscleGroup,
+                pushUpScore = pushUpScore,
+                plankScore = plankScore,
+                onPullUpScore = { pullUpScore ->
+                    navController.navigate("squat?height=$height&weight=$weight&bmiCategory=$bmiCategory&fitnessGoal=$fitnessGoal&muscleGroup=$muscleGroup&pushUpScore=$pushUpScore&plankScore=$plankScore&pullUpScore=$pullUpScore")
+                }
+            )
         }
 
-        composable("squat") {
-            squat(navController)
+        composable("squat?height={height}&weight={weight}&bmiCategory={bmiCategory}&fitnessGoal={fitnessGoal}&muscleGroup={muscleGroup}&pushUpScore={pushUpScore}&plankScore={plankScore}&pullUpScore={pullUpScore}") { backStackEntry ->
+            val height = backStackEntry.arguments?.getString("height")?.toDouble() ?: 0.0
+            val weight = backStackEntry.arguments?.getString("weight")?.toDouble() ?: 0.0
+            val bmiCategory = backStackEntry.arguments?.getString("bmiCategory") ?: "Unknown"
+            val fitnessGoal = backStackEntry.arguments?.getString("fitnessGoal") ?: "Unknown"
+            val muscleGroup = backStackEntry.arguments?.getString("muscleGroup") ?: "Unknown"
+            val pushUpScore = backStackEntry.arguments?.getString("pushUpScore")?.toInt() ?: 0
+            val plankScore = backStackEntry.arguments?.getString("plankScore")?.toInt() ?: 0
+            val pullUpScore = backStackEntry.arguments?.getString("pullUpScore")?.toInt() ?: 0
+
+            Log.d("Squat", "Height: $height, Weight: $weight")
+            Log.d("UserProfileRequest", "Height: $height, Weight: $weight, BMICategory: $bmiCategory, FitnessGoal: $fitnessGoal, MuscleGroup: $muscleGroup")
+
+
+            SquatScreen(
+                navController = navController,
+                height = height,
+                weight = weight,
+                bmiCategory = bmiCategory,
+                fitnessGoal = fitnessGoal,
+                muscleGroup = muscleGroup,
+                fitnessScore = pushUpScore + plankScore + pullUpScore
+            )
+
+
+
+
         }
 
         composable("main") {
             mainPage(navController)
         }
 
-        composable("workoutDay/{dayName}/{workouts}") { backStackEntry ->
-            val dayName = backStackEntry.arguments?.getString("dayName")
-            val workoutsString = backStackEntry.arguments?.getString("workouts")
-            val workouts = workoutsString?.split(",") ?: emptyList()
-            WorkoutDayPage(navController, dayName, workouts)
+        composable("workoutRoutine") {
+            WorkoutRoutinePage(navController)
         }
-
-
-        composable("workoutInfo/{workoutName}/{reps}/{sets}/{weight}") { backStackEntry ->
-            val workoutName = backStackEntry.arguments?.getString("workoutName") ?: "Unknown"
-            val reps = backStackEntry.arguments?.getString("reps")?.toInt() ?: 0
-            val sets = backStackEntry.arguments?.getString("sets")?.toInt() ?: 0
-            val weight = backStackEntry.arguments?.getString("weight")?.toDouble() ?: 0.0
-
-            WorkoutInfo(navController, workoutName, reps, sets, weight)
-        }
-
-
-
     }
 }
-

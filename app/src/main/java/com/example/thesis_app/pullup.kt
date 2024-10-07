@@ -18,40 +18,55 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.thesis_app.ui.theme.*
-import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun pullup(navController: NavController) {
-    var pushUpsCount by remember { mutableStateOf("") } // Store the number of push-ups
+fun pullup(
+    navController: NavController,
+    height: Double,
+    weight: Double,
+    bmiCategory: String,
+    fitnessGoal: String,
+    muscleGroup: String,
+    pushUpScore: Int,
+    plankScore: Int,
+    onPullUpScore: (Int) -> Unit
+) {
+    var pullUpCount by remember { mutableStateOf("") }
+    var isTestComplete by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf("") }
+    var pullUpScore by remember { mutableStateOf(0) }  // Store calculated pull-up score
 
+    // Function to calculate the pull-up score based on count
+    fun calculatePullUpScore(count: Int): Int {
+        return when {
+            count < 10 -> 1
+            count in 10..20 -> 2
+            else -> 3
+        }
+    }
+
+    // UI
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(BlueGreen)
     ) {
-        // Header and instructions
-        Column(
+
+        // Header
+        Box(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(start = 30.dp, end = 30.dp, top = 40.dp),
-            verticalArrangement = Arrangement.Top
+                .padding(start = 30.dp, end = 30.dp, top = 40.dp)
         ) {
-            // Header Section (Logo + Text)
             Box(
                 contentAlignment = Alignment.CenterStart,
-                modifier = Modifier
-                    .fillMaxWidth()
+                modifier = Modifier.fillMaxWidth()
             ) {
-                Box(
-                    modifier = Modifier
-                        .padding(start = 20.dp)
-                ) {
+                Box(modifier = Modifier.padding(start = 20.dp)) {
                     // Text container
                     Box(
                         contentAlignment = Alignment.Center,
@@ -64,132 +79,114 @@ fun pullup(navController: NavController) {
                             .offset(x = 20.dp)
                     ) {
                         Text(
-                            text = "Strength and Endurance Test",
+                            text = "Pull-up Test",
                             color = DirtyWhite,
-                            style = TextStyle(fontFamily = titleFont, fontSize = 16.sp),
+                            style = TextStyle(fontFamily = titleFont, fontSize = 24.sp),
                             textAlign = TextAlign.Center
                         )
                     }
                 }
-
-                // Logo circle
-                Box(
-                    modifier = Modifier
-                        .size(100.dp)
-                        .clip(shape = RoundedCornerShape(50.dp))
-                        .background(Slime)
-                        .align(Alignment.CenterStart)
-                ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.spot_logo_white),
-                        contentDescription = "Logo",
-                        contentScale = ContentScale.Fit,
-                        modifier = Modifier
-                            .size(70.dp)
-                            .align(Alignment.Center)
-                    )
-                }
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 95.dp, start = 80.dp),
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    repeat(6) {
-                        Box(
-                            modifier = Modifier
-                                .padding(horizontal = 3.dp)
-                        ) {
-                            Box(
-                                modifier = Modifier
-                                    .width(30.dp)
-                                    .height(4.dp)
-                                    .background(if (it == 4) Slime else DirtyWhite)
-                            )
-                        }
-                    }
-                }
-            }
-
-            Spacer(modifier = Modifier.height(10.dp))
-
-            Text(
-                text = buildAnnotatedString {
-                    withStyle(style = SpanStyle(color = Slime, fontFamily = titleFont, fontSize = 12.sp)) {
-                        append("Note: ")
-                    }
-                    append("For safety, we highly recommend having someone assist you in timing your tests.")
-                },
-                style = TextStyle(fontSize = 12.sp, color = DirtyWhite, fontFamily = captionFont),
-                textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .padding(top = 16.dp)
-                    .fillMaxWidth()
-            )
-
-            Spacer(modifier = Modifier.height(80.dp))
-
-            // Instruction Section
-            Box(
-                modifier = Modifier
-                    .clip(shape = RoundedCornerShape(20.dp))
-                    .background(DirtyWhite)
-                    .padding(20.dp)
-            ) {
-                Text(
-                    text = "Do pull-ups as much as possible.",
-                    style = TextStyle(fontSize = 20.sp, color = DarkGreen, fontFamily = alt),
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
-
-            Spacer(modifier = Modifier.height(20.dp))
-
-            // Push-Ups Count Input
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(shape = RoundedCornerShape(20.dp))
-                    .background(Slime)
-                    .padding(20.dp)
-            ) {
-                TextField(
-                    value = pushUpsCount,
-                    onValueChange = { pushUpsCount = it },
-                    label = { Text("How many pull-ups were you able to do?", fontFamily = alt, color = DarkGreen) },
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = TextFieldDefaults.textFieldColors(
-                        containerColor = Slime,
-                        focusedIndicatorColor = DarkGreen,
-                        unfocusedIndicatorColor = Color.Transparent
-                    )
-                )
             }
         }
 
-        // Next button
+        // Input Section
         Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(bottom = 60.dp),
-            contentAlignment = Alignment.BottomCenter
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
         ) {
-            Button(
-                onClick = { navController.navigate("squat") },
-                colors = ButtonDefaults.buttonColors(Slime),
-                modifier = Modifier
-                    .padding(start = 40.dp, bottom = 50.dp, end = 40.dp)
-                    .fillMaxWidth()
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(
-                    text = "Next",
-                    color = DarkGreen,
-                    fontFamily = titleFont,
-                    fontSize = 20.sp
+                TextField(
+                    value = pullUpCount,
+                    onValueChange = { pullUpCount = it },
+                    label = { Text("Enter number of pull-ups", fontFamily = alt, color = DarkGreen) },
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .fillMaxWidth(),
+                    singleLine = true,
+                    colors = TextFieldDefaults.textFieldColors(
+                        containerColor = Color.White,
+                        focusedIndicatorColor = DarkGreen,
+                        unfocusedIndicatorColor = Color.Gray
+                    )
                 )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Button(
+                    onClick = {
+                        val pullUps = pullUpCount.toIntOrNull()
+                        if (pullUps != null && pullUps >= 0) {
+                            pullUpScore = calculatePullUpScore(pullUps)  // Calculate pull-up score
+                            onPullUpScore(pullUpScore)  // Pass the score to the next screen
+                            isTestComplete = true
+                            errorMessage = ""
+                        } else {
+                            errorMessage = "Please enter a valid number of pull-ups"
+                            isTestComplete = false
+                        }
+                    },
+                    colors = ButtonDefaults.buttonColors(Slime),
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .fillMaxWidth()
+                ) {
+                    Text(
+                        text = "Submit",
+                        color = DarkGreen,
+                        fontSize = 18.sp,
+                        fontFamily = titleFont
+                    )
+                }
+
+                // Display error message if the input is invalid
+                if (errorMessage.isNotEmpty()) {
+                    Text(
+                        text = errorMessage,
+                        color = Color.Red,
+                        modifier = Modifier.padding(16.dp)
+                    )
+                }
+
+                if (isTestComplete) {
+                    Text(
+                        text = "Pull-up test complete",
+                        style = TextStyle(color = Color.Green, fontSize = 18.sp),
+                        modifier = Modifier.padding(16.dp)
+                    )
+                }
+            }
+        }
+
+        // Next Button
+        if (isTestComplete) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(bottom = 60.dp),
+                contentAlignment = Alignment.BottomCenter
+            ) {
+                Button(
+                    onClick = {
+                        navController.navigate("squat?height=$height&weight=$weight&bmiCategory=$bmiCategory&fitnessGoal=$fitnessGoal&muscleGroup=$muscleGroup&pushUpScore=$pushUpScore&plankScore=$plankScore&pullUpScore=$pullUpScore") {
+                            popUpTo("pullup") { inclusive = true }  // Remove Pull-up screen from backstack
+                            launchSingleTop = true
+                        }
+                    },
+                    colors = ButtonDefaults.buttonColors(Slime),
+                    modifier = Modifier
+                        .padding(start = 40.dp, bottom = 50.dp, end = 40.dp)
+                        .fillMaxWidth()
+                ) {
+                    Text(
+                        text = "Next",
+                        color = DarkGreen,
+                        fontFamily = titleFont,
+                        fontSize = 28.sp
+                    )
+                }
             }
         }
     }
 }
-

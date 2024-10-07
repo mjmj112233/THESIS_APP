@@ -1,5 +1,6 @@
 package com.example.thesis_app
 
+import android.content.Context
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.animation.AnimatedVisibility
@@ -42,13 +43,17 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun loginPage(navController: NavController) {
     // Add a coroutine scope for handling API calls
     val coroutineScope = rememberCoroutineScope()
-    val authRepository = AuthRepository() // Assuming AuthRepository is set up as shown earlier
-    val context = LocalContext.current // To show Toast messages
+    val context = LocalContext.current
+    val authRepository = AuthRepository(context) // Adjusted to not require context
+
+    // State for error message
+    var errorMessage by remember { mutableStateOf("") } // Error message state
 
     Box(
         modifier = Modifier
@@ -56,16 +61,13 @@ fun loginPage(navController: NavController) {
             .background(BlueGreen)
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxSize(),
+            modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
             Box(
                 contentAlignment = Alignment.TopCenter,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(480.dp)
+                modifier = Modifier.fillMaxWidth().height(480.dp)
             ) {
                 Box(
                     modifier = Modifier
@@ -84,9 +86,7 @@ fun loginPage(navController: NavController) {
                     val passwordFocusRequester = remember { FocusRequester() }
 
                     Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(top = 8.dp)
+                        modifier = Modifier.fillMaxSize().padding(top = 8.dp)
                     ) {
                         Text(
                             text = "Login",
@@ -108,17 +108,10 @@ fun loginPage(navController: NavController) {
                                 val labelOffset by animateDpAsState(if (isUsernameFocused || username.isNotEmpty()) 16.dp else 0.dp)
                                 val labelFontSize by animateFloatAsState(if (isUsernameFocused || username.isNotEmpty()) 10f else 16f)
 
-                                AnimatedVisibility(
-                                    visible = true,
-                                    modifier = Modifier.padding(bottom = labelOffset)
-                                ) {
+                                AnimatedVisibility(visible = true, modifier = Modifier.padding(bottom = labelOffset)) {
                                     Text(
                                         text = "Username",
-                                        style = TextStyle(
-                                            fontFamily = titleFont,
-                                            fontSize = labelFontSize.sp,
-                                            color = DarkerAsh
-                                        )
+                                        style = TextStyle(fontFamily = titleFont, fontSize = labelFontSize.sp, color = DarkerAsh)
                                     )
                                 }
                             },
@@ -128,9 +121,7 @@ fun loginPage(navController: NavController) {
                                 containerColor = Ash
                             ),
                             shape = RoundedCornerShape(20.dp),
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 2.dp)
+                            modifier = Modifier.fillMaxWidth().padding(horizontal = 2.dp)
                                 .focusRequester(usernameFocusRequester)
                                 .onFocusChanged { focusState -> isUsernameFocused = focusState.isFocused }
                         )
@@ -145,17 +136,10 @@ fun loginPage(navController: NavController) {
                                 val labelOffset by animateDpAsState(if (isPasswordFocused || password.isNotEmpty()) 16.dp else 0.dp)
                                 val labelFontSize by animateFloatAsState(if (isPasswordFocused || password.isNotEmpty()) 10f else 16f)
 
-                                AnimatedVisibility(
-                                    visible = true,
-                                    modifier = Modifier.padding(bottom = labelOffset)
-                                ) {
+                                AnimatedVisibility(visible = true, modifier = Modifier.padding(bottom = labelOffset)) {
                                     Text(
                                         text = "Password",
-                                        style = TextStyle(
-                                            fontFamily = titleFont,
-                                            fontSize = labelFontSize.sp,
-                                            color = DarkerAsh
-                                        )
+                                        style = TextStyle(fontFamily = titleFont, fontSize = labelFontSize.sp, color = DarkerAsh)
                                     )
                                 }
                             },
@@ -166,53 +150,36 @@ fun loginPage(navController: NavController) {
                             ),
                             shape = RoundedCornerShape(20.dp),
                             visualTransformation = PasswordVisualTransformation(),
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 2.dp)
+                            modifier = Modifier.fillMaxWidth().padding(horizontal = 2.dp)
                                 .focusRequester(passwordFocusRequester)
                                 .onFocusChanged { focusState -> isPasswordFocused = focusState.isFocused }
                         )
 
                         // Login button and functionality
-                        Box(
-                            modifier = Modifier
-                                .height(160.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Column(
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.Center
-                            ) {
+                        Box(modifier = Modifier.height(160.dp), contentAlignment = Alignment.Center) {
+                            Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
                                 Button(
                                     onClick = {
                                         coroutineScope.launch {
-                                            // Call login function when button is clicked
-                                            handleLogin(username, password, authRepository, context, navController)
+                                            handleLogin(username, password, authRepository, context, navController, { error ->
+                                                errorMessage = error
+                                            })
                                         }
                                     },
                                     colors = ButtonDefaults.buttonColors(Slime),
-                                    modifier = Modifier
-                                        .padding(start = 0.dp, bottom = 10.dp, end = 0.dp)
-                                        .fillMaxWidth()
+                                    modifier = Modifier.fillMaxWidth()
                                 ) {
-                                    Text(
-                                        text = "Login",
-                                        color = DarkGreen,
-                                        fontFamily = titleFont,
-                                        fontSize = 20.sp
-                                    )
+                                    Text(text = "Login", color = DarkGreen, fontFamily = titleFont, fontSize = 20.sp)
                                 }
 
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
+                                if (errorMessage.isNotEmpty()) {
+                                    Text(text = errorMessage, color = Color.Red, modifier = Modifier.padding(8.dp))
+                                }
+
+                                Row(verticalAlignment = Alignment.CenterVertically) {
                                     Text(
                                         text = "Don't have an account yet?",
-                                        style = TextStyle(
-                                            fontFamily = captionFont,
-                                            fontSize = 12.sp,
-                                            color = Blackk
-                                        )
+                                        style = TextStyle(fontFamily = captionFont, fontSize = 12.sp, color = Blackk)
                                     )
 
                                     Spacer(modifier = Modifier.width(4.dp))
@@ -223,13 +190,8 @@ fun loginPage(navController: NavController) {
                                                 append("Sign up here.")
                                             }
                                         },
-                                        onClick = {
-                                            navController.navigate("signup")
-                                        },
-                                        style = TextStyle(
-                                            fontFamily = titleFont,
-                                            fontSize = 13.sp
-                                        )
+                                        onClick = { navController.navigate("signup") },
+                                        style = TextStyle(fontFamily = titleFont, fontSize = 13.sp)
                                     )
                                 }
                             }
@@ -248,9 +210,7 @@ fun loginPage(navController: NavController) {
                         painter = painterResource(id = R.drawable.spot_logo_white),
                         contentDescription = "Logo",
                         contentScale = ContentScale.Fit,
-                        modifier = Modifier
-                            .size(60.dp)
-                            .align(Alignment.Center)
+                        modifier = Modifier.size(60.dp).align(Alignment.Center)
                     )
                 }
             }
@@ -262,35 +222,35 @@ suspend fun handleLogin(
     username: String,
     password: String,
     authRepository: AuthRepository,
-    context: android.content.Context,
-    navController: NavController
+    context: Context,
+    navController: NavController,
+    setError: (String) -> Unit // Pass a lambda to set the error message
 ) {
     // Prepare User data
     val loginRequest = LoginRequest(username, password)
 
     // Make the API call
-    withContext(Dispatchers.IO) {
-        authRepository.loginUser(loginRequest).enqueue(object : Callback<LoginResponse> {
-            override fun onResponse(call: Call<LoginResponse>, response: Response<LoginResponse>) {
-                if (response.isSuccessful) {
-                    // Save token using TokenManager (assume you have this implemented)
-                    val tokenManager = TokenManager(context)
-                    val token = response.body()?.token
-                    token?.let {
-                        tokenManager.saveToken(it)
-                    }
-                    // Navigate to main screen
-                    navController.navigate("main")
-                } else {
-                    // Show login failed message
-                    Toast.makeText(context, "Login failed", Toast.LENGTH_SHORT).show()
+    authRepository.loginUser(loginRequest).enqueue(object : Callback<LoginResponse> {
+        override fun onResponse(call: Call<LoginResponse>, response: Response<LoginResponse>) {
+            if (response.isSuccessful) {
+                // Save token using TokenManager
+                val token = response.body()?.token
+                token?.let {
+                    TokenManager.saveToken(context, it) // Save the token in shared preferences
                 }
+                // Navigate to main screen
+                navController.navigate("main")
+            } else {
+                // Show login failed message
+                setError("Login failed: ${response.message()}") // Call the lambda to set error
             }
+        }
 
-            override fun onFailure(call: Call<LoginResponse>, t: Throwable) {
-                // Show error message
-                Toast.makeText(context, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
-            }
-        })
-    }
+        override fun onFailure(call: Call<LoginResponse>, t: Throwable) {
+            // Show error message
+            setError("Error: ${t.message}") // Call the lambda to set error
+        }
+    })
 }
+
+
