@@ -26,16 +26,17 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun Navigation(startDestination: String = "second") {
+fun Navigation(startDestination: String = "third") {
     val navController = rememberNavController()
 
     NavHost(navController = navController, startDestination = startDestination) {
 //        composable("first") {
 //            splashScreen(navController)
 //        }
-        composable("second") {
-            loadingScreen(navController)
-        }
+//        composable("second") {
+//            loadingScreen(navController)
+//        }
+
         composable("third") {
             firstPage(navController)
         }
