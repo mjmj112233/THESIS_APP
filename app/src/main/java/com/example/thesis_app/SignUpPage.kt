@@ -120,7 +120,7 @@ fun signupPage(navController: NavController) {
                                 verticalArrangement = Arrangement.Center
                             ) {
                                 FloatingActionButton(
-                                    onClick = { navController.navigate("welcome") },
+                                    onClick = { navController.navigate("login") },
                                     containerColor = Slime,
                                     contentColor = DarkGreen,
                                     modifier = Modifier.size(60.dp)

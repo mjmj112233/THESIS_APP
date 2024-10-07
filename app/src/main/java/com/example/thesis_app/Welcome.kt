@@ -118,7 +118,7 @@ fun Welcome(navController: NavController) {
             // Button
             Button(
                 onClick = {
-                    navController.navigate("bmi")
+                    navController.navigate("main")
                 },
                 colors = ButtonDefaults.buttonColors(Slime),
                 modifier = Modifier
