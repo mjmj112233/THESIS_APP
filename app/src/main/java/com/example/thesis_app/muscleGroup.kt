@@ -178,7 +178,8 @@ fun muscleGroupScreen(navController: NavController) {
                             .size(100.dp)
                             .clip(CircleShape)
                             .background(Slime)
-                            .padding(8.dp),
+                            .padding(8.dp)
+                            .clickable { /*api call to add upper or lower sa target muscle group*/ },
                         contentAlignment = Alignment.Center
                     ) {
                         Image(

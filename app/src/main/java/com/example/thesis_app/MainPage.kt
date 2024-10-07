@@ -57,46 +57,46 @@ fun mainPage(navController: NavController) {
 //        WorkoutDay("DAY 7", listOf("Cardio 1"), true) // Rest day
 //    )
 
-    if (workoutDays.isEmpty() && showDialog) {
-        AlertDialog(
-            onDismissRequest = { showDialog = false },
-            text = {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        painter = painterResource(R.drawable.baseline_warning_24),
-                        contentDescription = "Warning",
-                        tint = DarkGreen,
-                        modifier = Modifier
-                            .padding(end = 24.dp)
-                            .size(40.dp)
-                    )
-                    Column {
-                        Text(
-                            text = "In order for us to recommend your personalized workout routine, a quick user assessment is needed.",
-                            color = DarkGreen,
-                            fontFamily = titleFont,
-                            textAlign = TextAlign.Justify
-                        )
-                        Spacer(modifier = Modifier.height(16.dp))
-                        Text(
-                            text = "To learn more about how we process your data, read our Terms and Conditions.",
-                            color = DarkGreen,
-                            fontFamily = titleFont,
-                            modifier = Modifier.clickable { /* Handle T&C click */ }
-                        )
-                    }
-                }
-            },
-            confirmButton = {
-                TextButton(
-                    onClick = { showDialog = false },
-                    modifier = Modifier.background(Slime, shape = RoundedCornerShape(16.dp))
-                ) {
-                    Text("Proceed", color = DarkGreen, fontFamily = titleFont,)
-                }
-            }
-        )
-    }
+//    if (workoutDays.isEmpty() && showDialog) {
+//        AlertDialog(
+//            onDismissRequest = { showDialog = false },
+//            text = {
+//                Row(verticalAlignment = Alignment.CenterVertically) {
+//                    Icon(
+//                        painter = painterResource(R.drawable.baseline_warning_24),
+//                        contentDescription = "Warning",
+//                        tint = DarkGreen,
+//                        modifier = Modifier
+//                            .padding(end = 24.dp)
+//                            .size(40.dp)
+//                    )
+//                    Column {
+//                        Text(
+//                            text = "In order for us to recommend your personalized workout routine, a quick user assessment is needed.",
+//                            color = DarkGreen,
+//                            fontFamily = titleFont,
+//                            textAlign = TextAlign.Justify
+//                        )
+//                        Spacer(modifier = Modifier.height(16.dp))
+//                        Text(
+//                            text = "To learn more about how we process your data, read our Terms and Conditions.",
+//                            color = DarkGreen,
+//                            fontFamily = titleFont,
+//                            modifier = Modifier.clickable { /* Handle T&C click */ }
+//                        )
+//                    }
+//                }
+//            },
+//            confirmButton = {
+//                TextButton(
+//                    onClick = { showDialog = false },
+//                    modifier = Modifier.background(Slime, shape = RoundedCornerShape(16.dp))
+//                ) {
+//                    Text("Proceed", color = DarkGreen, fontFamily = titleFont,)
+//                }
+//            }
+//        )
+//    }
 
     Box(modifier = Modifier.fillMaxSize()) {
         ModalNavigationDrawer(
@@ -195,24 +195,24 @@ fun mainPage(navController: NavController) {
                                 .padding(32.dp)
                         ) {
 
-                            //check if workout is empty, to show button
-                            if (workoutDays.isEmpty()) {
-                                if (!showDialog) {
-                                    Box(
-                                        modifier = Modifier.fillMaxSize(),
-                                        contentAlignment = Alignment.Center
-                                    ) {
-                                        Button(
-                                            onClick = { navController.navigate("bmi") },
-                                            colors = ButtonDefaults.buttonColors(containerColor = Slime),
-                                            modifier = Modifier
-                                                .padding(vertical = 20.dp)
-                                        ) {
-                                            Text(text = "Start User Assessment", color = DarkGreen, fontFamily = titleFont)
-                                        }
-                                    }
-                                }
-                            } else {
+//                            //check if workout is empty, to show button
+//                            if (workoutDays.isEmpty()) {
+//                                if (!showDialog) {
+//                                    Box(
+//                                        modifier = Modifier.fillMaxSize(),
+//                                        contentAlignment = Alignment.Center
+//                                    ) {
+//                                        Button(
+//                                            onClick = { navController.navigate("bmi") },
+//                                            colors = ButtonDefaults.buttonColors(containerColor = Slime),
+//                                            modifier = Modifier
+//                                                .padding(vertical = 20.dp)
+//                                        ) {
+//                                            Text(text = "Start User Assessment", color = DarkGreen, fontFamily = titleFont)
+//                                        }
+//                                    }
+//                                }
+//                            } else {
 
                                 Text(
                                     text = "Your Personalized Workout Routine",
@@ -235,7 +235,7 @@ fun mainPage(navController: NavController) {
                                     }
                                 }
                             }
-                        }
+//                        }
                     },
                     bottomBar = {
                         BottomAppBar(
