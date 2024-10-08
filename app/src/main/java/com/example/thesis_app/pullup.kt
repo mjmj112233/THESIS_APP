@@ -178,7 +178,7 @@ fun pullup(
                 TextField(
                     value = pullUpCount,
                     onValueChange = { pullUpCount = it },
-                    label = { Text("How many pull-ups were you able to do?", fontFamily = alt, color = BlueGreen) },
+                    label = { Text("How many pull-ups were you able to do?", fontFamily = alt, color = DarkGreen) },
                     modifier = Modifier.fillMaxWidth(),
                     colors = TextFieldDefaults.textFieldColors(
                         containerColor = DirtyWhite,

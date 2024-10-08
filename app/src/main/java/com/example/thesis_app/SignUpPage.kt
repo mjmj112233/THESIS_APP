@@ -133,6 +133,18 @@ fun signupPage(navController: NavController) {
                             ) {
                                 FloatingActionButton(
                                     onClick = {
+                                        // Check if there's input  username or password
+                                        if (username.isEmpty() || password.isEmpty()) {
+                                            Toast.makeText(context, "Please enter your Username or Password", Toast.LENGTH_SHORT).show()
+                                            return@FloatingActionButton
+                                        }
+
+                                        // check if there's no password confirmation
+                                        if (confirmPassword.isEmpty()) {
+                                            Toast.makeText(context, "Please confirm your password", Toast.LENGTH_SHORT).show()
+                                            return@FloatingActionButton
+                                        }
+
                                         // Check if passwords match
                                         if (password != confirmPassword) {
                                             Toast.makeText(context, "Passwords do not match", Toast.LENGTH_SHORT).show()

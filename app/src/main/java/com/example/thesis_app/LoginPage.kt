@@ -160,10 +160,14 @@ fun loginPage(navController: NavController) {
                             Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
                                 Button(
                                     onClick = {
-                                        coroutineScope.launch {
-                                            handleLogin(username, password, authRepository, context, navController, { error ->
-                                                errorMessage = error
-                                            })
+                                        if (username.isEmpty() || password.isEmpty()) {
+                                            Toast.makeText(context, "Please enter your Username and Password", Toast.LENGTH_SHORT).show()
+                                        } else {
+                                            coroutineScope.launch {
+                                                handleLogin(username, password, authRepository, context, navController, { error ->
+                                                    errorMessage = error }
+                                                )
+                                            }
                                         }
                                     },
                                     colors = ButtonDefaults.buttonColors(Slime),
@@ -240,6 +244,8 @@ suspend fun handleLogin(
                 }
                 // Navigate to main screen
                 navController.navigate("main")
+            } else if (response.code() == 401){
+                Toast.makeText(context, "Enter valid username or password", Toast.LENGTH_SHORT).show()
             } else {
                 // Show login failed message
                 setError("Login failed: ${response.message()}") // Call the lambda to set error
