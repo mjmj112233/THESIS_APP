@@ -136,7 +136,7 @@ fun mainPage(navController: NavController) {
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(16.dp)
-                            .clickable { /* Handle Settings click */ }
+                            .clickable { navController.navigate("login") }
                     )
 
                     Text(
