@@ -1,5 +1,6 @@
 package com.example.thesis_app
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -12,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
@@ -22,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.thesis_app.ui.theme.*
+import androidx.compose.ui.platform.LocalContext
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -38,8 +41,8 @@ fun pullup(
 ) {
     var pullUpCount by remember { mutableStateOf("") }
     var isTestComplete by remember { mutableStateOf(false) }
-    var errorMessage by remember { mutableStateOf("") }
     var pullUpScore by remember { mutableStateOf(0) }  // Store calculated pull-up score
+    val context = LocalContext.current
 
     // Function to calculate the pull-up score based on count
     fun calculatePullUpScore(count: Int): Int {
@@ -206,9 +209,8 @@ fun pullup(
                             pullUpScore = calculatePullUpScore(pullUps)  // Calculate pull-up score
                             onPullUpScore(pullUpScore)  // Pass the score to the next screen
                             isTestComplete = true
-                            errorMessage = ""
                         } else {
-                            errorMessage = "Please enter a valid number of pull-ups"
+                            Toast.makeText(context, "Please enter a valid number of pull ups", Toast.LENGTH_SHORT).show()
                             isTestComplete = false
                         }
                     },
@@ -222,23 +224,6 @@ fun pullup(
                         color = DarkGreen,
                         fontSize = 18.sp,
                         fontFamily = titleFont
-                    )
-                }
-
-                // Display error message if the input is invalid
-                if (errorMessage.isNotEmpty()) {
-                    Text(
-                        text = errorMessage,
-                        color = Color.Red,
-                        modifier = Modifier.padding(16.dp)
-                    )
-                }
-
-                if (isTestComplete) {
-                    Text(
-                        text = "Pull-up test complete",
-                        style = TextStyle(color = Color.Green, fontSize = 18.sp),
-                        modifier = Modifier.padding(16.dp)
                     )
                 }
             }

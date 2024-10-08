@@ -2,6 +2,7 @@ package com.example.thesis_app
 
 import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -345,7 +346,23 @@ fun SquatScreen(
         ) {
             Button(
                 onClick = {
+                    // Check if the input is empty
+                    if (squatCount.trim().isEmpty()) {
+                        // Handle the case where the input is empty (e.g., show an error message)
+                        Toast.makeText(context, "Please enter your squat count.", Toast.LENGTH_SHORT).show()
+                        return@Button
+                    }
+
                     val squats = squatCount.trim().toIntOrNull()
+
+                    // Check if it's a valid integer
+                    if (squats == null) {
+                        // Handle invalid input (e.g., show an error message)
+                        Toast.makeText(context, "Please enter a valid number for squats.", Toast.LENGTH_SHORT).show()
+                        return@Button
+
+                    }
+
                     squatScore = when {
                         squats != null && squats >= 30 -> 3
                         squats != null && squats in 15..29 -> 2

@@ -23,6 +23,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.thesis_app.ui.theme.*
+import android.widget.Toast
+import androidx.compose.ui.platform.LocalContext
+
 
 @SuppressLint("DefaultLocale")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -34,6 +37,8 @@ fun BMIScreen(navController: NavController) {
     var bmiCategory by remember { mutableStateOf("") }
     var fitnessGoal by remember { mutableStateOf("") }
     var isBmiCalculated by remember { mutableStateOf(false) }
+
+    val context = LocalContext.current
 
     // Image Background
     Box(
@@ -165,6 +170,17 @@ fun BMIScreen(navController: NavController) {
                     onClick = {
                         val height = heightInput.trim().toFloatOrNull()?.div(100) // Convert cm to meters
                         val weight = weightInput.trim().toFloatOrNull()
+
+                        // Check if both inputs are valid integers
+                        val isHeightValid = heightInput.trim().toIntOrNull() != null
+                        val isWeightValid = weightInput.trim().toIntOrNull() != null
+
+                        if (!isHeightValid || !isWeightValid) {
+                            // Show a toast message if either input is not a valid integer
+                            Toast.makeText(context,
+                                "Please enter your height and weight in number.", Toast.LENGTH_SHORT).show()
+                            return@Button
+                        }
 
                         if (height != null && weight != null && height > 0) {
                             val bmi = weight / (height * height)

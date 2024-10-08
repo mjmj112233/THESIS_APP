@@ -1,5 +1,6 @@
 package com.example.thesis_app
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -23,6 +24,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.thesis_app.ui.theme.*
 import kotlinx.coroutines.delay
+import androidx.compose.ui.platform.LocalContext
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -38,7 +40,6 @@ fun plank(
 ) {
     var plankTime by remember { mutableStateOf("") }
     var isTestComplete by remember { mutableStateOf(false) }
-    var errorMessage by remember { mutableStateOf("") }
     var plankScore by remember { mutableStateOf(0) }  // Store calculated plank score
 
     //timer
@@ -46,6 +47,7 @@ fun plank(
     var started by remember { mutableStateOf(false) } // Control if the timer has started
     var showDialog by remember { mutableStateOf(false) } // Control the visibility of the dialog
     var showInputField by remember { mutableStateOf(false) } // Control visibility of the input field
+    val context = LocalContext.current
 
     // Function to calculate the plank score based on time
     fun calculatePlankScore(time: Int): Int {
@@ -310,9 +312,8 @@ fun plank(
                             plankScore = calculatePlankScore(plankTimeInSeconds)
                             onPlankScore(plankScore)
                             isTestComplete = true
-                            errorMessage = ""
                         } else {
-                            errorMessage = "Please enter a valid plank time"
+                            Toast.makeText(context, "Please enter a valid plank time", Toast.LENGTH_SHORT).show()
                             isTestComplete = false
                         }
                     },
@@ -326,23 +327,6 @@ fun plank(
                         color = DarkGreen,
                         fontSize = 20.sp,
                         fontFamily = titleFont
-                    )
-                }
-
-                // Display error message if the input is invalid
-                if (errorMessage.isNotEmpty()) {
-                    Text(
-                        text = errorMessage,
-                        color = Color.Red,
-                        modifier = Modifier.padding(16.dp)
-                    )
-                }
-
-                if (isTestComplete) {
-                    Text(
-                        text = "Plank test complete",
-                        style = TextStyle(color = Color.Green, fontSize = 18.sp),
-                        modifier = Modifier.padding(16.dp)
                     )
                 }
             }

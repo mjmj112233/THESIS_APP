@@ -248,13 +248,13 @@ suspend fun handleLogin(
                 Toast.makeText(context, "Enter valid username or password", Toast.LENGTH_SHORT).show()
             } else {
                 // Show login failed message
-                setError("Login failed: ${response.message()}") // Call the lambda to set error
+                Toast.makeText(context, "Login failed: ${response.message()}", Toast.LENGTH_SHORT).show()
             }
         }
 
         override fun onFailure(call: Call<LoginResponse>, t: Throwable) {
             // Show error message
-            setError("Error: ${t.message}") // Call the lambda to set error
+            Toast.makeText(context, "Error: ${t.message}", Toast.LENGTH_SHORT).show()// Call the lambda to set error
         }
     })
 }
