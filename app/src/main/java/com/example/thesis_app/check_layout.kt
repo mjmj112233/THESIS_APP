@@ -3,7 +3,6 @@ package com.example.thesis_app
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -18,15 +17,16 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.example.thesis_app.ui.theme.*
-import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun plank(
+fun layout(
     navController: NavController,
     height: Double,
     weight: Double,
@@ -34,24 +34,19 @@ fun plank(
     fitnessGoal: String,
     muscleGroup: String,
     pushUpScore: Int,
-    onPlankScore: (Int) -> Unit
+    plankScore: Int,
+    onPullUpScore: (Int) -> Unit
 ) {
-    var plankTime by remember { mutableStateOf("") }
+    var pullUpCount by remember { mutableStateOf("") }
     var isTestComplete by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf("") }
-    var plankScore by remember { mutableStateOf(0) }  // Store calculated plank score
+    var pullUpScore by remember { mutableStateOf(0) }  // Store calculated pull-up score
 
-    //timer
-    var timeElapsed by remember { mutableStateOf(0) }  // Timer starting at 0 seconds (stopwatch)
-    var started by remember { mutableStateOf(false) } // Control if the timer has started
-    var showDialog by remember { mutableStateOf(false) } // Control the visibility of the dialog
-    var showInputField by remember { mutableStateOf(false) } // Control visibility of the input field
-
-    // Function to calculate the plank score based on time
-    fun calculatePlankScore(time: Int): Int {
+    // Function to calculate the pull-up score based on count
+    fun calculatePullUpScore(count: Int): Int {
         return when {
-            time < 30 -> 1
-            time in 30..60 -> 2
+            count < 10 -> 1
+            count in 10..20 -> 2
             else -> 3
         }
     }
@@ -62,7 +57,6 @@ fun plank(
             .fillMaxSize()
             .background(BlueGreen)
     ) {
-
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -132,12 +126,13 @@ fun plank(
                                 modifier = Modifier
                                     .width(30.dp)
                                     .height(4.dp)
-                                    .background(if (it == 3) Slime else DirtyWhite)
+                                    .background(if (it == 4) Slime else DirtyWhite)
                             )
                         }
                     }
                 }
             }
+
 
             Spacer(modifier = Modifier.height(10.dp))
 
@@ -165,7 +160,7 @@ fun plank(
                     .padding(20.dp)
             ) {
                 Text(
-                    text = "Plank as long as you can.",
+                    text = "Do pull-ups as much as possible.",
                     style = TextStyle(fontSize = 20.sp, color = DarkGreen, fontFamily = alt),
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -173,123 +168,28 @@ fun plank(
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            // Start Stopwatch Button
-            if (!started) {
-                Button(
-                    onClick = { showDialog = true }, // Open the dialog when the button is clicked
-                    colors = ButtonDefaults.buttonColors(Slime),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(shape = CircleShape)
-                ) {
-                    Text(
-                        text = "Start Test",
-                        color = DarkGreen,
-                        fontFamily = titleFont,
-                        fontSize = 20.sp
-                    )
-                }
-            }
-        }
-
-        // Stopwatch Dialog
-        if (showDialog) {
-            AlertDialog(
-                onDismissRequest = { /* Optionally handle dismiss if needed */ },
-                confirmButton = {
-                    if (!started) {
-                        Button(
-                            onClick = {
-                                started = true // Start the stopwatch
-                            },
-                            colors = ButtonDefaults.buttonColors(Slime),
-                            modifier = Modifier
-                                .fillMaxWidth()
-                        ) {
-                            Text("Start", color = DarkGreen, fontFamily = alt, fontSize = 16.sp)
-                        }
-                    } else {
-                        Button(
-                            onClick = {
-                                started = false // Stop the stopwatch
-                                showDialog = false // Close the dialog when the user clicks stop
-                                showInputField = true // Show input field
-                            },
-                            colors = ButtonDefaults.buttonColors(Slime),
-                            modifier = Modifier
-                                .fillMaxWidth()
-                        ) {
-                            Text("Stop", color = DarkGreen, fontFamily = alt, fontSize = 16.sp)
-                        }
-                    }
-                },
-                text = {
-                    Box(
-                        modifier = Modifier
-                            .background(DirtyWhite)
-                            .padding(top = 16.dp)
-                            .clip(RoundedCornerShape(16.dp))
-                    ) {
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.baseline_timer_24),
-                                contentDescription = "Stopwatch",
-                                tint = DarkGreen,
-                                modifier = Modifier.size(60.dp)
-                            )
-                            Spacer(modifier = Modifier.height(10.dp))
-                            Text(
-                                text = "${timeElapsed}s",
-                                style = TextStyle(fontSize = 20.sp, color = DarkGreen, fontFamily = alt),
-                                textAlign = TextAlign.Center
-                            )
-                        }
-                    }
-                },
-                containerColor = DirtyWhite,
-                modifier = Modifier.clip(RoundedCornerShape(16.dp))
-            )
-        }
-
-        // Show input field after stopping the stopwatch
-        if (showInputField) {
+            // Push-Ups Count Input
             Box(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(bottom = 220.dp),
-                contentAlignment = Alignment.BottomCenter
+                    .fillMaxWidth()
+                    .clip(shape = RoundedCornerShape(20.dp))
+                    .background(DirtyWhite)
+                    .padding(20.dp)
             ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(start = 30.dp, bottom = 50.dp, end = 30.dp)
-                ) {
-                    // Push-Ups Count Input
-                    Box(
-                        modifier = Modifier
-                            .clip(shape = RoundedCornerShape(20.dp))
-                            .background(DirtyWhite)
-                            .padding(20.dp)
-                    ) {
-                        TextField(
-                            value = plankTime,
-                            onValueChange = { plankTime = it },
-                            label = { Text("How long were you able to hold the plank?", fontFamily = alt, color = DarkGreen) },
-                            modifier = Modifier.fillMaxWidth(),
-                            colors = TextFieldDefaults.textFieldColors(
-                                containerColor = DirtyWhite,
-                                focusedIndicatorColor = DarkGreen,
-                                unfocusedIndicatorColor = Color.Transparent
-                            )
-                        )
-                    }
-                }
+                TextField(
+                    value = pullUpCount,
+                    onValueChange = { pullUpCount = it },
+                    label = { Text("How many pull-ups were you able to do?", fontFamily = alt, color = BlueGreen) },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = TextFieldDefaults.textFieldColors(
+                        containerColor = DirtyWhite,
+                        focusedIndicatorColor = BlueGreen,
+                        unfocusedIndicatorColor = Color.Transparent
+                    )
+                )
             }
         }
+
 
 
         // Input Section
@@ -300,19 +200,18 @@ fun plank(
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-
                 Spacer(modifier = Modifier.height(700.dp))
 
                 Button(
                     onClick = {
-                        val plankTimeInSeconds = plankTime.toIntOrNull()
-                        if (plankTimeInSeconds != null && plankTimeInSeconds >= 0) {
-                            plankScore = calculatePlankScore(plankTimeInSeconds)
-                            onPlankScore(plankScore)
+                        val pullUps = pullUpCount.toIntOrNull()
+                        if (pullUps != null && pullUps >= 0) {
+                            pullUpScore = calculatePullUpScore(pullUps)  // Calculate pull-up score
+                            onPullUpScore(pullUpScore)  // Pass the score to the next screen
                             isTestComplete = true
                             errorMessage = ""
                         } else {
-                            errorMessage = "Please enter a valid plank time"
+                            errorMessage = "Please enter a valid number of pull-ups"
                             isTestComplete = false
                         }
                     },
@@ -324,7 +223,7 @@ fun plank(
                     Text(
                         text = "Next",
                         color = DarkGreen,
-                        fontSize = 20.sp,
+                        fontSize = 18.sp,
                         fontFamily = titleFont
                     )
                 }
@@ -340,7 +239,7 @@ fun plank(
 
                 if (isTestComplete) {
                     Text(
-                        text = "Plank test complete",
+                        text = "Pull-up test complete",
                         style = TextStyle(color = Color.Green, fontSize = 18.sp),
                         modifier = Modifier.padding(16.dp)
                     )
@@ -358,8 +257,8 @@ fun plank(
             ) {
                 Button(
                     onClick = {
-                        navController.navigate("pullup?height=$height&weight=$weight&bmiCategory=$bmiCategory&fitnessGoal=$fitnessGoal&muscleGroup=$muscleGroup&pushUpScore=$pushUpScore&plankScore=$plankScore") {
-                            popUpTo("plank") { inclusive = true }  // Remove Plank screen from backstack
+                        navController.navigate("squat?height=$height&weight=$weight&bmiCategory=$bmiCategory&fitnessGoal=$fitnessGoal&muscleGroup=$muscleGroup&pushUpScore=$pushUpScore&plankScore=$plankScore&pullUpScore=$pullUpScore") {
+                            popUpTo("pullup") { inclusive = true }  // Remove Pull-up screen from backstack
                             launchSingleTop = true
                         }
                     },
@@ -378,4 +277,22 @@ fun plank(
             }
         }
     }
+}
+
+// Preview function to visualize in Android Studio
+@Preview(showBackground = true)
+@Composable
+fun PullupPreview() {
+    val navController = rememberNavController()
+    layout(
+        navController = navController,
+        height = 1.75,
+        weight = 70.0,
+        bmiCategory = "Normal",
+        fitnessGoal = "Strength",
+        muscleGroup = "Upper Body",
+        pushUpScore = 2,
+        plankScore = 3,
+        onPullUpScore = {}
+    )
 }

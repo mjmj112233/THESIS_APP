@@ -56,17 +56,22 @@ fun pullup(
             .fillMaxSize()
             .background(BlueGreen)
     ) {
-
-        // Header
-        Box(
+        Column(
             modifier = Modifier
-                .padding(start = 30.dp, end = 30.dp, top = 40.dp)
+                .fillMaxSize()
+                .padding(start = 30.dp, end = 30.dp, top = 40.dp),
+            verticalArrangement = Arrangement.Top
         ) {
+            // Header Section (Logo + Text)
             Box(
                 contentAlignment = Alignment.CenterStart,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
             ) {
-                Box(modifier = Modifier.padding(start = 20.dp)) {
+                Box(
+                    modifier = Modifier
+                        .padding(start = 20.dp)
+                ) {
                     // Text container
                     Box(
                         contentAlignment = Alignment.Center,
@@ -79,13 +84,108 @@ fun pullup(
                             .offset(x = 20.dp)
                     ) {
                         Text(
-                            text = "Pull-up Test",
+                            text = "Strength and Endurance Test",
                             color = DirtyWhite,
-                            style = TextStyle(fontFamily = titleFont, fontSize = 24.sp),
+                            style = TextStyle(fontFamily = titleFont, fontSize = 16.sp),
                             textAlign = TextAlign.Center
                         )
                     }
                 }
+
+                // Logo circle
+                Box(
+                    modifier = Modifier
+                        .size(100.dp)
+                        .clip(shape = RoundedCornerShape(50.dp))
+                        .background(Slime)
+                        .align(Alignment.CenterStart)
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.spot_logo_white),
+                        contentDescription = "Logo",
+                        contentScale = ContentScale.Fit,
+                        modifier = Modifier
+                            .size(70.dp)
+                            .align(Alignment.Center)
+                    )
+                }
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 95.dp, start = 80.dp),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    repeat(6) {
+                        Box(
+                            modifier = Modifier
+                                .padding(horizontal = 3.dp)
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .width(30.dp)
+                                    .height(4.dp)
+                                    .background(if (it == 4) Slime else DirtyWhite)
+                            )
+                        }
+                    }
+                }
+            }
+
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            Text(
+                text = buildAnnotatedString {
+                    withStyle(style = SpanStyle(color = Slime, fontFamily = titleFont, fontSize = 12.sp)) {
+                        append("Note: ")
+                    }
+                    append("For safety, we highly recommend having someone assist you in timing your tests.")
+                },
+                style = TextStyle(fontSize = 12.sp, color = DirtyWhite, fontFamily = captionFont),
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .padding(top = 16.dp)
+                    .fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(80.dp))
+
+            // Instruction Section
+            Box(
+                modifier = Modifier
+                    .clip(shape = RoundedCornerShape(20.dp))
+                    .background(DirtyWhite)
+                    .padding(20.dp)
+            ) {
+                Text(
+                    text = "Do pull-ups as much as possible.",
+                    style = TextStyle(fontSize = 20.sp, color = DarkGreen, fontFamily = alt),
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            // Push-Ups Count Input
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(shape = RoundedCornerShape(20.dp))
+                    .background(DirtyWhite)
+                    .padding(20.dp)
+            ) {
+                TextField(
+                    value = pullUpCount,
+                    onValueChange = { pullUpCount = it },
+                    label = { Text("How many pull-ups were you able to do?", fontFamily = alt, color = BlueGreen) },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = TextFieldDefaults.textFieldColors(
+                        containerColor = DirtyWhite,
+                        focusedIndicatorColor = BlueGreen,
+                        unfocusedIndicatorColor = Color.Transparent
+                    )
+                )
             }
         }
 
@@ -97,22 +197,7 @@ fun pullup(
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                TextField(
-                    value = pullUpCount,
-                    onValueChange = { pullUpCount = it },
-                    label = { Text("Enter number of pull-ups", fontFamily = alt, color = DarkGreen) },
-                    modifier = Modifier
-                        .padding(16.dp)
-                        .fillMaxWidth(),
-                    singleLine = true,
-                    colors = TextFieldDefaults.textFieldColors(
-                        containerColor = Color.White,
-                        focusedIndicatorColor = DarkGreen,
-                        unfocusedIndicatorColor = Color.Gray
-                    )
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(700.dp))
 
                 Button(
                     onClick = {
@@ -129,11 +214,11 @@ fun pullup(
                     },
                     colors = ButtonDefaults.buttonColors(Slime),
                     modifier = Modifier
-                        .padding(16.dp)
+                        .padding(28.dp)
                         .fillMaxWidth()
                 ) {
                     Text(
-                        text = "Submit",
+                        text = "Next",
                         color = DarkGreen,
                         fontSize = 18.sp,
                         fontFamily = titleFont
