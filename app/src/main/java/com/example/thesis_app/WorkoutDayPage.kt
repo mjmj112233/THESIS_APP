@@ -108,7 +108,7 @@ fun WorkoutDayPage(navController: NavController, dayNum: Int, workoutRoutines: L
                                 contentPadding = PaddingValues(bottom = 100.dp) // Add bottom padding to avoid overlap with FAB
                             ) {
                                 items(filteredRoutines) { routine ->
-                                    WorkoutItem(routine)
+                                    WorkoutItem(routine, containerOpacity = 1f)
                                 }
                             }
                         }
