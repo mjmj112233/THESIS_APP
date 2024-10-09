@@ -173,7 +173,6 @@ fun mainPage(navController: NavController) {
                                         text = "Your Personalized Workout Routine",
                                         color = DirtyWhite,
                                         style = TextStyle(fontFamily = titleFont, fontSize = 20.sp),
-                                        modifier = Modifier.padding(top = 30.dp)
                                     )
 
 
@@ -335,22 +334,16 @@ fun WorkoutRoutinesList(workoutRoutines: List<WorkoutRoutineRequest>, containerO
                         )
                     }
 
-                    Row(
+                    LazyRow(
                         modifier = Modifier.fillMaxWidth()
                             .padding(horizontal = 0.dp),
                     ) {
-                        routines.forEach { routine ->
-                            WorkoutRoutineCard(routine, containerOpacity = 0.3f)
+                        items(routines) { routine ->
+                            WorkoutRoutineCard(routine = routine, containerOpacity = 0.3f)
                         }
-
                     }
                 }
-
-
-
             }
-
-
         }
     }
 }
