@@ -162,27 +162,29 @@ fun mainPage(navController: NavController) {
                                 .background(BlueGreen)
                                 .padding(32.dp)
                         ) {
-                                Text(
-                                    text = "Your Personalized Workout Routine",
-                                    color = DirtyWhite,
-                                    style = TextStyle(fontFamily = titleFont, fontSize = 20.sp),
-                                    modifier = Modifier.padding(top = 30.dp)
-                                )
+                            LazyColumn(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(top = 80.dp)
+                            ) {
+                                // Add a header or any other static content before the list
+                                item {
+                                    Text(
+                                        text = "Your Personalized Workout Routine",
+                                        color = DirtyWhite,
+                                        style = TextStyle(fontFamily = titleFont, fontSize = 20.sp),
+                                        modifier = Modifier.padding(top = 30.dp)
+                                    )
+                                }
 
-                            if (isLoading) {
-                                CircularProgressIndicator()
-                            } else {
-                                LazyColumn(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(top = 80.dp)
-                                ) {
-                                    item { // Wrap the content in an item block
-                                        if (workoutRoutines.isNotEmpty()) {
-                                            WorkoutRoutinesList(workoutRoutines, containerOpacity = 0.2f)
-                                        } else {
-                                            BasicText(text = "No workout routines available.")
-                                        }
+                                // Now add the workout routines
+                                item { // This item block can be used for conditional rendering
+                                    if (isLoading) {
+                                        CircularProgressIndicator()
+                                    } else if (workoutRoutines.isNotEmpty()) {
+                                        WorkoutRoutinesList(workoutRoutines, containerOpacity = 0.2f)
+                                    } else {
+                                        BasicText(text = "No workout routines available.")
                                     }
                                 }
                             }
