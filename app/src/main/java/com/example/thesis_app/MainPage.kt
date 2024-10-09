@@ -169,8 +169,9 @@ fun mainPage(navController: NavController) {
                                     modifier = Modifier.padding(top = 30.dp)
                                 )
 
-
-
+                            if (isLoading) {
+                                CircularProgressIndicator()
+                            } else {
                                 LazyColumn(
                                     modifier = Modifier
                                         .fillMaxWidth()
@@ -184,6 +185,10 @@ fun mainPage(navController: NavController) {
                                         }
                                     }
                                 }
+                            }
+
+
+
 
                             }
                     },
