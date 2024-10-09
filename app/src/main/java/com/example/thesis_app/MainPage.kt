@@ -162,23 +162,23 @@ fun mainPage(navController: NavController) {
                                 .background(BlueGreen)
                                 .padding(32.dp)
                         ) {
-                            LazyColumn(
+                            Column(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(top = 80.dp)
                             ) {
                                 // Add a header or any other static content before the list
-                                item {
+
                                     Text(
                                         text = "Your Personalized Workout Routine",
                                         color = DirtyWhite,
                                         style = TextStyle(fontFamily = titleFont, fontSize = 20.sp),
                                         modifier = Modifier.padding(top = 30.dp)
                                     )
-                                }
+
 
                                 // Now add the workout routines
-                                item { // This item block can be used for conditional rendering
+                                 // This item block can be used for conditional rendering
                                     if (isLoading) {
                                         CircularProgressIndicator()
                                     } else if (workoutRoutines.isNotEmpty()) {
@@ -186,7 +186,7 @@ fun mainPage(navController: NavController) {
                                     } else {
                                         BasicText(text = "No workout routines available.")
                                     }
-                                }
+                                
                             }
 
 
@@ -299,81 +299,6 @@ private fun generateWorkoutRoutine(context: Context, onResult: (List<WorkoutRout
 }
 
 @Composable
-fun daysContainer(navController: NavController, workoutDay: WorkoutDay, workouts: List<String>, containerOpacity: Float = 1f) {
-    Box(
-        modifier = Modifier
-            .padding(vertical = 10.dp)
-            .fillMaxWidth()
-            .height(250.dp)
-            .background(DirtyWhite.copy(alpha = containerOpacity), RoundedCornerShape(8.dp))
-            .clickable {
-                navController.navigate("workoutDay/${workoutDay.day}/${workouts.joinToString(",")}")
-            }
-            .padding(16.dp)
-    ) {
-        Column {
-            Box(
-                modifier = Modifier
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(Slime)
-                    .width(75.dp)
-                    .padding(horizontal = 12.dp, vertical = 8.dp)
-            ) {
-                Text(
-                    text = workoutDay.day,
-                    fontFamily = alt,
-                    fontSize = 16.sp,
-                    color = DarkGreen
-                )
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            if (workoutDay.isRestDay) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    LazyRow(
-                        modifier = Modifier
-                            .weight(1f)
-                            .fillMaxHeight(),
-                        contentPadding = PaddingValues(horizontal = 0.dp)
-                    ) {
-                        workoutDay.workouts?.let { workouts ->
-                            items(workouts) { workout ->
-                                workoutBox(workout, containerOpacity = 0.3f)
-                            }
-                        }
-                    }
-
-                    Text(
-                        text = "Rest Day",
-                        fontFamily = alt,
-                        fontSize = 32.sp,
-                        color = DirtyWhite,
-                        modifier = Modifier
-                            .offset(y = (-20).dp)
-                            .wrapContentHeight()
-                    )
-                }
-            } else {
-                LazyRow(
-                    modifier = Modifier.fillMaxWidth(),
-                    contentPadding = PaddingValues(horizontal = 0.dp)
-                ) {
-                    workoutDay.workouts?.let { workouts ->
-                        items(workouts) { workout ->
-                            workoutBox(workout, containerOpacity = 0.3f)
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
 fun WorkoutRoutinesList(workoutRoutines: List<WorkoutRoutineRequest>, containerOpacity: Float = 1f) {
     // Group the workout routines by day number
     val groupedRoutines = workoutRoutines.groupBy { it.dayNum }
@@ -423,52 +348,10 @@ fun WorkoutRoutinesList(workoutRoutines: List<WorkoutRoutineRequest>, containerO
                     WorkoutRoutineCard(routine, containerOpacity = 0.3f)
                 }
             }
-
-            // Add a divider after each day
-            Divider(modifier = Modifier.padding(vertical = 8.dp))
         }
     }
 }
 
-@Composable
-fun workoutBox(workout: String, containerOpacity: Float = 1f) {
-    Box(
-        modifier = Modifier
-            .padding(8.dp)
-            .clip(RoundedCornerShape(12.dp))
-            .background(DirtyWhite.copy(alpha = containerOpacity), RoundedCornerShape(8.dp))
-            .width(100.dp)
-            .height(200.dp)
-            .padding(12.dp)
-    ) {
-        Box(
-            modifier = Modifier
-                .align(Alignment.TopCenter)
-                .clip(shape = CircleShape)
-                .background(BlueGreen)
-                .height(80.dp)
-                .width(80.dp)
-        ) {
-            Icon(
-                painter = painterResource(R.drawable.baseline_directions_run_24),
-                contentDescription = null,
-                modifier = Modifier
-                    .size(60.dp)
-                    .align(Alignment.Center),
-                tint = Slime
-            )
-        }
-        Text(
-            text = workout,
-            fontFamily = alt,
-            fontSize = 12.sp,
-            color = Color.White,
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(bottom = 20.dp)
-        )
-    }
-}
 
 @Composable
 fun WorkoutRoutineCard(routine: WorkoutRoutineRequest, containerOpacity: Float = 1f) {
