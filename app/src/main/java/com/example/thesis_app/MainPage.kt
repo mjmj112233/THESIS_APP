@@ -37,17 +37,12 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-data class WorkoutDay(val day: String, val workouts: List<String>?, val isRestDay: Boolean)
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun mainPage(navController: NavController) {
     // State to control the visibility of the drawer
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
-
-
-
 
     //----------------------------------------------------------------------------
 
@@ -165,7 +160,7 @@ fun mainPage(navController: NavController) {
                             Column(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(top = 80.dp)
+                                    .padding(top = 60.dp)
                             ) {
                                 // Add a header or any other static content before the list
 
@@ -176,7 +171,7 @@ fun mainPage(navController: NavController) {
                                     )
 
                                 if (workoutRoutines.isNotEmpty()) {
-                                        WorkoutRoutinesList(workoutRoutines, containerOpacity = 0.2f)
+                                        WorkoutRoutinesList(navController, workoutRoutines, containerOpacity = 0.2f)
                                     } else {
                                         BasicText(text = "No workout routines available.")
                                     }
@@ -290,7 +285,7 @@ private fun generateWorkoutRoutine(context: Context, onResult: (List<WorkoutRout
 }
 
 @Composable
-fun WorkoutRoutinesList(workoutRoutines: List<WorkoutRoutineRequest>, containerOpacity: Float = 1f) {
+fun WorkoutRoutinesList(navController: NavController, workoutRoutines: List<WorkoutRoutineRequest>, containerOpacity: Float = 1f) {
     // Group the workout routines by day number
     val groupedRoutines = workoutRoutines.groupBy { it.dayNum }
 
@@ -305,7 +300,7 @@ fun WorkoutRoutinesList(workoutRoutines: List<WorkoutRoutineRequest>, containerO
                     .height(250.dp)
                     .background(DirtyWhite.copy(alpha = containerOpacity), RoundedCornerShape(8.dp))
                     .clickable {
-
+                        navController.navigate("workoutDay/$dayNum")
                     }
                     .padding(16.dp)
             ) {

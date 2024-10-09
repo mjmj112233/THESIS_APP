@@ -67,11 +67,11 @@ fun WorkoutRoutinePage(navController: NavController) {
             }
 
             // Display workout routines if available
-            if (workoutRoutines.isNotEmpty()) {
-                WorkoutRoutinesList(workoutRoutines)
-            } else {
-                BasicText(text = "No workout routines available.")
-            }
+//            if (workoutRoutines.isNotEmpty()) {
+//                WorkoutRoutinesList(workoutRoutines)
+//            } else {
+//                BasicText(text = "No workout routines available.")
+//            }
         }
     }
 }
