@@ -47,8 +47,8 @@ fun pullup(
     // Function to calculate the pull-up score based on count
     fun calculatePullUpScore(count: Int): Int {
         return when {
-            count < 10 -> 1
-            count in 10..20 -> 2
+            count < 1 -> 1
+            count == 1 -> 2
             else -> 3
         }
     }

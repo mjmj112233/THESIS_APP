@@ -1,5 +1,6 @@
 package com.example.thesis_app
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -12,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
@@ -37,8 +39,9 @@ fun pushUp(
 ) {
     var pushUpCount by remember { mutableStateOf("") }
     var isTestComplete by remember { mutableStateOf(false) }
-    var errorMessage by remember { mutableStateOf("") }
     var pushUpScore by remember { mutableStateOf(0) }  // Store the calculated score
+
+    val context = LocalContext.current
 
     //timer
     var timeLeft by remember { mutableStateOf(10) }  // Timer starting at 60 seconds
@@ -49,8 +52,8 @@ fun pushUp(
     // Function to calculate the push-up score based on the count
     fun calculatePushUpScore(count: Int): Int {
         return when {
-            count < 20 -> 1
-            count in 20..39 -> 2
+            count < 15 -> 1
+            count in 15..25 -> 2
             else -> 3
         }
     }
@@ -302,9 +305,9 @@ fun pushUp(
                         if (pushUps != null && pushUps >= 0) {
                             pushUpScore = calculatePushUpScore(pushUps)
                             isTestComplete = true
-                            errorMessage = ""
+
                         } else {
-                            errorMessage = "Please enter a valid push-up count"
+                            Toast.makeText(context, "Please enter a valid push-up count", Toast.LENGTH_SHORT).show()
                             isTestComplete = false
                         }
                     },
@@ -318,15 +321,6 @@ fun pushUp(
                         color = DarkGreen,
                         fontSize = 18.sp,
                         fontFamily = titleFont
-                    )
-                }
-
-                // Display error message if the input is invalid
-                if (errorMessage.isNotEmpty()) {
-                    Text(
-                        text = errorMessage,
-                        color = Color.Red,
-                        modifier = Modifier.padding(16.dp)
                     )
                 }
 
