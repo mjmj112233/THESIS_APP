@@ -1,7 +1,6 @@
 package com.example.thesis_app
 
 import android.content.Context
-import android.util.Log
 import android.widget.Space
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -14,7 +13,9 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.BottomAppBar
+import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -60,18 +61,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun WorkoutDayPage(navController: NavController, dayNum: Int, workoutRoutines: List<WorkoutRoutineRequest>) {
-
-    // Filter routines for the selected day number
-    val filteredRoutines = workoutRoutines.filter { it.dayNum == dayNum }
-
-    // Log filtered routines size
-    Log.d("WorkoutDayPage", "Filtered Routines Size: ${filteredRoutines.size}")
-
-    // Log each routine
-    filteredRoutines.forEach { routine ->
-        Log.d("WorkoutDayPage", "Routine: $routine")
-    }
+fun WorkoutDayPage(navController: NavController, selectedDayNum: Int) {
 
     val context = LocalContext.current
     var workoutRoutines by remember { mutableStateOf<List<WorkoutRoutineRequest>>(emptyList()) }
@@ -128,33 +118,17 @@ fun WorkoutDayPage(navController: NavController, dayNum: Int, workoutRoutines: L
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
                             Text(
-                                text = "DAY $dayNum",
+                                text = "DAY $selectedDayNum",
                                 fontSize = 20.sp,
                                 fontFamily = titleFont,
                                 color = DirtyWhite,
                                 textAlign = TextAlign.Center
                             )
                         }
-
-                        // Display workouts in a LazyColumn
-                        LazyColumn(
-                            modifier = Modifier.fillMaxSize(),
-                            contentPadding = PaddingValues(bottom = 100.dp) // Add bottom padding to avoid overlap with FAB
-                        ) {
-                            if (filteredRoutines.isNotEmpty()) {
-                                items(filteredRoutines) { routine ->
-                                    WorkoutItem(routine, containerOpacity = 1f)
-
-                                    // Log the workout info for each routine
-                                    Log.d("WorkoutDayPage", "WorkoutItem: ${routine.workoutInfo?.workout?.name}")
-                                }
-                            } else {
-                                // Log when no routines are found for the selected day
-                                Log.d("WorkoutDayPage", "No routines found for day $dayNum")
-                            }
+                            WorkoutItem(workoutRoutines, containerOpacity = 1f)
                         }
                     }
-                }
+
             },
             bottomBar = {
                 BottomAppBar(
@@ -226,138 +200,165 @@ private fun fetchWorkoutRoutines(context: Context, onResult: (List<WorkoutRoutin
     }
 }
 
+
 @Composable
-fun WorkoutItem(routine: WorkoutRoutineRequest, containerOpacity: Float = 1f) {
-    routine.workoutInfo?.let { workoutInfo ->
-        Box(
+fun WorkoutItem(workoutRoutines: List<WorkoutRoutineRequest>, containerOpacity: Float = 1f)  {
+
+    val groupedRoutines = workoutRoutines.groupBy { it.dayNum }
+
+    LazyColumn(
+        modifier = Modifier.fillMaxSize(),
+        contentPadding = PaddingValues(bottom = 100.dp) // Add bottom padding to avoid overlap with FAB
+    ) {
+        items(groupedRoutines.toList()) { (dayNum, routines) ->
+
+            routines.forEach { routine ->
+                WorkoutCard(routine)
+            }
+
+            // Add a divider after each day
+            Divider(modifier = Modifier.padding(vertical = 8.dp))
+        }
+    }
+
+}
+
+@Composable
+fun WorkoutCard(routine: WorkoutRoutineRequest, containerOpacity: Float = 1f ) {
+    Box(
+        modifier = Modifier
+            .padding(vertical = 10.dp)
+            .fillMaxWidth()
+            .height(140.dp)
+            .clip(RoundedCornerShape(8.dp))  // Clip to rounded corners
+            .clickable {  }
+    ) {
+
+        // Image as the background
+        Image(
+            painter = painterResource(id = R.drawable.treadmill),
+            contentDescription = "Workout Image Background",
+            contentScale = ContentScale.Crop,  // Crop to fill the Box
             modifier = Modifier
-                .padding(vertical = 10.dp)
-                .fillMaxWidth()
-                .height(140.dp)
-                .clip(RoundedCornerShape(8.dp))  // Clip to rounded corners
-                .clickable {  }
-        ) {
-            // Image as the background
-            Image(
-                painter = painterResource(id = R.drawable.treadmill),
-                contentDescription = "Workout Image Background",
-                contentScale = ContentScale.Crop,  // Crop to fill the Box
-                modifier = Modifier
-                    .fillMaxSize()
-                    .alpha(containerOpacity)  // Apply opacity if needed
-            )
+                .fillMaxSize()
+                .alpha(containerOpacity)  // Apply opacity if needed
+        )
 
-            // Text container with a gradient effect
-            Box(
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .width(200.dp)  // Adjust the width to fit the text container
-                    .background(
-                        Brush.horizontalGradient(
-                            colors = listOf(
-                                BlueGreen,
-                                Color.Transparent
-                            ), // Gradient from Slime to transparent
-                            startX = 0f,
-                            endX = 600f  // Adjust this value for a smoother transition
-                        )
-                    )
-                    .padding(16.dp)  // Padding around the text inside the gradient box
-            ) {
-                // Workout text positioned to the left
-                Column(
-                    modifier = Modifier.align(Alignment.CenterStart)
-                ) {
-                    Text(
-                        text = "${workoutInfo.workout.name}",
-                        fontFamily = alt,
-                        fontSize = 20.sp,
-                        color = Color.White,  // Set text color for better contrast
-                    )
+        Column(modifier = Modifier.padding(16.dp)) {
+            // Display workout info
+            routine.workoutInfo?.let { workoutInfo ->
 
-                    // Row for sets and reps boxes
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 8.dp, end = 8.dp),
-                        horizontalArrangement = Arrangement.Start
-                    ) {
-                        // Sets box
-                        Box(
-                            modifier = Modifier
-                                .clip(shape = RoundedCornerShape(20.dp))
-                                .background(Slime)
-                                .padding(horizontal = 8.dp, vertical = 4.dp)
-                        ) {
-                            Text(
-                                text = "${workoutInfo.sets} sets",
-                                style = TextStyle(fontSize = 14.sp, color = DarkGreen, fontFamily = alt),
+                // Text container with a gradient effect
+                Box(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .width(200.dp)  // Adjust the width to fit the text container
+                        .background(
+                            Brush.horizontalGradient(
+                                colors = listOf(
+                                    BlueGreen,
+                                    Color.Transparent
+                                ), // Gradient from Slime to transparent
+                                startX = 0f,
+                                endX = 600f  // Adjust this value for a smoother transition
                             )
+                        )
+                        .padding(16.dp)  // Padding around the text inside the gradient box
+                ) {
+                    // Workout text positioned to the left
+                    Column(
+                        modifier = Modifier.align(Alignment.CenterStart)
+                    ) {
+                        Text(
+                            text = "${workoutInfo.workout.name}",
+                            fontFamily = alt,
+                            fontSize = 20.sp,
+                            color = Color.White,  // Set text color for better contrast
+                        )
+
+                        // Row for sets and reps boxes
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 8.dp, end = 8.dp),
+                            horizontalArrangement = Arrangement.Start
+                        ) {
+                            // Sets box
+                            Box(
+                                modifier = Modifier
+                                    .clip(shape = RoundedCornerShape(20.dp))
+                                    .background(Slime)
+                                    .padding(horizontal = 8.dp, vertical = 4.dp)
+                            ) {
+                                Text(
+                                    text = "${workoutInfo.sets}",
+                                    style = TextStyle(fontSize = 14.sp, color = DarkGreen, fontFamily = alt),
+                                )
+                            }
+
+                            // Spacer between sets and reps boxes
+                            Spacer(modifier = Modifier.width(4.dp))
+
+                            // Reps box
+                            Box(
+                                modifier = Modifier
+                                    .clip(shape = RoundedCornerShape(20.dp))
+                                    .background(Slime)
+                                    .padding(horizontal = 8.dp, vertical = 4.dp)
+                            ) {
+                                Text(
+                                    text = "${workoutInfo.reps}",
+                                    style = TextStyle(fontSize = 14.sp, color = DarkGreen, fontFamily = alt),
+                                )
+                            }
                         }
 
-                        // Spacer between sets and reps boxes
-                        Spacer(modifier = Modifier.width(4.dp))
+                        Spacer(modifier = Modifier.height(8.dp))
 
-                        // Reps box
-                        Box(
+                        // Weight box with border
+                        OutlinedCard(
+                            colors = CardDefaults.cardColors(
+                                containerColor = Color.Transparent,
+                            ),
+                            border = BorderStroke(4.dp, Slime),
                             modifier = Modifier
                                 .clip(shape = RoundedCornerShape(20.dp))
-                                .background(Slime)
-                                .padding(horizontal = 8.dp, vertical = 4.dp)
                         ) {
                             Text(
-                                text = "${workoutInfo.reps} reps",
-                                style = TextStyle(fontSize = 14.sp, color = DarkGreen, fontFamily = alt),
+                                text = "${workoutInfo.weight} kg",
+                                style = TextStyle(fontSize = 14.sp, color = Slime, fontFamily = alt),
+                                modifier = Modifier
+                                    .padding(horizontal = 8.dp, vertical = 4.dp)
+                                    .clip(shape = RoundedCornerShape(20.dp))
                             )
                         }
                     }
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    // Weight box with border
-                    OutlinedCard(
-                        colors = CardDefaults.cardColors(
-                            containerColor = Color.Transparent,
-                        ),
-                        border = BorderStroke(4.dp, Slime),
+                    // Add the button to the rightmost side
+                    Box(
                         modifier = Modifier
-                            .clip(shape = RoundedCornerShape(20.dp))
+                            .align(Alignment.CenterEnd)
+                            .padding(end = 16.dp)
+                            .clip(RoundedCornerShape(50.dp))
+                            .background(Slime) // Background can be adjusted if needed
+                            .clickable { /* Handle button click */ }
+                            .size(40.dp), // Set the size of the box
+                        contentAlignment = Alignment.Center // Center the icon inside the box
                     ) {
-                        Text(
-                            text = "${workoutInfo.weight} kg",
-                            style = TextStyle(fontSize = 14.sp, color = Slime, fontFamily = alt),
-                            modifier = Modifier
-                                .padding(horizontal = 8.dp, vertical = 4.dp)
-                                .clip(shape = RoundedCornerShape(20.dp))
+                        Icon(
+                            painter = painterResource(id = R.drawable.baseline_directions_run_24),
+                            contentDescription = "Run Icon",
+                            modifier = Modifier.size(20.dp), // Icon size
+                            tint = DarkGreen // Adjust tint color as needed
                         )
                     }
                 }
-            }
 
-            // Add the button to the rightmost side
-            Box(
-                modifier = Modifier
-                    .align(Alignment.CenterEnd)
-                    .padding(end = 16.dp)
-                    .clip(RoundedCornerShape(50.dp))
-                    .background(Slime) // Background can be adjusted if needed
-                    .clickable { /* Handle button click */ }
-                    .size(40.dp), // Set the size of the box
-                contentAlignment = Alignment.Center // Center the icon inside the box
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.baseline_directions_run_24),
-                    contentDescription = "Run Icon",
-                    modifier = Modifier.size(20.dp), // Icon size
-                    tint = DarkGreen // Adjust tint color as needed
-                )
             }
         }
-    } ?: run {
-        // Log when workoutInfo is null
-        Log.e("WorkoutItem", "Workout info is null for routine: $routine")
     }
 }
+
+
 
 
 

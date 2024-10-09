@@ -197,10 +197,9 @@ fun Navigation(startDestination: String = "third") {  // Change to the correct s
             mainPage(navController)
         }
 
-        composable("workoutDay/{dayNum}") { backStackEntry ->
-            var workoutRoutines by remember { mutableStateOf(listOf<WorkoutRoutineRequest>()) }
-            val dayNum = backStackEntry.arguments?.getString("dayNum")?.toIntOrNull() ?: 1 // Default to day 1 if not found
-            WorkoutDayPage(navController, dayNum, workoutRoutines) // Make sure workoutRoutines is available in this scope
+        composable("workoutDay/{selectedDayNum}") { backStackEntry ->
+            val selectedDayNum = backStackEntry.arguments?.getString("selectedDayNum")?.toInt() ?: 1
+            WorkoutDayPage(navController, selectedDayNum)
         }
 
         composable("workoutRoutine") {
