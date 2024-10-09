@@ -334,22 +334,23 @@ fun WorkoutRoutinesList(workoutRoutines: List<WorkoutRoutineRequest>, containerO
                             color = DarkGreen
                         )
                     }
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth()
+                            .padding(horizontal = 0.dp),
+                    ) {
+                        routines.forEach { routine ->
+                            WorkoutRoutineCard(routine, containerOpacity = 0.3f)
+                        }
+
+                    }
                 }
 
 
 
             }
 
-            Row(
-                modifier = Modifier.fillMaxWidth()
-                .padding(horizontal = 0.dp),
-            ) {
-                routines.forEach { routine ->
-                    WorkoutRoutineCard(routine, containerOpacity = 0.3f)
-                }
 
-
-            }
         }
     }
 }
@@ -357,19 +358,6 @@ fun WorkoutRoutinesList(workoutRoutines: List<WorkoutRoutineRequest>, containerO
 
 @Composable
 fun WorkoutRoutineCard(routine: WorkoutRoutineRequest, containerOpacity: Float = 1f) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-    ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            // Display workout info
-            routine.workoutInfo?.let { workoutInfo ->
-                Text(text = "Exercise: ${workoutInfo.workout.name}", style = MaterialTheme.typography.titleMedium)
-            }
-        }
-    }
 
     Box(
         modifier = Modifier
@@ -399,7 +387,7 @@ fun WorkoutRoutineCard(routine: WorkoutRoutineRequest, containerOpacity: Float =
         }
 
         routine.workoutInfo?.let { workoutInfo ->
-            Text(text = "Exercise: ${workoutInfo.workout.name}",
+            Text(text = "${workoutInfo.workout.name}",
                 fontFamily = alt,
                 fontSize = 12.sp,
                 color = Color.White,
