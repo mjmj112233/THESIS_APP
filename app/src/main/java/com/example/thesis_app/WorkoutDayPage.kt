@@ -125,7 +125,7 @@ fun WorkoutDayPage(navController: NavController, selectedDayNum: Int) {
                                 textAlign = TextAlign.Center
                             )
                         }
-                            WorkoutItem(workoutRoutines, containerOpacity = 1f)
+                            WorkoutItem(workoutRoutines, selectedDayNum, containerOpacity = 1f)
                         }
                     }
 
@@ -202,7 +202,7 @@ private fun fetchWorkoutRoutines(context: Context, onResult: (List<WorkoutRoutin
 
 
 @Composable
-fun WorkoutItem(workoutRoutines: List<WorkoutRoutineRequest>, containerOpacity: Float = 1f)  {
+fun WorkoutItem(workoutRoutines: List<WorkoutRoutineRequest>, selectedDayNum: Int, containerOpacity: Float = 1f)  {
 
     val groupedRoutines = workoutRoutines.groupBy { it.dayNum }
 
@@ -210,14 +210,22 @@ fun WorkoutItem(workoutRoutines: List<WorkoutRoutineRequest>, containerOpacity: 
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(bottom = 100.dp) // Add bottom padding to avoid overlap with FAB
     ) {
-        items(groupedRoutines.toList()) { (dayNum, routines) ->
 
-            routines.forEach { routine ->
+        val routinesForSelectedDay = groupedRoutines[selectedDayNum] ?: emptyList()
+
+        if (routinesForSelectedDay.isNotEmpty()) {
+            items(routinesForSelectedDay) { routine ->
                 WorkoutCard(routine)
             }
-
-            // Add a divider after each day
-            Divider(modifier = Modifier.padding(vertical = 8.dp))
+        } else {
+            // Optionally, show a message if no routines are available for the selected day
+            item {
+                Text(
+                    text = "No routines available for Day $selectedDayNum",
+                    modifier = Modifier.padding(16.dp),
+                    style = TextStyle(fontSize = 18.sp, color = Color.White)
+                )
+            }
         }
     }
 
@@ -291,8 +299,8 @@ fun WorkoutCard(routine: WorkoutRoutineRequest, containerOpacity: Float = 1f ) {
                                     .padding(horizontal = 8.dp, vertical = 4.dp)
                             ) {
                                 Text(
-                                    text = "${workoutInfo.sets}",
-                                    style = TextStyle(fontSize = 14.sp, color = DarkGreen, fontFamily = alt),
+                                    text = "${workoutInfo.sets} sets",
+                                    style = TextStyle(fontSize = 10.sp, color = DarkGreen, fontFamily = alt),
                                 )
                             }
 
@@ -307,8 +315,8 @@ fun WorkoutCard(routine: WorkoutRoutineRequest, containerOpacity: Float = 1f ) {
                                     .padding(horizontal = 8.dp, vertical = 4.dp)
                             ) {
                                 Text(
-                                    text = "${workoutInfo.reps}",
-                                    style = TextStyle(fontSize = 14.sp, color = DarkGreen, fontFamily = alt),
+                                    text = "${workoutInfo.reps} reps",
+                                    style = TextStyle(fontSize = 10.sp, color = DarkGreen, fontFamily = alt),
                                 )
                             }
                         }
@@ -326,7 +334,7 @@ fun WorkoutCard(routine: WorkoutRoutineRequest, containerOpacity: Float = 1f ) {
                         ) {
                             Text(
                                 text = "${workoutInfo.weight} kg",
-                                style = TextStyle(fontSize = 14.sp, color = Slime, fontFamily = alt),
+                                style = TextStyle(fontSize = 10.sp, color = Slime, fontFamily = alt),
                                 modifier = Modifier
                                     .padding(horizontal = 8.dp, vertical = 4.dp)
                                     .clip(shape = RoundedCornerShape(20.dp))
