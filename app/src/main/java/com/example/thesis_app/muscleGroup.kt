@@ -119,7 +119,7 @@ fun muscleGroupScreen(
                             modifier = Modifier
                                 .size(100.dp)
                                 .clip(CircleShape)
-                                .background(if (selectedUpper) Color.Gray else Slime)
+                                .background(if (selectedUpper) Slime else Color.Gray)
                                 .clickable {
                                     selectedUpper = !selectedUpper
                                     updateMuscleGroup(selectedUpper, selectedLower) { updatedGroup ->
@@ -160,7 +160,7 @@ fun muscleGroupScreen(
                             modifier = Modifier
                                 .size(100.dp)
                                 .clip(CircleShape)
-                                .background(if (selectedLower) Color.Gray else Slime)
+                                .background(if (selectedLower) Slime else Color.Gray)
                                 .clickable {
                                     selectedLower = !selectedLower
                                     updateMuscleGroup(selectedUpper, selectedLower) { updatedGroup ->

@@ -1,5 +1,6 @@
 package com.example.thesis_app
 
+import android.util.Log
 import android.widget.Space
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -22,6 +23,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -52,6 +54,14 @@ fun WorkoutDayPage(navController: NavController, dayNum: Int, workoutRoutines: L
 
     // Filter routines for the selected day number
     val filteredRoutines = workoutRoutines.filter { it.dayNum == dayNum }
+
+    // Log filtered routines size
+    Log.d("WorkoutDayPage", "Filtered Routines Size: ${filteredRoutines.size}")
+
+    // Log each routine
+    filteredRoutines.forEach { routine ->
+        Log.d("WorkoutDayPage", "Routine: $routine")
+    }
 
     Box(modifier = Modifier.fillMaxSize()) {
         Scaffold(
@@ -101,19 +111,25 @@ fun WorkoutDayPage(navController: NavController, dayNum: Int, workoutRoutines: L
                             )
                         }
 
-
-                            // Display workouts in a LazyColumn
-                            LazyColumn(
-                                modifier = Modifier.fillMaxSize(),
-                                contentPadding = PaddingValues(bottom = 100.dp) // Add bottom padding to avoid overlap with FAB
-                            ) {
+                        // Display workouts in a LazyColumn
+                        LazyColumn(
+                            modifier = Modifier.fillMaxSize(),
+                            contentPadding = PaddingValues(bottom = 100.dp) // Add bottom padding to avoid overlap with FAB
+                        ) {
+                            if (filteredRoutines.isNotEmpty()) {
                                 items(filteredRoutines) { routine ->
                                     WorkoutItem(routine, containerOpacity = 1f)
+
+                                    // Log the workout info for each routine
+                                    Log.d("WorkoutDayPage", "WorkoutItem: ${routine.workoutInfo?.workout?.name}")
                                 }
+                            } else {
+                                // Log when no routines are found for the selected day
+                                Log.d("WorkoutDayPage", "No routines found for day $dayNum")
                             }
                         }
                     }
-
+                }
             },
             bottomBar = {
                 BottomAppBar(
@@ -172,11 +188,8 @@ fun WorkoutDayPage(navController: NavController, dayNum: Int, workoutRoutines: L
     }
 }
 
-
-
 @Composable
 fun WorkoutItem(routine: WorkoutRoutineRequest, containerOpacity: Float = 1f) {
-
     routine.workoutInfo?.let { workoutInfo ->
         Box(
             modifier = Modifier
@@ -302,8 +315,10 @@ fun WorkoutItem(routine: WorkoutRoutineRequest, containerOpacity: Float = 1f) {
                 )
             }
         }
+    } ?: run {
+        // Log when workoutInfo is null
+        Log.e("WorkoutItem", "Workout info is null for routine: $routine")
     }
-
 }
 
 
