@@ -160,7 +160,7 @@ fun mainPage(navController: NavController) {
                                 .padding(innerPadding)
                                 .fillMaxSize()
                                 .background(BlueGreen)
-                                .padding(32.dp)
+                                .padding(horizontal = 20.dp)
                         ) {
                             Column(
                                 modifier = Modifier
@@ -175,21 +175,13 @@ fun mainPage(navController: NavController) {
                                         style = TextStyle(fontFamily = titleFont, fontSize = 20.sp),
                                     )
 
-
-                                // Now add the workout routines
-                                 // This item block can be used for conditional rendering
-                                    if (isLoading) {
-                                        CircularProgressIndicator()
-                                    } else if (workoutRoutines.isNotEmpty()) {
+                                if (workoutRoutines.isNotEmpty()) {
                                         WorkoutRoutinesList(workoutRoutines, containerOpacity = 0.2f)
                                     } else {
                                         BasicText(text = "No workout routines available.")
                                     }
 
                             }
-
-
-
 
                             }
                     },
@@ -221,7 +213,7 @@ fun mainPage(navController: NavController) {
                     painter = painterResource(id = R.drawable.spot_logo),
                     contentDescription = "Spot Logo",
                     modifier = Modifier
-                        .size(60.dp)
+                        .size(80.dp)
                         .align(Alignment.Center)
                 )
             }
