@@ -1,5 +1,6 @@
 package com.example.thesis_app
 
+import android.content.Context
 import android.util.Log
 import android.widget.Space
 import androidx.compose.foundation.BorderStroke
@@ -24,6 +25,10 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -32,6 +37,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
@@ -39,6 +45,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.api.RetrofitInstance
 import com.example.model.WorkoutRoutineRequest
 import com.example.thesis_app.ui.theme.BlueGreen
 import com.example.thesis_app.ui.theme.DarkGreen
@@ -46,7 +53,10 @@ import com.example.thesis_app.ui.theme.DirtyWhite
 import com.example.thesis_app.ui.theme.Slime
 import com.example.thesis_app.ui.theme.alt
 import com.example.thesis_app.ui.theme.titleFont
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.handleCoroutineException
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -61,6 +71,21 @@ fun WorkoutDayPage(navController: NavController, dayNum: Int, workoutRoutines: L
     // Log each routine
     filteredRoutines.forEach { routine ->
         Log.d("WorkoutDayPage", "Routine: $routine")
+    }
+
+    val context = LocalContext.current
+    var workoutRoutines by remember { mutableStateOf<List<WorkoutRoutineRequest>>(emptyList()) }
+    var isLoading by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
+
+    // Fetch workout routines on launch
+    LaunchedEffect(Unit) {
+        isLoading = true
+        fetchWorkoutRoutines(context) { routines, error ->
+            workoutRoutines = routines
+            errorMessage = error
+            isLoading = false
+        }
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -184,6 +209,19 @@ fun WorkoutDayPage(navController: NavController, dayNum: Int, workoutRoutines: L
                     tint = DarkGreen
                 )
             }
+        }
+    }
+}
+
+private fun fetchWorkoutRoutines(context: Context, onResult: (List<WorkoutRoutineRequest>, String?) -> Unit) {
+    val service = RetrofitInstance.WorkoutRoutineService(context)
+
+    CoroutineScope(Dispatchers.IO).launch {
+        try {
+            val routines = service.getWorkoutRoutines() // Call suspend function here
+            onResult(routines, null)
+        } catch (e: Exception) {
+            onResult(emptyList(), e.message)
         }
     }
 }
