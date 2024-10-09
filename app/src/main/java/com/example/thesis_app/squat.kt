@@ -62,8 +62,22 @@ fun SquatScreen(
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
 
-    // Function to submit user profile and generate workouts
-    suspend fun submitUserProfile() {
+    // Function to check if the profile exists
+    suspend fun checkProfileExists(): Boolean {
+        return try {
+            // Call the API to get the user profile
+            val response = RetrofitInstance.UserProfileService(context).getProfile()
+
+            // If the response is successful and the profile exists, return true
+            response.isSuccessful && response.body() != null
+        } catch (e: Exception) {
+            // In case of any error (network or other), return false
+            false
+        }
+    }
+
+    // Function to submit or update user profile and generate workouts
+    suspend fun submitUserProfile(isUpdating: Boolean) {
         try {
             isLoading = true
             val request = UserProfileRequest(
@@ -79,8 +93,14 @@ fun SquatScreen(
             println("UserProfileRequest: ${Gson().toJson(request)}")
             Log.d("UserProfileRequest", Gson().toJson(request))
 
-            // Call the API to create user profile
-            RetrofitInstance.UserProfileService(context).createUserProfile(request).enqueue(object : Callback<Void> {
+            // Depending on isUpdating, call either the create or update API
+            val apiCall = if (isUpdating) {
+                RetrofitInstance.UserProfileService(context).updateUserProfile(request)
+            } else {
+                RetrofitInstance.UserProfileService(context).createUserProfile(request)
+            }
+
+            apiCall.enqueue(object : Callback<Void> {
                 override fun onResponse(call: Call<Void>, response: Response<Void>) {
                     if (response.isSuccessful) {
                         // Navigate to the main screen if the API call was successful
@@ -90,24 +110,24 @@ fun SquatScreen(
                         }
                     } else {
                         // Handle error if response is not successful
-                        errorMessage = response.errorBody()?.string() ?: "Error creating profile"
-                        println("Error creating profile: $errorMessage") // Log the error message
+                        errorMessage = response.errorBody()?.string() ?: "Error submitting profile"
+                        println("Error submitting profile: $errorMessage") // Log the error message
                     }
                 }
 
                 override fun onFailure(call: Call<Void>, t: Throwable) {
-                    errorMessage = "Error creating profile: ${t.message}"
-                    println("Exception creating profile: ${t.message}") // Log the exception
+                    errorMessage = "Error submitting profile: ${t.message}"
+                    println("Exception submitting profile: ${t.message}") // Log the exception
                 }
             })
+
         } catch (e: Exception) {
-            errorMessage = "Error creating profile: ${e.message}"
-            println("Exception creating profile: ${e.message}") // Log the exception
+            errorMessage = "Error submitting profile: ${e.message}"
+            println("Exception submitting profile: ${e.message}") // Log the exception
         } finally {
             isLoading = false
         }
     }
-
 
 
     // Countdown logic for the squat test
@@ -364,7 +384,7 @@ fun SquatScreen(
                     }
 
                     squatScore = when {
-                        squats != null && squats >= 40 -> 3
+                        squats != null && squats >= 41 -> 3
                         squats != null && squats in 20..40 -> 2
                         squats != null && squats < 20 -> 1
                         else -> 0
@@ -372,7 +392,8 @@ fun SquatScreen(
 
                     if (squatScore != 0) {
                         coroutineScope.launch {
-                            submitUserProfile() // Call the API to submit the profile
+                            val isUpdating = checkProfileExists()
+                            submitUserProfile(isUpdating)
                         }
                     }
                 },
