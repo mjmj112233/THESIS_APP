@@ -33,6 +33,7 @@ import com.example.thesis_app.ui.theme.DirtyWhite
 import com.example.thesis_app.ui.theme.Slime
 import com.example.thesis_app.ui.theme.alt
 import com.example.thesis_app.ui.theme.titleFont
+import com.example.util.TokenManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -102,7 +103,7 @@ fun mainPage(navController: NavController) {
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(16.dp)
-                            .clickable { navController.navigate("login") }
+                            .clickable { performLogout(context, navController) }
                     )
 
                     Text(
@@ -376,5 +377,12 @@ fun WorkoutRoutineCard(routine: WorkoutRoutineRequest, containerOpacity: Float =
                     .padding(bottom = 20.dp))
         }
 
+    }
+}
+
+fun performLogout(context: Context, navController: NavController) {
+    TokenManager.clearToken(context)
+    navController.navigate("login") {
+        popUpTo("main") { inclusive = true }  // Clear the backstack to prevent navigation back
     }
 }
