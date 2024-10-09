@@ -84,7 +84,7 @@ fun SquatScreen(
                 override fun onResponse(call: Call<Void>, response: Response<Void>) {
                     if (response.isSuccessful) {
                         // Navigate to the main screen if the API call was successful
-                        navController.navigate("workoutRoutine") {
+                        navController.navigate("main") {
                             popUpTo("plank") { inclusive = true }  // Remove Plank screen from backstack
                             launchSingleTop = true
                         }

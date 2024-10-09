@@ -104,7 +104,7 @@ private fun generateWorkoutRoutine(context: Context, onResult: (List<WorkoutRout
     }
 }
 @Composable
-fun WorkoutRoutinesList(workoutRoutines: List<WorkoutRoutineRequest>) {
+fun WorkoutRoutinesList2(workoutRoutines: List<WorkoutRoutineRequest>) {
     // Group the workout routines by day number
     val groupedRoutines = workoutRoutines.groupBy { it.dayNum }
 
@@ -130,7 +130,7 @@ fun WorkoutRoutinesList(workoutRoutines: List<WorkoutRoutineRequest>) {
 
 
 @Composable
-fun WorkoutRoutineCard(routine: WorkoutRoutineRequest) {
+fun WorkoutRoutineCard2(routine: WorkoutRoutineRequest) {
     Card(
         modifier = Modifier
             .fillMaxWidth()

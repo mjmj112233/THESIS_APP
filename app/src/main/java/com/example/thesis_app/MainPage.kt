@@ -1,5 +1,6 @@
 package com.example.thesis_app
 
+import android.content.Context
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -9,12 +10,14 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicText
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
@@ -22,12 +25,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import androidx.navigation.NavController
+import com.example.api.RetrofitInstance
+import com.example.model.WorkoutRoutineRequest
 import com.example.thesis_app.ui.theme.BlueGreen
 import com.example.thesis_app.ui.theme.DarkGreen
 import com.example.thesis_app.ui.theme.DirtyWhite
 import com.example.thesis_app.ui.theme.Slime
 import com.example.thesis_app.ui.theme.alt
 import com.example.thesis_app.ui.theme.titleFont
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 data class WorkoutDay(val day: String, val workouts: List<String>?, val isRestDay: Boolean)
@@ -39,60 +46,24 @@ fun mainPage(navController: NavController) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
 
-    // State to control the visibility of the alert dialog
-    var showDialog by remember { mutableStateOf(true) }
 
-    // Sample workout days for demonstration purposes
-    var workoutDays by remember { mutableStateOf<List<WorkoutDay>>(emptyList()) }
 
-    // Sample data to demonstrate functionality
-    if (workoutDays.isEmpty()) {
-        workoutDays = listOf(
-            WorkoutDay("DAY 1", listOf("Lat Pulldown", "Chest Press Machine", "Workout 3", "Workout 4"), false),
-            WorkoutDay("DAY 2", listOf("Cardio 1"), true), // Rest day
-            WorkoutDay("DAY 3", listOf("Workout 1", "Workout 2"), false)
-        )
-    }
 
-    if (workoutDays.isEmpty() && showDialog) {
-        AlertDialog(
-            onDismissRequest = { showDialog = false },
-            text = {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        painter = painterResource(R.drawable.baseline_warning_24),
-                        contentDescription = "Warning",
-                        tint = DarkGreen,
-                        modifier = Modifier
-                            .padding(end = 24.dp)
-                            .size(40.dp)
-                    )
-                    Column {
-                        Text(
-                            text = "In order for us to recommend your personalized workout routine, a quick user assessment is needed.",
-                            color = DarkGreen,
-                            fontFamily = titleFont,
-                            textAlign = TextAlign.Justify
-                        )
-                        Spacer(modifier = Modifier.height(16.dp))
-                        Text(
-                            text = "To learn more about how we process your data, read our Terms and Conditions.",
-                            color = DarkGreen,
-                            fontFamily = titleFont,
-                            modifier = Modifier.clickable { /* Handle T&C click */ }
-                        )
-                    }
-                }
-            },
-            confirmButton = {
-                TextButton(
-                    onClick = { showDialog = false },
-                    modifier = Modifier.background(Slime, shape = RoundedCornerShape(16.dp))
-                ) {
-                    Text("Proceed", color = DarkGreen, fontFamily = titleFont)
-                }
-            }
-        )
+    //----------------------------------------------------------------------------
+
+    val context = LocalContext.current
+    var workoutRoutines by remember { mutableStateOf<List<WorkoutRoutineRequest>>(emptyList()) }
+    var isLoading by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
+
+    // Fetch workout routines on launch
+    LaunchedEffect(Unit) {
+        isLoading = true
+        fetchWorkoutRoutines(context) { routines, error ->
+            workoutRoutines = routines
+            errorMessage = error
+            isLoading = false
+        }
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -191,23 +162,6 @@ fun mainPage(navController: NavController) {
                                 .background(BlueGreen)
                                 .padding(32.dp)
                         ) {
-                            if (workoutDays.isEmpty()) {
-                                if (!showDialog) {
-                                    Box(
-                                        modifier = Modifier.fillMaxSize(),
-                                        contentAlignment = Alignment.Center
-                                    ) {
-                                        Button(
-                                            onClick = { /* Handle start user assessment */ },
-                                            colors = ButtonDefaults.buttonColors(containerColor = Slime),
-                                            modifier = Modifier
-                                                .padding(vertical = 20.dp)
-                                        ) {
-                                            Text(text = "Start User Assessment", color = DarkGreen, fontFamily = titleFont)
-                                        }
-                                    }
-                                }
-                            } else {
                                 Text(
                                     text = "Your Personalized Workout Routine",
                                     color = DirtyWhite,
@@ -215,22 +169,23 @@ fun mainPage(navController: NavController) {
                                     modifier = Modifier.padding(top = 30.dp)
                                 )
 
+
+
                                 LazyColumn(
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .padding(top = 80.dp)
                                 ) {
-                                    items(workoutDays) { workoutDay ->
-                                        daysContainer(
-                                            navController = navController,
-                                            workoutDay = workoutDay,
-                                            workouts = workoutDay.workouts ?: emptyList(),
-                                            containerOpacity = 0.2f
-                                        )
+                                    item { // Wrap the content in an item block
+                                        if (workoutRoutines.isNotEmpty()) {
+                                            WorkoutRoutinesList(workoutRoutines, containerOpacity = 0.2f)
+                                        } else {
+                                            BasicText(text = "No workout routines available.")
+                                        }
                                     }
                                 }
+
                             }
-                        }
                     },
                     bottomBar = {
                         BottomAppBar(
@@ -273,21 +228,65 @@ fun mainPage(navController: NavController) {
                 .padding(bottom = 16.dp),
             contentAlignment = Alignment.BottomCenter
         ) {
-            FloatingActionButton(
-                onClick = { /* Handle button click */ },
-                shape = CircleShape,
-                containerColor = DirtyWhite,
-                modifier = Modifier
-                    .size(100.dp)
-                    .offset(y = (-20).dp)
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.scan),
-                    contentDescription = "Scan",
-                    modifier = Modifier.size(40.dp),
-                    tint = DarkGreen
-                )
+            if (isLoading) {
+                CircularProgressIndicator()
+            } else {
+                // Display error message if exists
+                errorMessage?.let {
+                    BasicText(text = it)
+                }
+                // Floating Action Button to generate workout routines
+                FloatingActionButton(
+                    onClick = {
+                        // Handle button click to generate workout routines
+                        isLoading = true // Set loading state to true
+                        generateWorkoutRoutine(context) { generatedRoutines, error ->
+                            workoutRoutines = generatedRoutines
+                            errorMessage = error
+                            isLoading = false // Reset loading state
+                        }
+                    },
+                    shape = CircleShape,
+                    containerColor = DirtyWhite,
+                    modifier = Modifier
+                        .size(100.dp)
+                        .offset(y = (-20).dp)
+                ) {
+                    Image(
+                        painter = painterResource(R.drawable.spot_avatar),
+                        contentDescription = "Generate Workout",
+                        modifier = Modifier.size(40.dp) // Adjust size as needed
+                    )
+                }
             }
+        }
+    }
+}
+
+private fun fetchWorkoutRoutines(context: Context, onResult: (List<WorkoutRoutineRequest>, String?) -> Unit) {
+    val service = RetrofitInstance.WorkoutRoutineService(context)
+
+    CoroutineScope(Dispatchers.IO).launch {
+        try {
+            val routines = service.getWorkoutRoutines() // Call suspend function here
+            onResult(routines, null)
+        } catch (e: Exception) {
+            onResult(emptyList(), e.message)
+        }
+    }
+}
+
+private fun generateWorkoutRoutine(context: Context, onResult: (List<WorkoutRoutineRequest>, String?) -> Unit) {
+    val service = RetrofitInstance.WorkoutRoutineService(context)
+
+    CoroutineScope(Dispatchers.IO).launch {
+        try {
+            val response = service.generateWorkoutRoutine() // Call your generate function here
+            // Flattening the map values into a single list
+            val generatedRoutines = response.values.flatten() // Flattening if multiple keys exist
+            onResult(generatedRoutines, null)
+        } catch (e: Exception) {
+            onResult(emptyList(), e.message)
         }
     }
 }
@@ -368,6 +367,63 @@ fun daysContainer(navController: NavController, workoutDay: WorkoutDay, workouts
 }
 
 @Composable
+fun WorkoutRoutinesList(workoutRoutines: List<WorkoutRoutineRequest>, containerOpacity: Float = 1f) {
+    // Group the workout routines by day number
+    val groupedRoutines = workoutRoutines.groupBy { it.dayNum }
+
+    LazyColumn(modifier = Modifier.padding(16.dp)) {
+        items(groupedRoutines.toList()) { (dayNum, routines) ->
+
+
+            Box(
+                modifier = Modifier
+                    .padding(vertical = 10.dp)
+                    .fillMaxWidth()
+                    .height(250.dp)
+                    .background(DirtyWhite.copy(alpha = containerOpacity), RoundedCornerShape(8.dp))
+                    .clickable {
+
+                    }
+                    .padding(16.dp)
+            ) {
+
+                Column {
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(Slime)
+                            .width(75.dp)
+                            .padding(horizontal = 12.dp, vertical = 8.dp)
+                    ) {
+                        Text(
+                            text = "Day $dayNum",
+                            fontFamily = alt,
+                            fontSize = 16.sp,
+                            color = DarkGreen
+                        )
+                    }
+                }
+
+
+
+            }
+
+            LazyRow(
+                modifier = Modifier.fillMaxWidth(),
+                contentPadding = PaddingValues(horizontal = 0.dp)
+            ) {
+                items(routines) { routine ->
+                    WorkoutRoutineCard(routine, containerOpacity = 0.3f)
+                }
+            }
+
+            // Add a divider after each day
+            Divider(modifier = Modifier.padding(vertical = 8.dp))
+        }
+    }
+}
+
+@Composable
 fun workoutBox(workout: String, containerOpacity: Float = 1f) {
     Box(
         modifier = Modifier
@@ -404,5 +460,61 @@ fun workoutBox(workout: String, containerOpacity: Float = 1f) {
                 .align(Alignment.BottomCenter)
                 .padding(bottom = 20.dp)
         )
+    }
+}
+
+@Composable
+fun WorkoutRoutineCard(routine: WorkoutRoutineRequest, containerOpacity: Float = 1f) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            // Display workout info
+            routine.workoutInfo?.let { workoutInfo ->
+                Text(text = "Exercise: ${workoutInfo.workout.name}", style = MaterialTheme.typography.titleMedium)
+            }
+        }
+    }
+
+    Box(
+        modifier = Modifier
+            .padding(8.dp)
+            .clip(RoundedCornerShape(12.dp))
+            .background(DirtyWhite.copy(alpha = containerOpacity), RoundedCornerShape(8.dp))
+            .width(100.dp)
+            .height(200.dp)
+            .padding(12.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .clip(shape = CircleShape)
+                .background(BlueGreen)
+                .height(80.dp)
+                .width(80.dp)
+        ) {
+            Icon(
+                painter = painterResource(R.drawable.baseline_directions_run_24),
+                contentDescription = null,
+                modifier = Modifier
+                    .size(60.dp)
+                    .align(Alignment.Center),
+                tint = Slime
+            )
+        }
+
+        routine.workoutInfo?.let { workoutInfo ->
+            Text(text = "Exercise: ${workoutInfo.workout.name}",
+                fontFamily = alt,
+                fontSize = 12.sp,
+                color = Color.White,
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = 20.dp))
+        }
+
     }
 }
