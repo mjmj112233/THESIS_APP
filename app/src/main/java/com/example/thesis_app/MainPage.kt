@@ -186,7 +186,7 @@ fun mainPage(navController: NavController) {
                                     } else {
                                         BasicText(text = "No workout routines available.")
                                     }
-                                
+
                             }
 
 
@@ -340,13 +340,15 @@ fun WorkoutRoutinesList(workoutRoutines: List<WorkoutRoutineRequest>, containerO
 
             }
 
-            LazyRow(
-                modifier = Modifier.fillMaxWidth(),
-                contentPadding = PaddingValues(horizontal = 0.dp)
+            Row(
+                modifier = Modifier.fillMaxWidth()
+                .padding(horizontal = 0.dp),
             ) {
-                items(routines) { routine ->
+                routines.forEach { routine ->
                     WorkoutRoutineCard(routine, containerOpacity = 0.3f)
                 }
+
+
             }
         }
     }
