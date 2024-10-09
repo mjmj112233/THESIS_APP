@@ -364,9 +364,9 @@ fun SquatScreen(
                     }
 
                     squatScore = when {
-                        squats != null && squats >= 30 -> 3
-                        squats != null && squats in 15..29 -> 2
-                        squats != null && squats < 15 -> 1
+                        squats != null && squats >= 40 -> 3
+                        squats != null && squats in 20..40 -> 2
+                        squats != null && squats < 20 -> 1
                         else -> 0
                     }
 

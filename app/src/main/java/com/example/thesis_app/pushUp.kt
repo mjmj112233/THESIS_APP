@@ -23,6 +23,8 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.thesis_app.ui.theme.*
 import kotlinx.coroutines.delay
+import android.widget.Toast
+import androidx.compose.ui.platform.LocalContext
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -37,8 +39,8 @@ fun pushUp(
 ) {
     var pushUpCount by remember { mutableStateOf("") }
     var isTestComplete by remember { mutableStateOf(false) }
-    var errorMessage by remember { mutableStateOf("") }
     var pushUpScore by remember { mutableStateOf(0) }  // Store the calculated score
+    val context = LocalContext.current
 
     //timer
     var timeLeft by remember { mutableStateOf(10) }  // Timer starting at 60 seconds
@@ -49,8 +51,8 @@ fun pushUp(
     // Function to calculate the push-up score based on the count
     fun calculatePushUpScore(count: Int): Int {
         return when {
-            count < 20 -> 1
-            count in 20..39 -> 2
+            count < 15 -> 1
+            count in 15..25 -> 2
             else -> 3
         }
     }
@@ -302,9 +304,8 @@ fun pushUp(
                         if (pushUps != null && pushUps >= 0) {
                             pushUpScore = calculatePushUpScore(pushUps)
                             isTestComplete = true
-                            errorMessage = ""
                         } else {
-                            errorMessage = "Please enter a valid push-up count"
+                            Toast.makeText(context, "Please enter a valid push-up count", Toast.LENGTH_SHORT).show()
                             isTestComplete = false
                         }
                     },
@@ -318,15 +319,6 @@ fun pushUp(
                         color = DarkGreen,
                         fontSize = 18.sp,
                         fontFamily = titleFont
-                    )
-                }
-
-                // Display error message if the input is invalid
-                if (errorMessage.isNotEmpty()) {
-                    Text(
-                        text = errorMessage,
-                        color = Color.Red,
-                        modifier = Modifier.padding(16.dp)
                     )
                 }
 
