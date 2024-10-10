@@ -260,7 +260,7 @@ fun WorkoutCard(routine: WorkoutRoutineRequest, containerOpacity: Float = 1f ) {
                 Box(
                     modifier = Modifier
                         .fillMaxHeight()
-                        .width(200.dp)  // Adjust the width to fit the text container
+                        .fillMaxWidth()  // Adjust the width to fit the text container
                         .background(
                             Brush.horizontalGradient(
                                 colors = listOf(
