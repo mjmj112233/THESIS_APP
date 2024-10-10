@@ -67,7 +67,6 @@ fun pushUp(
             started = false // Stop the timer
             showDialog = false // Close the dialog
             showInputField = true // Show the input field when the timer hits 0
-            isTestComplete = true
         }
     }
 
@@ -253,7 +252,6 @@ fun pushUp(
         }
 
         if (showInputField) {
-
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -290,9 +288,6 @@ fun pushUp(
             }
         }
 
-
-
-
         // Input Section
         Box(
             modifier = Modifier.fillMaxSize(),
@@ -303,19 +298,42 @@ fun pushUp(
             ) {
                 Spacer(modifier = Modifier.height(700.dp))
 
+                Button(
+                    onClick = {
+                        val pushUps = pushUpCount.toIntOrNull()
+                        if (pushUps != null && pushUps >= 0) {
+                            pushUpScore = calculatePushUpScore(pushUps)
+                            isTestComplete = true
+                        } else {
+                            Toast.makeText(context, "Please enter a valid push-up count", Toast.LENGTH_SHORT).show()
+                            isTestComplete = false
+                        }
+                    },
+                    colors = ButtonDefaults.buttonColors(Slime),
+                    modifier = Modifier
+                        .padding(28.dp)
+                        .fillMaxWidth()
+                ) {
+                    Text(
+                        text = "Next",
+                        color = DarkGreen,
+                        fontSize = 18.sp,
+                        fontFamily = titleFont
+                    )
+                }
+
+                if (isTestComplete) {
+                    Text(
+                        text = "Push-up test complete",
+                        style = TextStyle(color = Color.Green, fontSize = 18.sp),
+                        modifier = Modifier.padding(16.dp)
+                    )
+                }
             }
         }
 
         // Next Button
         if (isTestComplete) {
-            val pushUps = pushUpCount.toIntOrNull()
-            if (pushUps != null && pushUps >= 0) {
-                pushUpScore = calculatePushUpScore(pushUps)
-
-            } else {
-                Toast.makeText(context, "Please enter a valid push-up count", Toast.LENGTH_SHORT).show()
-            }
-
             Box(
                 modifier = Modifier
                     .fillMaxSize()
