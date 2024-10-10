@@ -58,6 +58,14 @@ fun plank(
         }
     }
 
+    // Stopwatch logic
+    LaunchedEffect(key1 = started, key2 = timeElapsed) {
+        if (started) {
+            delay(1000L) // 1 second delay
+            timeElapsed += 1 // Increment time by 1 second
+        }
+    }
+
     // UI
     Box(
         modifier = Modifier
