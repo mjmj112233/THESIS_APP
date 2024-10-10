@@ -67,6 +67,7 @@ fun pushUp(
             started = false // Stop the timer
             showDialog = false // Close the dialog
             showInputField = true // Show the input field when the timer hits 0
+            isTestComplete = true
         }
     }
 
@@ -253,12 +254,6 @@ fun pushUp(
 
         if (showInputField) {
 
-            val pushUps = pushUpCount.toIntOrNull()
-            if (pushUps != null && pushUps >= 0) {
-                pushUpScore = calculatePushUpScore(pushUps)
-                isTestComplete = true
-            }
-
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -313,6 +308,14 @@ fun pushUp(
 
         // Next Button
         if (isTestComplete) {
+            val pushUps = pushUpCount.toIntOrNull()
+            if (pushUps != null && pushUps >= 0) {
+                pushUpScore = calculatePushUpScore(pushUps)
+
+            } else {
+                Toast.makeText(context, "Please enter a valid push-up count", Toast.LENGTH_SHORT).show()
+            }
+
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -321,10 +324,6 @@ fun pushUp(
             ) {
                 Button(
                     onClick = {
-                        val pushUps = pushUpCount.toIntOrNull()
-                        if (pushUps != null && pushUps >= 0)  {
-                            Toast.makeText(context, "Please enter a valid push-up count", Toast.LENGTH_SHORT).show()
-                        }
                         navController.navigate("plank?height=$height&weight=$weight&bmiCategory=$bmiCategory&fitnessGoal=$fitnessGoal&muscleGroup=$muscleGroup&pushUpScore=$pushUpScore") {
                             popUpTo("pushup") { inclusive = true }  // Remove Push-up screen from backstack
                             launchSingleTop = true
