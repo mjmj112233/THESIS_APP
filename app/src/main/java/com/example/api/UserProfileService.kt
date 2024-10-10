@@ -14,7 +14,7 @@ interface UserProfileService {
     fun createUserProfile(@Body userProfileRequest: UserProfileRequest): Call<Void> // No need for suspend here if using Call
 
     @PUT("/api/profile/update")
-    suspend fun updateUserProfile(@Body userProfileRequest: UserProfileRequest): Call<Void>
+    fun updateUserProfile(@Body userProfileRequest: UserProfileRequest): Call<Void>
     @GET("/api/profile/me")
     suspend fun getProfile(): Response<UserProfile>
 }
