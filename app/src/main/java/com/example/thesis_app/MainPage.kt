@@ -209,7 +209,7 @@ fun mainPage(navController: NavController) {
                     painter = painterResource(id = R.drawable.spot_logo),
                     contentDescription = "Spot Logo",
                     modifier = Modifier
-                        .size(80.dp)
+                        .size(60.dp)
                         .align(Alignment.Center)
                 )
             }
@@ -249,7 +249,7 @@ fun mainPage(navController: NavController) {
                     Image(
                         painter = painterResource(R.drawable.spot_avatar),
                         contentDescription = "Generate Workout",
-                        modifier = Modifier.size(40.dp) // Adjust size as needed
+                        modifier = Modifier.size(60.dp) // Adjust size as needed
                     )
                 }
             }

@@ -252,7 +252,7 @@ fun WorkoutCard(routine: WorkoutRoutineRequest, containerOpacity: Float = 1f ) {
                 .alpha(containerOpacity)  // Apply opacity if needed
         )
 
-        Column(modifier = Modifier.padding(16.dp)) {
+
             // Display workout info
             routine.workoutInfo?.let { workoutInfo ->
 
@@ -362,7 +362,7 @@ fun WorkoutCard(routine: WorkoutRoutineRequest, containerOpacity: Float = 1f ) {
                 }
 
             }
-        }
+
     }
 }
 
