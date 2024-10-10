@@ -275,15 +275,37 @@ private fun generateWorkoutRoutine(context: Context, onResult: (List<WorkoutRout
 
     CoroutineScope(Dispatchers.IO).launch {
         try {
-            val response = service.generateWorkoutRoutine() // Call your generate function here
-            // Flattening the map values into a single list
-            val generatedRoutines = response.values.flatten() // Flattening if multiple keys exist
-            onResult(generatedRoutines, null)
+            // Fetch existing workout routines for the user
+            val existingRoutines = service.getWorkoutRoutines()
+
+            if (existingRoutines.isNotEmpty()) {
+                // If routines exist, use the PUT request to regenerate the workout routine
+                val updateResponse = service.updateWorkoutRoutine()
+
+                if (updateResponse.isSuccessful) {
+                    // Fetch the updated routines
+                    val updatedRoutines = updateResponse.body()?.values?.flatten() ?: emptyList()
+                    println("Successfully updated workout routines.")
+                    onResult(updatedRoutines, null)
+                } else {
+                    // Handle failed update request
+                    val errorMessage = updateResponse.errorBody()?.string() ?: "Failed to update workout routines"
+                    println(errorMessage)
+                    onResult(emptyList(), errorMessage)
+                }
+            } else {
+                // If no routines exist, generate a new workout routine
+                val response = service.generateWorkoutRoutine()
+                val generatedRoutines = response.values.flatten() // Flatten the response if needed
+                onResult(generatedRoutines, null)
+            }
         } catch (e: Exception) {
             onResult(emptyList(), e.message)
         }
     }
 }
+
+
 
 @Composable
 fun WorkoutRoutinesList(navController: NavController, workoutRoutines: List<WorkoutRoutineRequest>, containerOpacity: Float = 1f) {
