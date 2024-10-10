@@ -10,7 +10,7 @@ import com.google.gson.GsonBuilder
 
 object RetrofitInstance {
 
-    private const val BASE_URL = "http://172.15.3.156:8080/"  // Replace with your Spring Boot server URL
+    private const val BASE_URL = "https://hammerhead-app-9jxwf.ondigitalocean.app/api/"  // Replace with your Spring Boot server URL
 
     // Function to provide an OkHttpClient that adds JWT tokens to headers and logs HTTP requests/responses
     private fun provideOkHttpClient(context: Context): OkHttpClient {

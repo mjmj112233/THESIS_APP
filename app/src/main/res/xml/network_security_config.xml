@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <network-security-config>
-    <domain-config cleartextTrafficPermitted="true">
-        <domain includeSubdomains="true">172.15.3.156</domain>
-        <base-config cleartextTrafficPermitted="true" /><!-- Replace with your machine's IPv4 address -->
+    <domain-config cleartextTrafficPermitted="false">
+        <domain includeSubdomains="true">hammerhead-app-9jxwf.ondigitalocean.app</domain>
     </domain-config>
 </network-security-config>
