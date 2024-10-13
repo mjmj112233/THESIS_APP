@@ -202,6 +202,12 @@ fun Navigation(startDestination: String = "third") {  // Change to the correct s
             WorkoutDayPage(navController, selectedDayNum)
         }
 
+        composable("workoutInfoPage/{workoutName}") { backStackEntry ->
+            val workoutName =
+                backStackEntry.arguments?.getString("workoutName") ?: "Unknown Workout"
+            WorkoutInfoPage(navController, workoutName)
+        }
+
         composable("workoutRoutine") {
             WorkoutRoutinePage(navController)
         }
