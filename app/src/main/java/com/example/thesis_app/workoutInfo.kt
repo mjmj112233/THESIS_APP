@@ -98,28 +98,42 @@ fun WorkoutInfoPage(navController: NavController, workoutName: String) {
                             )
                         }
 
-                        // Container for video
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(280.dp) // Adjust height as needed
-                                .padding(top = 30.dp) // Padding below the title
+                                .height(280.dp)
+                                .padding(top = 30.dp)
                                 .clip(RoundedCornerShape(10.dp))
-                                .background(Color.Gray) // Placeholder for video background
+                                .background(Color.Gray) // Placeholder background
                         ) {
-                            workoutInfo.workout.demoUrl?.let { videoUrl ->
+                            workoutInfo.workout.demoUrl?.let { iframeString ->
                                 AndroidView(
                                     modifier = Modifier.fillMaxSize(),
                                     factory = { context ->
                                         WebView(context).apply {
-                                            webViewClient = WebViewClient() // Ensure links open in the WebView
-                                            settings.javaScriptEnabled = true // Enable JavaScript for YouTube embedding
-                                            loadUrl(videoUrl) // Use the non-null demoUrl
+                                            webViewClient = WebViewClient()
+                                            settings.javaScriptEnabled = true // Enable JavaScript for YouTube content
+                                            settings.loadWithOverviewMode = true
+                                            settings.useWideViewPort = true
+
+                                            // Load the iframe string as HTML content
+                                            loadData(
+                                                """
+                        <html>
+                        <body>
+                            $iframeString
+                        </body>
+                        </html>
+                        """.trimIndent(),
+                                                "text/html",
+                                                "utf-8"
+                                            )
                                         }
                                     }
                                 )
                             }
                         }
+
 
                         Row(
                             modifier = Modifier
