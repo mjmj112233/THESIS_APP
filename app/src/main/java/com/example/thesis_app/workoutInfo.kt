@@ -32,6 +32,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import android.webkit.WebView
+import android.webkit.WebViewClient
+import androidx.compose.ui.viewinterop.AndroidView
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -104,7 +107,18 @@ fun WorkoutInfoPage(navController: NavController, workoutName: String) {
                                 .clip(RoundedCornerShape(10.dp))
                                 .background(Color.Gray) // Placeholder for video background
                         ) {
-                            // Placeholder for video (if needed)
+                            workoutInfo.workout.demoUrl?.let { videoUrl ->
+                                AndroidView(
+                                    modifier = Modifier.fillMaxSize(),
+                                    factory = { context ->
+                                        WebView(context).apply {
+                                            webViewClient = WebViewClient() // Ensure links open in the WebView
+                                            settings.javaScriptEnabled = true // Enable JavaScript for YouTube embedding
+                                            loadUrl(videoUrl) // Use the non-null demoUrl
+                                        }
+                                    }
+                                )
+                            }
                         }
 
                         Row(
