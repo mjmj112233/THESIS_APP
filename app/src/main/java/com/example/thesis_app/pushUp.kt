@@ -288,17 +288,38 @@ fun pushUp(
 
                 // Input Section
                 Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(bottom = 220.dp),
+                    contentAlignment = Alignment.BottomCenter
                 ) {
                     Column(
-                        horizontalAlignment = Alignment.End,  // Align content to the right
+                        horizontalAlignment = Alignment.CenterHorizontally,
                         modifier = Modifier
-                            .fillMaxWidth() // Ensure the column takes up the full width
-                            .padding(end = 28.dp) // Optional padding on the right
+                            .fillMaxWidth()
+                            .padding(start = 30.dp, bottom = 50.dp, end = 30.dp)
                     ) {
-                        Spacer(modifier = Modifier.height(700.dp))
+                        // Push-Ups Count Input
+                        Box(
+                            modifier = Modifier
+                                .clip(shape = RoundedCornerShape(20.dp))
+                                .background(DirtyWhite)
+                                .padding(20.dp)
+                        ) {
+                            TextField(
+                                value = pushUpCount,
+                                onValueChange = { pushUpCount = it },
+                                label = { Text("How many push-ups did you do?", fontFamily = alt, color = DarkGreen) },
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = TextFieldDefaults.textFieldColors(
+                                    containerColor = DirtyWhite,
+                                    focusedIndicatorColor = DarkGreen, // Optional: Customize the focused indicator
+                                    unfocusedIndicatorColor = Color.Transparent // Optional: Remove the underline
+                                )
+                            )
+                        }
 
+                        // Align the button directly inside the box and ensure it sticks to the right
                         Button(
                             onClick = {
                                 val pushUps = pushUpCount.toIntOrNull()
@@ -312,9 +333,9 @@ fun pushUp(
                             },
                             colors = ButtonDefaults.buttonColors(Slime),
                             modifier = Modifier
+                                .align(Alignment.End) // Align button to the right
                                 .padding(28.dp)
                                 .width(160.dp)
-                                .align(Alignment.End)  // Align the button to the rightmost side
                         ) {
                             Text(
                                 text = "Submit",
@@ -325,6 +346,7 @@ fun pushUp(
                         }
                     }
                 }
+
             }
         }
 
