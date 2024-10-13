@@ -285,71 +285,45 @@ fun pushUp(
                     }
 
                 }
+            }
+        }
 
-                // Input Section
-                Box(
+        // Input Section
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Spacer(modifier = Modifier.height(700.dp))
+
+                Button(
+                    onClick = {
+                        val pushUps = pushUpCount.toIntOrNull()
+                        if (pushUps != null && pushUps >= 0) {
+                            pushUpScore = calculatePushUpScore(pushUps)
+                            isTestComplete = true
+                        } else {
+                            Toast.makeText(context, "Please enter a valid push-up count", Toast.LENGTH_SHORT).show()
+                            isTestComplete = false
+                        }
+                    },
+                    colors = ButtonDefaults.buttonColors(Slime),
                     modifier = Modifier
-                        .fillMaxSize()
-                        .padding(bottom = 220.dp),
-                    contentAlignment = Alignment.BottomCenter
+                        .padding(28.dp)
+                        .fillMaxWidth()
                 ) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(start = 30.dp, bottom = 50.dp, end = 30.dp)
-                    ) {
-                        // Push-Ups Count Input
-                        Box(
-                            modifier = Modifier
-                                .clip(shape = RoundedCornerShape(20.dp))
-                                .background(DirtyWhite)
-                                .padding(20.dp)
-                        ) {
-                            TextField(
-                                value = pushUpCount,
-                                onValueChange = { pushUpCount = it },
-                                label = { Text("How many push-ups did you do?", fontFamily = alt, color = DarkGreen) },
-                                modifier = Modifier.fillMaxWidth(),
-                                colors = TextFieldDefaults.textFieldColors(
-                                    containerColor = DirtyWhite,
-                                    focusedIndicatorColor = DarkGreen, // Optional: Customize the focused indicator
-                                    unfocusedIndicatorColor = Color.Transparent // Optional: Remove the underline
-                                )
-                            )
-                        }
-
-                        // Align the button directly inside the box and ensure it sticks to the right
-                        Button(
-                            onClick = {
-                                val pushUps = pushUpCount.toIntOrNull()
-                                if (pushUps != null && pushUps >= 0) {
-                                    pushUpScore = calculatePushUpScore(pushUps)
-                                    isTestComplete = true
-                                } else {
-                                    Toast.makeText(context, "Please enter a valid push-up count", Toast.LENGTH_SHORT).show()
-                                    isTestComplete = false
-                                }
-                            },
-                            colors = ButtonDefaults.buttonColors(Slime),
-                            modifier = Modifier
-                                .align(Alignment.End) // Align button to the right
-                                .padding(28.dp)
-                                .width(160.dp)
-                        ) {
-                            Text(
-                                text = "Submit",
-                                color = DarkGreen,
-                                fontSize = 18.sp,
-                                fontFamily = titleFont
-                            )
-                        }
-                    }
+                    Text(
+                        text = "Submit",
+                        color = DarkGreen,
+                        fontSize = 18.sp,
+                        fontFamily = titleFont
+                    )
                 }
 
             }
         }
-
 
         // Next Button
         if (isTestComplete) {
@@ -372,10 +346,10 @@ fun pushUp(
                         .fillMaxWidth()
                 ) {
                     Text(
-                        text = "Proceed to Next Test",
+                        text = "Proceed",
                         color = DarkGreen,
                         fontFamily = titleFont,
-                        fontSize = 18.sp
+                        fontSize = 28.sp
                     )
                 }
             }

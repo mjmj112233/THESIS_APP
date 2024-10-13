@@ -331,7 +331,7 @@ fun plank(
                         .fillMaxWidth()
                 ) {
                     Text(
-                        text = "Next",
+                        text = "Submit",
                         color = DarkGreen,
                         fontSize = 20.sp,
                         fontFamily = titleFont
@@ -361,10 +361,10 @@ fun plank(
                         .fillMaxWidth()
                 ) {
                     Text(
-                        text = "Next",
+                        text = "Proceed",
                         color = DarkGreen,
                         fontFamily = titleFont,
-                        fontSize = 28.sp
+                        fontSize = 18.sp
                     )
                 }
             }
