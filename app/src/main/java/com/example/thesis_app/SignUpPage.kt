@@ -47,7 +47,9 @@ import com.example.thesis_app.ui.theme.titleFont
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun signupPage(navController: NavController) {
-    val context = LocalContext.current // To show Toast messages
+
+    val context = LocalContext.current
+     // To show Toast messages
 
     Box(
         modifier = Modifier

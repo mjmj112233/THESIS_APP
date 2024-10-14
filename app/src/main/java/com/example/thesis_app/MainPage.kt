@@ -276,7 +276,11 @@ private fun generateWorkoutRoutine(context: Context, onResult: (List<WorkoutRout
     CoroutineScope(Dispatchers.IO).launch {
         try {
             // Fetch existing workout routines for the user
+            println("Making API request for existing routines")
             val existingRoutines = service.getWorkoutRoutines()
+            println("API response: $existingRoutines")
+
+
 
             if (existingRoutines.isNotEmpty()) {
                 // If routines exist, use the PUT request to regenerate the workout routine
