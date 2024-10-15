@@ -1,6 +1,7 @@
 package com.example.thesis_app
 
 import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -227,7 +228,7 @@ fun mainPage(navController: NavController) {
             } else {
                 // Display error message if exists
                 errorMessage?.let {
-                    BasicText(text = it)
+                    Toast.makeText(context, "Please edit your profile first.", Toast.LENGTH_SHORT).show()
                 }
                 // Floating Action Button to generate workout routines
                 FloatingActionButton(
