@@ -264,7 +264,7 @@ fun WorkoutCard(routine: WorkoutRoutineRequest, navController: NavController, co
                         fontSize = 20.sp,
                         color = Color.White,  // Set text color for better contrast
                     )
-
+                    if (workoutInfo.workout.name != "Cardio") {
                     // Row for sets and reps boxes
                     Row(
                         modifier = Modifier
@@ -281,7 +281,11 @@ fun WorkoutCard(routine: WorkoutRoutineRequest, navController: NavController, co
                         ) {
                             Text(
                                 text = "${workoutInfo.sets} sets",
-                                style = TextStyle(fontSize = 10.sp, color = DarkGreen, fontFamily = alt),
+                                style = TextStyle(
+                                    fontSize = 10.sp,
+                                    color = DarkGreen,
+                                    fontFamily = alt
+                                ),
                             )
                         }
 
@@ -297,8 +301,37 @@ fun WorkoutCard(routine: WorkoutRoutineRequest, navController: NavController, co
                         ) {
                             Text(
                                 text = "${workoutInfo.reps} reps",
-                                style = TextStyle(fontSize = 10.sp, color = DarkGreen, fontFamily = alt),
+                                style = TextStyle(
+                                    fontSize = 10.sp,
+                                    color = DarkGreen,
+                                    fontFamily = alt
+                                ),
                             )
+                        }
+                    }
+                    } else {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 8.dp, end = 8.dp),
+                            horizontalArrangement = Arrangement.Start
+                        ) {
+                            // Sets box
+                            Box(
+                                modifier = Modifier
+                                    .clip(shape = RoundedCornerShape(20.dp))
+                                    .background(Slime)
+                                    .padding(horizontal = 8.dp, vertical = 4.dp)
+                            ) {
+                                Text(
+                                    text = String.format("%.0f min", workoutInfo.weight),
+                                    style = TextStyle(
+                                        fontSize = 10.sp,
+                                        color = DarkGreen,
+                                        fontFamily = alt
+                                    ),
+                                )
+                            }
                         }
                     }
                 }

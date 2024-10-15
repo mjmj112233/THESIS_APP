@@ -134,60 +134,100 @@ fun WorkoutInfoPage(navController: NavController, workoutName: String) {
                             }
                         }
 
-
-                        Row(
-                            modifier = Modifier
-                                .padding(top = 14.dp)
-                                .fillMaxWidth()
-                                .padding(top = 8.dp, end = 8.dp),
-                            horizontalArrangement = Arrangement.Start
-                        ) {
-                            // Sets box
-                            Box(
+                        if (workoutInfo.workout.name != "Cardio") {
+                            Row(
                                 modifier = Modifier
-                                    .clip(shape = RoundedCornerShape(20.dp))
-                                    .background(Slime)
-                                    .padding(horizontal = 12.dp, vertical = 8.dp)
+                                    .padding(top = 14.dp)
+                                    .fillMaxWidth()
+                                    .padding(top = 8.dp, end = 8.dp),
+                                horizontalArrangement = Arrangement.Start
                             ) {
-                                Text(
-                                    text = "${workoutInfo.sets} sets",
-                                    style = TextStyle(fontSize = 18.sp, color = DarkGreen, fontFamily = alt),
-                                )
-                            }
-
-                            // Spacer between sets and reps boxes
-                            Spacer(modifier = Modifier.width(4.dp))
-
-                            // Reps box
-                            Box(
-                                modifier = Modifier
-                                    .clip(shape = RoundedCornerShape(20.dp))
-                                    .background(Slime)
-                                    .padding(horizontal = 12.dp, vertical = 8.dp)
-                            ) {
-                                Text(
-                                    text = "${workoutInfo.reps} reps",
-                                    style = TextStyle(fontSize = 18.sp, color = DarkGreen, fontFamily = alt),
-                                )
-                            }
-
-                            Spacer(modifier = Modifier.width(4.dp))
-
-                            OutlinedCard(
-                                colors = CardDefaults.cardColors(
-                                    containerColor = Color.Transparent,
-                                ),
-                                border = BorderStroke(4.dp, Slime),
-                                modifier = Modifier
-                                    .clip(shape = RoundedCornerShape(20.dp))
-                            ) {
-                                Text(
-                                    text = "${workoutInfo.weight} kg",
-                                    style = TextStyle(fontSize = 18.sp, color = Slime, fontFamily = alt),
+                                // Sets box
+                                Box(
                                     modifier = Modifier
-                                        .padding(horizontal = 12.dp, vertical = 8.dp)
                                         .clip(shape = RoundedCornerShape(20.dp))
-                                )
+                                        .background(Slime)
+                                        .padding(horizontal = 12.dp, vertical = 8.dp)
+                                ) {
+                                    Text(
+                                        text = "${workoutInfo.sets} sets",
+                                        style = TextStyle(
+                                            fontSize = 18.sp,
+                                            color = DarkGreen,
+                                            fontFamily = alt
+                                        ),
+                                    )
+                                }
+
+                                // Spacer between sets and reps boxes
+                                Spacer(modifier = Modifier.width(4.dp))
+
+                                // Reps box
+                                Box(
+                                    modifier = Modifier
+                                        .clip(shape = RoundedCornerShape(20.dp))
+                                        .background(Slime)
+                                        .padding(horizontal = 12.dp, vertical = 8.dp)
+                                ) {
+                                    Text(
+                                        text = "${workoutInfo.reps} reps",
+                                        style = TextStyle(
+                                            fontSize = 18.sp,
+                                            color = DarkGreen,
+                                            fontFamily = alt
+                                        ),
+                                    )
+                                }
+
+                                Spacer(modifier = Modifier.width(4.dp))
+
+                                OutlinedCard(
+                                    colors = CardDefaults.cardColors(
+                                        containerColor = Color.Transparent,
+                                    ),
+                                    border = BorderStroke(4.dp, Slime),
+                                    modifier = Modifier
+                                        .clip(shape = RoundedCornerShape(20.dp))
+                                ) {
+                                    Text(
+                                        text = "${workoutInfo.weight} kg",
+                                        style = TextStyle(
+                                            fontSize = 18.sp,
+                                            color = Slime,
+                                            fontFamily = alt
+                                        ),
+                                        modifier = Modifier
+                                            .padding(horizontal = 12.dp, vertical = 8.dp)
+                                            .clip(shape = RoundedCornerShape(20.dp))
+                                    )
+                                }
+                            }
+                        } else {
+                            Column(
+                                modifier = Modifier
+                                    .padding(top = 16.dp) // Simulates margin-top by adding padding to the parent
+                            ) {
+                                OutlinedCard(
+                                    colors = CardDefaults.cardColors(
+                                        containerColor = Color.Transparent,
+                                    ),
+                                    border = BorderStroke(4.dp, Slime),
+                                    modifier = Modifier
+                                        .clip(shape = RoundedCornerShape(20.dp))
+                                ) {
+                                    Text(
+                                        text = String.format("%.0f min", workoutInfo.weight), // Display duration in minutes
+                                        style = TextStyle(
+
+                                            fontSize = 18.sp,
+                                            color = Slime,
+                                            fontFamily = alt
+                                        ),
+                                        modifier = Modifier
+                                            .padding(horizontal = 12.dp, vertical = 8.dp)
+                                            .clip(shape = RoundedCornerShape(20.dp))
+                                    )
+                                }
                             }
                         }
 
