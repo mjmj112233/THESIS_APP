@@ -37,6 +37,7 @@ fun muscleGroupScreen(
 ) {
     var selectedUpper by remember { mutableStateOf(false) }
     var selectedLower by remember { mutableStateOf(false) }
+
     val context = LocalContext.current
 
     // Automatically assign if fitness goal is Weight Loss
@@ -185,6 +186,52 @@ fun muscleGroupScreen(
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
                             text = "Lower Muscles",
+                            fontSize = 16.sp,
+                            fontFamily = titleFont,
+                            color = Slime,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.padding(top = 24.dp)
+                        )
+                    }
+                }
+            }
+        } else {
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier.fillMaxSize()
+            ) {
+                Row(
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    // Upper Body Selection
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier.padding(horizontal = 16.dp)
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(100.dp)
+                                .clip(CircleShape)
+                                .background(Slime)
+                                .clickable {
+                                },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Image(
+                                painter = painterResource(id = R.drawable.wl),
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .size(80.dp)
+                                    .clip(CircleShape)
+                                    .background(DirtyWhite),
+                                contentScale = ContentScale.Crop
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = "Both Muscles",
                             fontSize = 16.sp,
                             fontFamily = titleFont,
                             color = Slime,
