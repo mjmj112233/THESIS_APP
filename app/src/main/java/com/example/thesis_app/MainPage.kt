@@ -399,18 +399,58 @@ fun WorkoutRoutineCard(routine: WorkoutRoutineRequest, containerOpacity: Float =
             )
         }
 
-        routine.workoutInfo?.let { workoutInfo ->
-            Text(text = "${workoutInfo.workout.name}",
-                fontFamily = alt,
-                fontSize = 12.sp,
-                color = Color.White,
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(bottom = 20.dp))
-        }
+        Spacer(modifier = Modifier.height(30.dp))
 
+        routine.workoutInfo?.let { workoutInfo ->
+            // Check if the workout name is null or empty
+            val workoutName = workoutInfo.workout.name ?: ""
+            Column(
+                modifier = Modifier
+                    .align(Alignment.BottomStart)
+                    .padding(top = 20.dp)
+            ) {
+                Text(
+                    text = if (workoutName.isEmpty()) "Rest Day" else workoutName,
+                    fontFamily = alt,
+                    fontSize = 12.sp,
+                    color = Color.White
+                )
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                // Only show equipment if it's not a rest day
+                if (workoutName.isNotEmpty()) {
+                    Box(
+                        modifier = Modifier
+                            .clip(shape = RoundedCornerShape(20.dp))
+                            .background(Slime)
+                            .padding(horizontal = 8.dp, vertical = 4.dp)
+                    ) {
+                        Text(
+                            text = "${workoutInfo.workout.equipment}",
+                            style = TextStyle(fontSize = 8.sp, color = DarkGreen, fontFamily = alt),
+                        )
+                    }
+                }
+            }
+        } ?: run {
+            // Handle the case where workoutInfo is null
+            Column(
+                modifier = Modifier
+                    .align(Alignment.BottomStart)
+                    .padding(bottom = 20.dp)
+            ) {
+                Text(
+                    text = "Rest Day",
+                    fontFamily = alt,
+                    fontSize = 12.sp,
+                    color = Color.White
+                )
+            }
+        }
     }
 }
+
 
 fun performLogout(context: Context, navController: NavController) {
     TokenManager.clearToken(context)

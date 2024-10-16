@@ -102,7 +102,7 @@ fun WorkoutDayPage(navController: NavController, selectedDayNum: Int) {
                             Text(
                                 text = "DAY $selectedDayNum",
                                 fontSize = 20.sp,
-                                fontFamily = titleFont,
+                                fontFamily = alt,
                                 color = DirtyWhite,
                                 textAlign = TextAlign.Center
                             )
@@ -258,12 +258,29 @@ fun WorkoutCard(routine: WorkoutRoutineRequest, navController: NavController, co
                 Column(
                     modifier = Modifier.align(Alignment.CenterStart)
                 ) {
+                    // Equipment text positioned above the workout name
+                    Box(
+                        modifier = Modifier
+                            .clip(shape = RoundedCornerShape(20.dp))
+                            .background(Slime)
+                            .padding(horizontal = 8.dp, vertical = 4.dp)
+                    ) {
+                        Text(
+                            text = "${workoutInfo.workout.equipment}",
+                            style = TextStyle(fontSize = 20.sp, color = DarkGreen, fontFamily = alt),
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    // Workout name text below the equipment
                     Text(
                         text = "${workoutInfo.workout.name}",
                         fontFamily = alt,
                         fontSize = 20.sp,
                         color = Color.White,  // Set text color for better contrast
                     )
+
                     if (workoutInfo.workout.name != "Cardio") {
                     // Row for sets and reps boxes
                     Row(
