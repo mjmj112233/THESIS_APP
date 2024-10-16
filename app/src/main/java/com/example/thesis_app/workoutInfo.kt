@@ -147,12 +147,12 @@ fun WorkoutInfoPage(navController: NavController, workoutName: String) {
                                     modifier = Modifier
                                         .clip(shape = RoundedCornerShape(20.dp))
                                         .background(Slime)
-                                        .padding(horizontal = 12.dp, vertical = 8.dp)
+                                        .padding(horizontal = 10.dp, vertical = 8.dp)
                                 ) {
                                     Text(
                                         text = "${workoutInfo.sets} sets",
                                         style = TextStyle(
-                                            fontSize = 18.sp,
+                                            fontSize = 16.sp,
                                             color = DarkGreen,
                                             fontFamily = alt
                                         ),
@@ -167,12 +167,12 @@ fun WorkoutInfoPage(navController: NavController, workoutName: String) {
                                     modifier = Modifier
                                         .clip(shape = RoundedCornerShape(20.dp))
                                         .background(Slime)
-                                        .padding(horizontal = 12.dp, vertical = 8.dp)
+                                        .padding(horizontal = 10.dp, vertical = 8.dp)
                                 ) {
                                     Text(
                                         text = "${workoutInfo.reps} reps",
                                         style = TextStyle(
-                                            fontSize = 18.sp,
+                                            fontSize = 16.sp,
                                             color = DarkGreen,
                                             fontFamily = alt
                                         ),
@@ -192,12 +192,34 @@ fun WorkoutInfoPage(navController: NavController, workoutName: String) {
                                     Text(
                                         text = "${workoutInfo.weight} kg",
                                         style = TextStyle(
-                                            fontSize = 18.sp,
+                                            fontSize = 16.sp,
                                             color = Slime,
                                             fontFamily = alt
                                         ),
                                         modifier = Modifier
-                                            .padding(horizontal = 12.dp, vertical = 8.dp)
+                                            .padding(horizontal = 10.dp, vertical = 8.dp)
+                                            .clip(shape = RoundedCornerShape(20.dp))
+                                    )
+                                }
+                                Spacer(modifier = Modifier.width(4.dp))
+
+                                OutlinedCard(
+                                    colors = CardDefaults.cardColors(
+                                        containerColor = Color.Transparent,
+                                    ),
+                                    border = BorderStroke(4.dp, Slime),
+                                    modifier = Modifier
+                                        .clip(shape = RoundedCornerShape(20.dp))
+                                ) {
+                                    Text(
+                                        text = "${workoutInfo.workout.classification.name}",
+                                        style = TextStyle(
+                                            fontSize = 16.sp,
+                                            color = Slime,
+                                            fontFamily = alt
+                                        ),
+                                        modifier = Modifier
+                                            .padding(horizontal = 10.dp, vertical = 8.dp)
                                             .clip(shape = RoundedCornerShape(20.dp))
                                     )
                                 }
