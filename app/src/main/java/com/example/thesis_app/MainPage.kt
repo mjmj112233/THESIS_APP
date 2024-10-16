@@ -171,7 +171,7 @@ fun mainPage(navController: NavController) {
                             Column(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(top = 60.dp),
+                                    .padding(top = 20.dp),
                             ) {
                                 // Add a header or any other static content before the list
                                 // Display the fitness goal before the header
@@ -180,7 +180,7 @@ fun mainPage(navController: NavController) {
                                         modifier = Modifier
                                             .clip(shape = RoundedCornerShape(20.dp))
                                             .width(160.dp)
-                                            .align(Alignment.CenterHorizontally)
+                                            .align(Alignment.End)
                                             .background(DirtyWhite)
                                             .padding(horizontal = 8.dp, vertical = 6.dp),
                                         contentAlignment = Alignment.Center
