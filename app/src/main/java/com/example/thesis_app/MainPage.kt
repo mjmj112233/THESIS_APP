@@ -22,11 +22,14 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import androidx.navigation.NavController
 import com.example.api.RetrofitInstance
+import com.example.model.UserProfile
+import com.example.model.UserProfileRequest
 import com.example.model.WorkoutRoutineRequest
 import com.example.thesis_app.ui.theme.BlueGreen
 import com.example.thesis_app.ui.theme.DarkGreen
@@ -53,10 +56,15 @@ fun mainPage(navController: NavController) {
     var isLoading by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
     var hasShownError by remember { mutableStateOf(false) }
-
+    var userProfile by remember { mutableStateOf<UserProfile?>(null) }
     // Fetch workout routines on launch
     LaunchedEffect(Unit) {
         isLoading = true
+        fetchUserProfile(context) { profile, error ->
+            userProfile = profile
+            errorMessage = error
+        }
+
         fetchWorkoutRoutines(context) { routines, error ->
             workoutRoutines = routines
             errorMessage = error
@@ -163,15 +171,31 @@ fun mainPage(navController: NavController) {
                             Column(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(top = 60.dp)
+                                    .padding(top = 60.dp),
                             ) {
                                 // Add a header or any other static content before the list
+                                // Display the fitness goal before the header
+                                userProfile?.fitnessGoal?.let {
+                                    Box(
+                                        modifier = Modifier
+                                            .clip(shape = RoundedCornerShape(20.dp))
+                                            .width(160.dp)
+                                            .align(Alignment.CenterHorizontally)
+                                            .background(DirtyWhite)
+                                            .padding(horizontal = 8.dp, vertical = 6.dp),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Text(
+                                            text = "$it",
+                                            color = DarkGreen,
+                                            style = TextStyle(
+                                                fontFamily = titleFont,
+                                                fontSize = 18.sp
+                                            ),
+                                        )
+                                    }
+                                }
 
-                                    Text(
-                                        text = "Your Personalized Workout Routine",
-                                        color = DirtyWhite,
-                                        style = TextStyle(fontFamily = titleFont, fontSize = 20.sp),
-                                    )
 
                                 if (workoutRoutines.isNotEmpty()) {
                                         WorkoutRoutinesList(navController, workoutRoutines, containerOpacity = 0.2f)
@@ -262,6 +286,30 @@ fun mainPage(navController: NavController) {
         }
     }
 }
+
+private fun fetchUserProfile(context: Context, onResult: (UserProfile?, String?) -> Unit) {
+    val service = RetrofitInstance.UserProfileService(context)
+
+    CoroutineScope(Dispatchers.IO).launch {
+        try {
+            // Call the suspend function to get a Response<UserProfile>
+            val response = service.getProfile()
+
+            // Check if the response is successful
+            if (response.isSuccessful) {
+                val profile = response.body() // Get the UserProfile
+                onResult(profile, null) // Return the profile and null error
+            } else {
+                // Handle unsuccessful response
+                onResult(null, response.message()) // Return null profile and error message
+            }
+        } catch (e: Exception) {
+            // Handle any exceptions that occur
+            onResult(null, e.message) // Return null profile and exception message
+        }
+    }
+}
+
 
 private fun fetchWorkoutRoutines(context: Context, onResult: (List<WorkoutRoutineRequest>, String?) -> Unit) {
     val service = RetrofitInstance.WorkoutRoutineService(context)
