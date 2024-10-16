@@ -43,6 +43,8 @@ import com.example.thesis_app.ui.theme.DirtyWhite
 import com.example.thesis_app.ui.theme.Slime
 import com.example.thesis_app.ui.theme.captionFont
 import com.example.thesis_app.ui.theme.titleFont
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -110,7 +112,8 @@ fun signupPage(navController: NavController) {
                         AnimatedTextField(
                             label = "Password",
                             value = password,
-                            onValueChange = { password = it }
+                            onValueChange = { password = it },
+                            visualTransformation = PasswordVisualTransformation()
                         )
 
                         Spacer(modifier = Modifier.height(17.dp))
@@ -119,7 +122,8 @@ fun signupPage(navController: NavController) {
                         AnimatedTextField(
                             label = "Confirm Password",
                             value = confirmPassword,
-                            onValueChange = { confirmPassword = it }
+                            onValueChange = { confirmPassword = it },
+                            visualTransformation = PasswordVisualTransformation()
                         )
 
                         Spacer(modifier = Modifier.height(20.dp))
@@ -245,7 +249,8 @@ fun signupPage(navController: NavController) {
 fun AnimatedTextField(
     label: String,
     value: String,
-    onValueChange: (String) -> Unit
+    onValueChange: (String) -> Unit,
+    visualTransformation: VisualTransformation = VisualTransformation.None,
 ) {
     var isFocused by remember { mutableStateOf(false) }
     val isLabelSmall = isFocused || value.isNotEmpty()
@@ -274,6 +279,7 @@ fun AnimatedTextField(
                 )
             }
         },
+        visualTransformation = visualTransformation,
         colors = TextFieldDefaults.textFieldColors(
             focusedIndicatorColor = Color.Transparent,
             unfocusedIndicatorColor = Color.Transparent,

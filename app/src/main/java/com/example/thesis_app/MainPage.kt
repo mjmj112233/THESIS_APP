@@ -52,6 +52,7 @@ fun mainPage(navController: NavController) {
     var workoutRoutines by remember { mutableStateOf<List<WorkoutRoutineRequest>>(emptyList()) }
     var isLoading by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
+    var hasShownError by remember { mutableStateOf(false) }
 
     // Fetch workout routines on launch
     LaunchedEffect(Unit) {
@@ -228,12 +229,16 @@ fun mainPage(navController: NavController) {
             } else {
                 // Display error message if exists
                 errorMessage?.let {
-                    Toast.makeText(context, "Please edit your profile first.", Toast.LENGTH_SHORT).show()
+                    if (!hasShownError) {
+                        Toast.makeText(context, "Please edit your profile first.", Toast.LENGTH_SHORT).show()
+                        hasShownError = true
+                    }
                 }
                 // Floating Action Button to generate workout routines
                 FloatingActionButton(
                     onClick = {
                         // Handle button click to generate workout routines
+                        hasShownError = false
                         isLoading = true // Set loading state to true
                         generateWorkoutRoutine(context) { generatedRoutines, error ->
                             workoutRoutines = generatedRoutines
