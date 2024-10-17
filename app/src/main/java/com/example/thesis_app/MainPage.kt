@@ -36,6 +36,7 @@ import com.example.thesis_app.ui.theme.DarkGreen
 import com.example.thesis_app.ui.theme.DirtyWhite
 import com.example.thesis_app.ui.theme.Slime
 import com.example.thesis_app.ui.theme.alt
+import com.example.thesis_app.ui.theme.captionFont
 import com.example.thesis_app.ui.theme.titleFont
 import com.example.util.TokenManager
 import kotlinx.coroutines.CoroutineScope
@@ -48,6 +49,8 @@ fun mainPage(navController: NavController) {
     // State to control the visibility of the drawer
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
+    // State to control the visibility of the alert dialog
+    var showDialog by remember { mutableStateOf(false) }
 
     //----------------------------------------------------------------------------
 
@@ -59,6 +62,8 @@ fun mainPage(navController: NavController) {
     var userProfile by remember { mutableStateOf<UserProfile?>(null) }
     // Fetch workout routines on launch
     LaunchedEffect(Unit) {
+        showDialog = false
+
         isLoading = true
         fetchUserProfile(context) { profile, error ->
             userProfile = profile
@@ -69,6 +74,11 @@ fun mainPage(navController: NavController) {
             workoutRoutines = routines
             errorMessage = error
             isLoading = false
+
+            // Show the dialog if there's an error after loading is complete
+            if (error != null) {
+                showDialog = true
+            }
         }
     }
 
@@ -166,7 +176,7 @@ fun mainPage(navController: NavController) {
                                 .padding(innerPadding)
                                 .fillMaxSize()
                                 .background(BlueGreen)
-                                .padding(horizontal = 20.dp)
+                                .padding(horizontal = 4.dp)
                         ) {
                             Column(
                                 modifier = Modifier
@@ -178,6 +188,7 @@ fun mainPage(navController: NavController) {
                                 userProfile?.fitnessGoal?.let {
                                     Box(
                                         modifier = Modifier
+                                            .padding(horizontal = 12.dp)
                                             .clip(shape = RoundedCornerShape(20.dp))
                                             .width(160.dp)
                                             .align(Alignment.End)
@@ -200,11 +211,32 @@ fun mainPage(navController: NavController) {
                                 if (workoutRoutines.isNotEmpty()) {
                                         WorkoutRoutinesList(navController, workoutRoutines, containerOpacity = 0.2f)
                                     } else {
-                                        BasicText(text = "No workout routines available.")
+                                    Column(
+                                        modifier = Modifier
+                                            .padding(bottom = 20.dp)
+                                            .fillMaxSize(),  // This makes the column take up the whole screen
+                                        verticalArrangement = Arrangement.Center,  // Centers the content vertically
+                                        horizontalAlignment = Alignment.CenterHorizontally  // Centers the content horizontally
+                                    ) {
+                                        Box(
+                                            modifier = Modifier
+                                                .clip(RoundedCornerShape(12.dp))
+                                                .height(70.dp)
+                                                .width(400.dp)
+                                                .background(DirtyWhite)
+                                                .padding(18.dp)
+                                        ) {
+                                            Text(
+                                                text = "Tip: Generate your Workout Routine by clicking Spot button below!",
+                                                color = DarkGreen,
+                                                fontFamily = alt,
+                                                textAlign = TextAlign.Justify,
+                                                fontSize = 18.sp
+                                            )
+                                        }
                                     }
-
+                                }
                             }
-
                             }
                     },
                     bottomBar = {
@@ -254,10 +286,53 @@ fun mainPage(navController: NavController) {
                 // Display error message if exists
                 errorMessage?.let {
                     if (!hasShownError) {
-                        Toast.makeText(context, "Please edit your profile first.", Toast.LENGTH_SHORT).show()
                         hasShownError = true
+                        showDialog = true
                     }
                 }
+
+                if (showDialog) {
+                    AlertDialog(
+                        onDismissRequest = { showDialog = false },
+                        text = {
+                            Row(verticalAlignment = Alignment.CenterVertically){
+                                Icon(
+                                    painter = painterResource(R.drawable.baseline_warning_24),
+                                    contentDescription = "Warning",
+                                    tint = DarkGreen,
+                                    modifier = Modifier
+                                        .padding(end = 24.dp)
+                                        .size(40.dp)
+                                )
+
+                                Column {
+                                    Text(
+                                        text = "In order for us to recommend your personalized workout routine, a quick user assessment is needed.",
+                                        color = DarkGreen,
+                                        fontFamily = titleFont,
+                                        textAlign = TextAlign.Justify
+                                    )
+                                    Spacer(modifier = Modifier.height(16.dp))
+                                    Text(
+                                        text = "To learn more about how we process your data, read our Terms and Conditions.",
+                                        color = DarkGreen,
+                                        fontFamily = titleFont,
+                                        modifier = Modifier.clickable { /* Handle T&C click */ }
+                                    )
+                                }
+                            }
+                        },
+                        confirmButton = { TextButton(
+                            onClick = {
+                                showDialog = false
+                                navController.navigate("bmi")
+                            },
+                            modifier = Modifier.background(Slime, shape = RoundedCornerShape(16.dp))
+                        ) {
+                            Text("Proceed", color = DarkGreen, fontFamily = titleFont,)
+                        } })
+                }
+
                 // Floating Action Button to generate workout routines
                 FloatingActionButton(
                     onClick = {
@@ -370,7 +445,7 @@ fun WorkoutRoutinesList(navController: NavController, workoutRoutines: List<Work
     // Group the workout routines by day number
     val groupedRoutines = workoutRoutines.groupBy { it.dayNum }
 
-    LazyColumn(modifier = Modifier.padding(16.dp)) {
+    LazyColumn(modifier = Modifier.padding(8.dp)) {
         items(groupedRoutines.toList()) { (dayNum, routines) ->
 
 
@@ -403,7 +478,8 @@ fun WorkoutRoutinesList(navController: NavController, workoutRoutines: List<Work
                     }
 
                     LazyRow(
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier
+                            .fillMaxWidth()
                             .padding(horizontal = 0.dp),
                     ) {
                         items(routines) { routine ->
