@@ -47,11 +47,11 @@ fun WorkoutInfoPage(navController: NavController, workoutName: String) {
     var filteredWorkout by remember { mutableStateOf<WorkoutRoutineRequest?>(null) }
     var isLoading by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
-    var isFinished by remember { mutableStateOf(false) }
+    var isFinished by remember { mutableStateOf(false) } // State to track if workout is finished
 
     val service = RetrofitInstance.WorkoutRoutineService(context)
 
-    // Fetch workout routines on launch
+    // Fetch workout routines and check finished status on launch
     LaunchedEffect(Unit) {
         isLoading = true
         fetchWorkoutRoutines(context) { routines, error ->
@@ -59,6 +59,12 @@ fun WorkoutInfoPage(navController: NavController, workoutName: String) {
             errorMessage = error
             // Filter the workout that matches workoutName
             filteredWorkout = routines.find { it.workoutInfo?.workout?.name == workoutName }
+
+            // Check if the filteredWorkout is finished
+            if (filteredWorkout != null) {
+                isFinished = filteredWorkout!!.isFinished // Assuming isFinished is part of your data model
+            }
+
             isLoading = false
         }
     }
@@ -104,13 +110,13 @@ fun WorkoutInfoPage(navController: NavController, workoutName: String) {
                             )
                         }
 
+                        // Video/Content Placeholder
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(280.dp)
+                                .height(305.dp)
                                 .padding(top = 30.dp)
-                                .clip(RoundedCornerShape(10.dp))
-                                .background(BlueGreen) // Placeholder background
+                                .background(BlueGreen)
                         ) {
                             workoutInfo.workout.demoUrl?.let { iframeString ->
                                 AndroidView(
@@ -126,6 +132,15 @@ fun WorkoutInfoPage(navController: NavController, workoutName: String) {
                                             loadData(
                                                 """
                         <html>
+                        <head>
+                            <style>
+                            body {
+                                background-color: transparent; 
+                                margin-right: 0;
+                                padding: 0;
+                            }
+                        </style>
+                        </head>
                         <body>
                             $iframeString
                         </body>
@@ -258,6 +273,7 @@ fun WorkoutInfoPage(navController: NavController, workoutName: String) {
                             }
                         }
 
+
                         Spacer(modifier = Modifier.height(8.dp))
 
                         Text(
@@ -277,34 +293,62 @@ fun WorkoutInfoPage(navController: NavController, workoutName: String) {
                                 .padding(end = 8.dp),
                             horizontalArrangement = Arrangement.Start
                         ) {
+                            // Button to toggle between Finish and Unfinish
                             Button(
                                 onClick = {
-                                    // Call the API to mark the workout as finished
-                                    if (workout.id > 0) { // Check if workout has a valid ID
-                                        CoroutineScope(Dispatchers.IO).launch {
-                                            try {
-                                                val response = service.markWorkoutAsFinished(workout.id)
-                                                if (response.isSuccessful) {
-                                                    // Switch to the main thread to show the Toast
-                                                    withContext(Dispatchers.Main) {
-                                                        Toast.makeText(context, "Workout marked as finished!", Toast.LENGTH_SHORT).show()
+                                    if (isFinished) {
+                                        // Call the API to mark the workout as unfinished
+                                        if (workout.id > 0) { // Check if workout has a valid ID
+                                            CoroutineScope(Dispatchers.IO).launch {
+                                                try {
+                                                    val response = service.resetWorkout(workout.id) // Call the reset API
+                                                    if (response.isSuccessful) {
+                                                        // Switch to the main thread to show the Toast
+                                                        withContext(Dispatchers.Main) {
+                                                            Toast.makeText(context, "Workout marked as unfinished!", Toast.LENGTH_SHORT).show()
+                                                        }
+                                                        isFinished = false // Update local state
+                                                    } else {
+                                                        // Handle API error
+                                                        withContext(Dispatchers.Main) {
+                                                            Toast.makeText(context, "Error marking workout as unfinished", Toast.LENGTH_SHORT).show()
+                                                        }
                                                     }
-                                                    isFinished = true // Update local state if needed
-                                                } else {
-                                                    // Handle API error
+                                                } catch (e: Exception) {
+                                                    // Handle exception
                                                     withContext(Dispatchers.Main) {
-                                                        Toast.makeText(context, "Error marking workout as finished", Toast.LENGTH_SHORT).show()
+                                                        Toast.makeText(context, "Network error: ${e.message}", Toast.LENGTH_SHORT).show()
                                                     }
                                                 }
-                                            } catch (e: Exception) {
-                                                // Handle exception
-                                                withContext(Dispatchers.Main) {
-                                                    Toast.makeText(context, "Network error: ${e.message}", Toast.LENGTH_SHORT).show()
+                                            }
+                                        }
+                                    } else {
+                                        // Call the API to mark the workout as finished
+                                        if (workout.id > 0) { // Check if workout has a valid ID
+                                            CoroutineScope(Dispatchers.IO).launch {
+                                                try {
+                                                    val response = service.markWorkoutAsFinished(workout.id)
+                                                    if (response.isSuccessful) {
+                                                        // Switch to the main thread to show the Toast
+                                                        withContext(Dispatchers.Main) {
+                                                            Toast.makeText(context, "Workout marked as finished!", Toast.LENGTH_SHORT).show()
+                                                        }
+                                                        isFinished = true // Update local state
+                                                    } else {
+                                                        // Handle API error
+                                                        withContext(Dispatchers.Main) {
+                                                            Toast.makeText(context, "Error marking workout as finished", Toast.LENGTH_SHORT).show()
+                                                        }
+                                                    }
+                                                } catch (e: Exception) {
+                                                    // Handle exception
+                                                    withContext(Dispatchers.Main) {
+                                                        Toast.makeText(context, "Network error: ${e.message}", Toast.LENGTH_SHORT).show()
+                                                    }
                                                 }
                                             }
                                         }
                                     }
-                                    navController.popBackStack() // Navigate back
                                 },
                                 colors = ButtonDefaults.buttonColors(DirtyWhite),
                                 modifier = Modifier
@@ -312,13 +356,14 @@ fun WorkoutInfoPage(navController: NavController, workoutName: String) {
                                     .height(60.dp)
                             ) {
                                 Text(
-                                    text = "Finish",
+                                    text = if (isFinished) "Unfinish" else "Finish", // Toggle text
                                     color = DarkGreen,
                                     fontFamily = titleFont,
                                     fontSize = 20.sp
                                 )
                             }
 
+                            // Navigation Buttons (unchanged)
                             Spacer(modifier = Modifier.width(12.dp))
 
                             FloatingActionButton(
@@ -360,6 +405,7 @@ fun WorkoutInfoPage(navController: NavController, workoutName: String) {
         }
     }
 }
+
 
 private fun fetchWorkoutRoutines(context: Context, onResult: (List<WorkoutRoutineRequest>, String?) -> Unit) {
     val service = RetrofitInstance.WorkoutRoutineService(context)

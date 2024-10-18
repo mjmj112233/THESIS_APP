@@ -1,5 +1,6 @@
 package com.example.thesis_app
 
+import android.content.Context
 import androidx.compose.foundation.Image
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateDpAsState
@@ -131,6 +132,13 @@ fun signupPage(navController: NavController) {
                             }
                         }
 
+                        // Password requirements message
+                        Text(
+                            text = "Password must be at least 6 characters, contain at least 1 uppercase letter, and be alphanumeric.",
+                            style = TextStyle(fontSize = 8.sp, color = DarkerAsh, fontFamily = captionFont),
+                            modifier = Modifier.padding(top = 4.dp, start = 12.dp, end = 12.dp)
+                        )
+
                         Spacer(modifier = Modifier.height(17.dp))
 
                         // Confirm Password field with toggle icon
@@ -184,6 +192,39 @@ fun signupPage(navController: NavController) {
                                             Toast.makeText(context, "Passwords do not match", Toast.LENGTH_SHORT).show()
                                             return@FloatingActionButton
                                         }
+
+                                        // Validate password requirements
+                                        if (!isValidPassword(password)) {
+                                            Toast.makeText(context, "Password must be at least 6 characters, contain at least 1 uppercase letter, and be alphanumeric", Toast.LENGTH_SHORT).show()
+                                            return@FloatingActionButton
+                                        }
+
+                                        /*// Check if username is already taken
+                                        checkUsernameAvailability(username, context) { isTaken ->
+                                            if (isTaken) {
+                                                Toast.makeText(context, "Username is already taken", Toast.LENGTH_SHORT).show()
+                                                return@checkUsernameAvailability
+                                            } else {
+                                                // Proceed with registration if the username is available
+                                                val registrationRequest = RegistrationRequest(username, password)
+
+                                                RetrofitInstance.AuthService(context).registerUser(registrationRequest)
+                                                    .enqueue(object : Callback<Void> {
+                                                        override fun onResponse(call: Call<Void>, response: Response<Void>) {
+                                                            if (response.isSuccessful) {
+                                                                Toast.makeText(context, "Registration successful", Toast.LENGTH_SHORT).show()
+                                                                navController.navigate("login")
+                                                            } else {
+                                                                Toast.makeText(context, "Registration failed", Toast.LENGTH_SHORT).show()
+                                                            }
+                                                        }
+
+                                                        override fun onFailure(call: Call<Void>, t: Throwable) {
+                                                            Toast.makeText(context, "API call failed: ${t.message}", Toast.LENGTH_SHORT).show()
+                                                        }
+                                                    })
+                                            }
+                                        }*/
 
                                         // Make registration API call
                                         val registrationRequest = RegistrationRequest(username, password)
@@ -272,6 +313,26 @@ fun signupPage(navController: NavController) {
         }
     }
 }
+
+// Password validation function
+fun isValidPassword(password: String): Boolean {
+    val regex = Regex("^(?=.*[A-Z])(?=.*[a-zA-Z])(?=.*\\d).{6,}\$")
+    return regex.matches(password)
+}
+
+// Function to check username availability
+/*fun checkUsernameAvailability(username: String, context: Context, onResult: (Boolean) -> Unit) {
+    RetrofitInstance.AuthService(context).checkUsername(username).enqueue(object : Callback<Void> {
+        override fun onResponse(call: Call<Void>, response: Response<Void>) {
+            onResult(response.code() == 409) // Assuming 409 Conflict is returned if username is taken
+        }
+
+        override fun onFailure(call: Call<Void>, t: Throwable) {
+            Toast.makeText(context, "Error checking username: ${t.message}", Toast.LENGTH_SHORT).show()
+            onResult(false)
+        }
+    })
+}*/
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

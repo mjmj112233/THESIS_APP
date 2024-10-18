@@ -57,6 +57,7 @@ fun mainPage(navController: NavController) {
     var showDialog by remember { mutableStateOf(false) }
     var showConfirmDialog by remember { mutableStateOf(false) } // New state for confirmation dialog
     var showCongratsDialog by remember { mutableStateOf(false) } // New state for congratulations dialog
+    var hasCompletedAssessment by remember { mutableStateOf(false) } // New state to track assessment completion
 
     // State to control the visibility of FAB and floating logo
     val fabAndLogoVisible = remember { derivedStateOf { drawerState.isOpen.not() } }
@@ -91,7 +92,7 @@ fun mainPage(navController: NavController) {
 
             if (error != null) {
                 showDialog = true
-            } else if (areAllWorkoutsFinished()) {
+            } else if (areAllWorkoutsFinished() && workoutRoutines.isNotEmpty()) {
                 // If all workouts are finished, show the congratulations dialog
                 showCongratsDialog = true
             }

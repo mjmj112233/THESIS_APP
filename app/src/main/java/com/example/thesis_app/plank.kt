@@ -209,7 +209,7 @@ fun plank(
             // display the plank time after the stopwatch stops
             if (!started && showPlankTime > 0) {
                 Text(
-                    text = "You held the plank for ${showPlankTime}s!",
+                    text = "You held the plank for ${showPlankTime} seconds!",
                     style = TextStyle(fontSize = 20.sp, color = Slime, fontFamily = alt),
                     textAlign = TextAlign.Center,
                     modifier = Modifier.fillMaxWidth().padding(top = 20.dp)

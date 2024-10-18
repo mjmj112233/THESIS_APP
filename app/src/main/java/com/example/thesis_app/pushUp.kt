@@ -330,7 +330,7 @@ fun pushUp(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(bottom = 60.dp),
+                    .padding(bottom = 60.dp, start = 28.dp, end = 28.dp),
                 contentAlignment = Alignment.BottomCenter
             ) {
                 Button(
@@ -349,7 +349,7 @@ fun pushUp(
                         text = "Submit",
                         color = DarkGreen,
                         fontFamily = titleFont,
-                        fontSize = 28.sp
+                        fontSize = 18.sp
                     )
                 }
             }
