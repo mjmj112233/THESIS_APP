@@ -172,8 +172,8 @@ fun BMIScreen(navController: NavController) {
                         val weight = weightInput.trim().toFloatOrNull()
 
                         // Check if both inputs are valid integers
-                        val isHeightValid = heightInput.trim().toIntOrNull() != null
-                        val isWeightValid = weightInput.trim().toIntOrNull() != null
+                        val isHeightValid = height != null
+                        val isWeightValid = weight != null
 
                         if (!isHeightValid || !isWeightValid) {
                             // Show a toast message if either input is not a valid integer

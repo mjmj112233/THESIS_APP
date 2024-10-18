@@ -1,6 +1,7 @@
 package com.example.thesis_app
 
 import android.content.Context
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -286,17 +287,21 @@ fun WorkoutCard(routine: WorkoutRoutineRequest, navController: NavController, co
             }
     ) {
         // Image as the background
-        Image(
-            painter = painterResource(id = R.drawable.treadmill),
-            contentDescription = "Workout Image Background",
-            contentScale = ContentScale.Crop,  // Crop to fill the Box
-            modifier = Modifier
-                .fillMaxSize()
-                .alpha(containerOpacity)  // Apply opacity if needed
-        )
-
-        // Display workout info
         routine.workoutInfo?.let { workoutInfo ->
+            val equipmentName = workoutInfo.workout.equipment.replace(" ", "_").lowercase()
+            val exerciseName = workoutInfo.workout.name.replace("-", "_").replace(" ", "_").lowercase() // Assuming name contains the exercise name
+            val imageName = "a_${equipmentName}_$exerciseName" // Construct the drawable name
+
+            val resId = LocalContext.current.resources.getIdentifier(imageName, "drawable", LocalContext.current.packageName)
+
+            // Set the image as the background, using a placeholder if the drawable is not found
+            Image(
+                painter = if (resId != 0) painterResource(id = resId) else painterResource(id = R.drawable.treadmill), // Replace with your placeholder image
+                contentDescription = "Workout Image Background",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize().alpha(containerOpacity)
+            )
+        // Display workout info
             // Text container with a gradient effect
             Box(
                 modifier = Modifier
