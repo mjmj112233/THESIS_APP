@@ -44,6 +44,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import androidx.compose.ui.platform.LocalContext
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -51,13 +52,14 @@ fun mainPage(navController: NavController) {
     // State to control the visibility of the drawer
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
-    // State to control the visibility of the alert dialog
+
+    // State to control the visibility of the alert dialog and confirmation dialog
     var showDialog by remember { mutableStateOf(false) }
+    var showConfirmDialog by remember { mutableStateOf(false) } // New state for confirmation dialog
+    var showCongratsDialog by remember { mutableStateOf(false) } // New state for congratulations dialog
 
     // State to control the visibility of FAB and floating logo
     val fabAndLogoVisible = remember { derivedStateOf { drawerState.isOpen.not() } }
-
-    //----------------------------------------------------------------------------
 
     val context = LocalContext.current
     var workoutRoutines by remember { mutableStateOf<List<WorkoutRoutineRequest>>(emptyList()) }
@@ -66,10 +68,16 @@ fun mainPage(navController: NavController) {
     var hasShownError by remember { mutableStateOf(false) }
     var userProfile by remember { mutableStateOf<UserProfile?>(null) }
 
+    // Function to check if all workouts are finished
+    fun areAllWorkoutsFinished(): Boolean {
+        return workoutRoutines
+            .filterNot { it.isRestDay } // Exclude rest days from the check
+            .all { it.isFinished } // Assuming isFinished is a Boolean in WorkoutRoutineRequest
+    }
+
     // Fetch workout routines on launch
     LaunchedEffect(Unit) {
         showDialog = false
-
         isLoading = true
         fetchUserProfile(context) { profile, error ->
             userProfile = profile
@@ -81,9 +89,11 @@ fun mainPage(navController: NavController) {
             errorMessage = error
             isLoading = false
 
-            // Show the dialog if there's an error after loading is complete
             if (error != null) {
                 showDialog = true
+            } else if (areAllWorkoutsFinished()) {
+                // If all workouts are finished, show the congratulations dialog
+                showCongratsDialog = true
             }
         }
     }
@@ -105,12 +115,10 @@ fun mainPage(navController: NavController) {
                         contentDescription = "Spot Logo",
                         modifier = Modifier
                             .padding(16.dp)
-                            .size(40.dp) // Adjust the size as needed
+                            .size(40.dp)
                     )
-
                     Spacer(modifier = Modifier.height(20.dp))
 
-                    // Example drawer items
                     Text(
                         text = "About the Devs",
                         color = DirtyWhite,
@@ -121,7 +129,6 @@ fun mainPage(navController: NavController) {
                             .padding(16.dp)
                             .clickable { /* Handle Home click */ }
                     )
-
                     Text(
                         text = "Edit User Profile",
                         color = DirtyWhite,
@@ -132,7 +139,6 @@ fun mainPage(navController: NavController) {
                             .padding(16.dp)
                             .clickable { navController.navigate("bmi") }
                     )
-
                     Text(
                         text = "Logout",
                         color = DirtyWhite,
@@ -143,7 +149,6 @@ fun mainPage(navController: NavController) {
                             .padding(16.dp)
                             .clickable { performLogout(context, navController) }
                     )
-
                 }
             },
             content = {
@@ -190,8 +195,6 @@ fun mainPage(navController: NavController) {
                                     .fillMaxWidth()
                                     .padding(top = 20.dp),
                             ) {
-                                // Add a header or any other static content before the list
-                                // Display the fitness goal before the header
                                 userProfile?.fitnessGoal?.let {
                                     Box(
                                         modifier = Modifier
@@ -220,9 +223,9 @@ fun mainPage(navController: NavController) {
                                     Column(
                                         modifier = Modifier
                                             .padding(bottom = 20.dp)
-                                            .fillMaxSize(),  // This makes the column take up the whole screen
-                                        verticalArrangement = Arrangement.Center,  // Centers the content vertically
-                                        horizontalAlignment = Alignment.CenterHorizontally  // Centers the content horizontally
+                                            .fillMaxSize(),
+                                        verticalArrangement = Arrangement.Center,
+                                        horizontalAlignment = Alignment.CenterHorizontally
                                     ) {
                                         Box(
                                             modifier = Modifier
@@ -255,7 +258,6 @@ fun mainPage(navController: NavController) {
             }
         )
 
-        //FLOATING LOGO - Update visibility based on drawer state
         if (fabAndLogoVisible.value) {
             Box(
                 modifier = Modifier
@@ -292,7 +294,6 @@ fun mainPage(navController: NavController) {
             if (isLoading) {
                 CircularProgressIndicator(color = DarkGreen)
             } else {
-                // Display error message if exists
                 errorMessage?.let {
                     if (!hasShownError) {
                         hasShownError = true
@@ -345,18 +346,10 @@ fun mainPage(navController: NavController) {
                     )
                 }
 
-                // Floating Action Button to generate workout routines
-                if (fabAndLogoVisible.value) { // Check visibility before showing FAB
+                if (fabAndLogoVisible.value) {
                     FloatingActionButton(
                         onClick = {
-                            // Handle button click to generate workout routines
-                            hasShownError = false
-                            isLoading = true // Set loading state to true
-                            generateWorkoutRoutine(context) { generatedRoutines, error ->
-                                workoutRoutines = generatedRoutines
-                                errorMessage = error
-                                isLoading = false // Reset loading state
-                            }
+                            showConfirmDialog = true // Show confirmation dialog when FAB is clicked
                         },
                         shape = CircleShape,
                         containerColor = DirtyWhite,
@@ -367,14 +360,109 @@ fun mainPage(navController: NavController) {
                         Image(
                             painter = painterResource(R.drawable.spot_avatar),
                             contentDescription = "Generate Workout",
-                            modifier = Modifier.size(60.dp) // Adjust size as needed
+                            modifier = Modifier.size(60.dp)
                         )
                     }
                 }
             }
         }
     }
+
+    // Congratulations Dialog
+    if (showCongratsDialog) {
+        AlertDialog(
+            onDismissRequest = { showCongratsDialog = false },
+            title = {
+                Text(text = "Congratulations!", fontFamily = alt, color = DarkGreen)
+            },
+            text = {
+                Text(text = "You have finished the workout routine we recommended for you. Do you want to redo this routine or generate new?", fontFamily = alt,  color = DarkGreen )
+            },
+            confirmButton = {
+
+                Box(
+                    modifier = Modifier
+                        .clip(shape = RoundedCornerShape(20.dp))
+                        .width(100.dp)
+                        .background(Slime),
+                    contentAlignment = Alignment.Center
+                ) {
+                    TextButton(
+                        onClick = {
+                            showCongratsDialog = false
+                            // Logic to generate a new workout or redo the same routine
+                            generateWorkoutRoutine(context) { generatedRoutines, error ->
+                                workoutRoutines = generatedRoutines
+                                errorMessage = error
+                            }
+                        }
+                    ) {
+                        Text("Generate", color = DarkGreen, fontFamily = alt)
+                    }
+                }
+
+            },
+            dismissButton = {
+                TextButton(onClick = {
+                    showCongratsDialog = false
+                    resetAllWorkouts(context, { error ->
+                        if (error != null) {
+                            // Handle the error appropriately
+                            Toast.makeText(context, error, Toast.LENGTH_SHORT).show()
+                        }
+                    }, { sortedRoutines ->
+                        workoutRoutines = sortedRoutines // Update the workoutRoutines state
+                    })
+                }) {
+                    Text("Redo Routine", color = DarkGreen, fontFamily = alt)
+                }
+            }
+        )
+    }
+
+    // Confirmation Dialog
+    if (showConfirmDialog) {
+        AlertDialog(
+            onDismissRequest = { showConfirmDialog = false },
+            text = {
+                Text(text = "You are generating a new workout routine, proceed?", fontFamily = alt)
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showConfirmDialog = false
+                        isLoading = true // Show loading indicator
+                        generateWorkoutRoutine(context) { generatedRoutines, error ->
+                            workoutRoutines = generatedRoutines
+                            errorMessage = error
+                            isLoading = false // Reset loading state
+                        }
+                    }
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .clip(shape = RoundedCornerShape(20.dp))
+                            .width(80.dp)
+                            .background(Slime)
+                            .padding(vertical = 12.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text("Proceed", color = DarkGreen, fontFamily = alt)
+                    }
+
+                    Spacer(modifier = Modifier.padding(bottom = 8.dp))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showConfirmDialog = false }) {
+                    Text("Cancel", color = DarkGreen, fontFamily = alt)
+                }
+            }
+        )
+    }
 }
+
+
 
 private fun fetchUserProfile(context: Context, onResult: (UserProfile?, String?) -> Unit) {
     val service = RetrofitInstance.UserProfileService(context)
@@ -406,7 +494,10 @@ private fun fetchWorkoutRoutines(context: Context, onResult: (List<WorkoutRoutin
     CoroutineScope(Dispatchers.IO).launch {
         try {
             val routines = service.getWorkoutRoutines() // Call suspend function here
-            onResult(routines, null)
+
+            // Sort the routines by day before passing to the result
+            val sortedRoutines = routines.sortedBy { it.dayNum } // Assuming 'day' is a property in WorkoutRoutineRequest
+            onResult(sortedRoutines, null)
         } catch (e: Exception) {
             onResult(emptyList(), e.message)
         }
@@ -423,8 +514,6 @@ private fun generateWorkoutRoutine(context: Context, onResult: (List<WorkoutRout
             val existingRoutines = service.getWorkoutRoutines()
             println("API response: $existingRoutines")
 
-
-
             if (existingRoutines.isNotEmpty()) {
                 // If routines exist, use the PUT request to regenerate the workout routine
                 val updateResponse = service.updateWorkoutRoutine()
@@ -433,7 +522,10 @@ private fun generateWorkoutRoutine(context: Context, onResult: (List<WorkoutRout
                     // Fetch the updated routines
                     val updatedRoutines = updateResponse.body()?.values?.flatten() ?: emptyList()
                     println("Successfully updated workout routines.")
-                    onResult(updatedRoutines, null)
+
+                    // Sort the updated routines by day before passing to the result
+                    val sortedUpdatedRoutines = updatedRoutines.sortedBy { it.dayNum }
+                    onResult(sortedUpdatedRoutines, null)
                 } else {
                     // Handle failed update request
                     val errorMessage = updateResponse.errorBody()?.string() ?: "Failed to update workout routines"
@@ -444,13 +536,56 @@ private fun generateWorkoutRoutine(context: Context, onResult: (List<WorkoutRout
                 // If no routines exist, generate a new workout routine
                 val response = service.generateWorkoutRoutine()
                 val generatedRoutines = response.values.flatten() // Flatten the response if needed
-                onResult(generatedRoutines, null)
+
+                // Sort the generated routines by day before passing to the result
+                val sortedGeneratedRoutines = generatedRoutines.sortedBy { it.dayNum }
+                onResult(sortedGeneratedRoutines, null)
             }
         } catch (e: Exception) {
             onResult(emptyList(), e.message)
         }
     }
 }
+
+
+// Function to reset all workouts to unfinished
+fun resetAllWorkouts(
+    context: Context,
+    onComplete: (error: String?) -> Unit,
+    onUpdateRoutines: (List<WorkoutRoutineRequest>) -> Unit // New callback to update routines
+) {
+    val service = RetrofitInstance.WorkoutRoutineService(context)
+
+    CoroutineScope(Dispatchers.IO).launch {
+        try {
+            val response = service.resetAllWorkouts()
+            withContext(Dispatchers.Main) {
+                if (response.isSuccessful) {
+                    // Show a toast message upon successful reset
+                    Toast.makeText(context, "Workout routine progress reset.", Toast.LENGTH_SHORT).show()
+
+                    // Fetch the updated workout routines
+                    fetchWorkoutRoutines(context) { updatedRoutines, error ->
+                        if (error == null) {
+                            // Sort the updated routines after resetting
+                            val sortedRoutines = updatedRoutines.sortedBy { it.dayNum } // Assuming 'day' is the property to sort by
+                            onUpdateRoutines(sortedRoutines) // Update the state with sorted routines
+                        }
+                        onComplete(error) // Pass any error from fetching
+                    }
+                } else {
+                    onComplete("Failed to reset workouts")
+                }
+            }
+        } catch (e: Exception) {
+            withContext(Dispatchers.Main) {
+                onComplete("Error: ${e.message}")
+            }
+        }
+    }
+}
+
+
 
 @Composable
 fun WorkoutRoutinesList(navController: NavController, workoutRoutines: List<WorkoutRoutineRequest>, containerOpacity: Float = 1f) {

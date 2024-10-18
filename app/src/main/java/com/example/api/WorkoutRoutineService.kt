@@ -23,11 +23,11 @@ interface WorkoutRoutineService {
 
     // New API: Reset all workouts for the user
     @PUT("/api/workout-routine/reset-all")
-    suspend fun resetAllWorkouts(): Response<String>
+    suspend fun resetAllWorkouts(): Response<Void>
 
     // New API: Reset a specific workout by ID
     @PUT("/api/workout-routine/reset/{id}")
-    suspend fun resetWorkout(@Path("id") id: Long): Response<String>
+    suspend fun resetWorkout(@Path("id") id: Long): Response<Void>
 
     @PUT("/api/workout-routine/mark-finished/{id}")
     suspend fun markWorkoutAsFinished(@Path("id") id: Long): Response<Void>
