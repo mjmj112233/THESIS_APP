@@ -43,10 +43,11 @@ fun plank(
     var plankScore by remember { mutableStateOf(0) }  // Store calculated plank score
 
     //timer
-    var timeElapsed by remember { mutableStateOf(0) }  // Timer starting at 0 seconds (stopwatch)
+    var timeElapsed by remember { mutableStateOf(0L) }  // Timer starting at 0 seconds (stopwatch)
     var started by remember { mutableStateOf(false) } // Control if the timer has started
     var showDialog by remember { mutableStateOf(false) } // Control the visibility of the dialog
-    var showInputField by remember { mutableStateOf(false) } // Control visibility of the input field
+    var showPlankTime by remember { mutableStateOf(0L) }
+
     val context = LocalContext.current
 
     // Function to calculate the plank score based on time
@@ -153,7 +154,13 @@ fun plank(
 
             Text(
                 text = buildAnnotatedString {
-                    withStyle(style = SpanStyle(color = Slime, fontFamily = titleFont, fontSize = 12.sp)) {
+                    withStyle(
+                        style = SpanStyle(
+                            color = Slime,
+                            fontFamily = titleFont,
+                            fontSize = 12.sp
+                        )
+                    ) {
                         append("Note: ")
                     }
                     append("For safety, we highly recommend having someone assist you in timing your tests.")
@@ -183,26 +190,35 @@ fun plank(
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            // Start Stopwatch Button
-            if (!started) {
-                Button(
-                    onClick = { showDialog = true }, // Open the dialog when the button is clicked
-                    colors = ButtonDefaults.buttonColors(Slime),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(shape = CircleShape)
-                ) {
-                    Text(
-                        text = "Start Test",
-                        color = DarkGreen,
-                        fontFamily = titleFont,
-                        fontSize = 20.sp
-                    )
-                }
+        // Start Stopwatch Button
+        if (!started) {
+            Button(
+                onClick = { showDialog = true }, // Open the dialog when the button is clicked
+                colors = ButtonDefaults.buttonColors(Slime),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(shape = CircleShape)
+            ) {
+                Text(
+                    text = "Start Test",
+                    color = DarkGreen,
+                    fontFamily = titleFont,
+                    fontSize = 20.sp
+                )
+            }
+            // display the plank time after the stopwatch stops
+            if (!started && showPlankTime > 0) {
+                Text(
+                    text = "You held the plank for ${showPlankTime}s!",
+                    style = TextStyle(fontSize = 20.sp, color = Slime, fontFamily = alt),
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth().padding(top = 20.dp)
+                )
             }
         }
+        }
 
-        // Stopwatch Dialog
+// Stopwatch Dialog
         if (showDialog) {
             AlertDialog(
                 onDismissRequest = { /* Optionally handle dismiss if needed */ },
@@ -223,7 +239,7 @@ fun plank(
                             onClick = {
                                 started = false // Stop the stopwatch
                                 showDialog = false // Close the dialog when the user clicks stop
-                                showInputField = true // Show input field
+                                showPlankTime = timeElapsed // Save the total plank time
                             },
                             colors = ButtonDefaults.buttonColors(Slime),
                             modifier = Modifier
@@ -252,8 +268,12 @@ fun plank(
                             )
                             Spacer(modifier = Modifier.height(10.dp))
                             Text(
-                                text = "${timeElapsed}s",
-                                style = TextStyle(fontSize = 20.sp, color = DarkGreen, fontFamily = alt),
+                                text = "${timeElapsed}s", // Display the time elapsed
+                                style = TextStyle(
+                                    fontSize = 20.sp,
+                                    color = DarkGreen,
+                                    fontFamily = alt
+                                ),
                                 textAlign = TextAlign.Center
                             )
                         }
@@ -263,44 +283,6 @@ fun plank(
                 modifier = Modifier.clip(RoundedCornerShape(16.dp))
             )
         }
-
-        // Show input field after stopping the stopwatch
-        if (showInputField) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(bottom = 220.dp),
-                contentAlignment = Alignment.BottomCenter
-            ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(start = 30.dp, bottom = 50.dp, end = 30.dp)
-                ) {
-                    // Push-Ups Count Input
-                    Box(
-                        modifier = Modifier
-                            .clip(shape = RoundedCornerShape(20.dp))
-                            .background(DirtyWhite)
-                            .padding(20.dp)
-                    ) {
-                        TextField(
-                            value = plankTime,
-                            onValueChange = { plankTime = it },
-                            label = { Text("How long were you able to hold the plank?", fontFamily = alt, color = DarkGreen) },
-                            modifier = Modifier.fillMaxWidth(),
-                            colors = TextFieldDefaults.textFieldColors(
-                                containerColor = DirtyWhite,
-                                focusedIndicatorColor = DarkGreen,
-                                unfocusedIndicatorColor = Color.Transparent
-                            )
-                        )
-                    }
-                }
-            }
-        }
-
 
         // Input Section
         Box(
@@ -315,14 +297,13 @@ fun plank(
 
                 Button(
                     onClick = {
-                        val plankTimeInSeconds = plankTime.toIntOrNull()
-                        if (plankTimeInSeconds != null && plankTimeInSeconds >= 0) {
-                            plankScore = calculatePlankScore(plankTimeInSeconds)
-                            onPlankScore(plankScore)
-                            isTestComplete = true
+                        if (showPlankTime > 0) { // Check if the stopwatch has been stopped and time recorded
+                            plankScore = calculatePlankScore(showPlankTime.toInt()) // Use recorded time
+                            onPlankScore(plankScore) // Proceed with the plank score
+                            isTestComplete = true // Mark the test as complete
                         } else {
-                            Toast.makeText(context, "Please enter a valid plank time", Toast.LENGTH_SHORT).show()
-                            isTestComplete = false
+                            Toast.makeText(context, "Please start and stop the stopwatch to record your plank time", Toast.LENGTH_SHORT).show()
+                            isTestComplete = false // Prevent proceeding if the stopwatch wasn't used
                         }
                     },
                     colors = ButtonDefaults.buttonColors(Slime),

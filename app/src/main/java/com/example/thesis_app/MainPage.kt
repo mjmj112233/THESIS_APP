@@ -223,8 +223,8 @@ fun mainPage(navController: NavController) {
                                         Box(
                                             modifier = Modifier
                                                 .clip(RoundedCornerShape(12.dp))
-                                                .height(70.dp)
-                                                .width(400.dp)
+                                                .height(90.dp)
+                                                .width(370.dp)
                                                 .background(DirtyWhite)
                                                 .padding(18.dp)
                                         ) {

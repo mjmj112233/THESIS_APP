@@ -101,6 +101,27 @@ fun muscleGroupScreen(
                     )
                 }
             }
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 95.dp, start = 80.dp), // Adjust spacing above the circles
+                horizontalArrangement = Arrangement.Center
+            ) {
+                repeat(6) {
+                    Box(
+                        modifier = Modifier
+                            .padding(horizontal = 3.dp) // Space between circles
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .width(30.dp) // Adjust the size for smaller circles
+                                .height(4.dp)
+                                .background(if (it == 1) Slime else DirtyWhite) // Highlight first circle
+                        )
+                    }
+                }
+            }
         }
 
         // Centered Row for Muscle Selection (only if fitnessGoal != Weight Loss)
