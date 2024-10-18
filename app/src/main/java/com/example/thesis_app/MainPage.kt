@@ -440,8 +440,6 @@ private fun generateWorkoutRoutine(context: Context, onResult: (List<WorkoutRout
     }
 }
 
-
-
 @Composable
 fun WorkoutRoutinesList(navController: NavController, workoutRoutines: List<WorkoutRoutineRequest>, containerOpacity: Float = 1f) {
     // Group the workout routines by day number
@@ -451,18 +449,45 @@ fun WorkoutRoutinesList(navController: NavController, workoutRoutines: List<Work
 
     LazyColumn(modifier = Modifier.padding(8.dp)) {
         items(groupedRoutines.toList()) { (dayNum, routines) ->
-
-            val isRestDay = routines.all { it.workoutInfo?.workout?.name.isNullOrEmpty() }
-
             // Count finished workouts for the day
             val finishedCount = routines.count { it.isFinished }
+            val totalWorkouts = routines.size
 
             // Calculate the progress
-            val totalWorkouts = routines.size // Get the total number of workouts for the day
             val progress = if (totalWorkouts > 0) {
-                finishedCount.toFloat() / totalWorkouts.toFloat() // Use the total workouts for progress
+                finishedCount.toFloat() / totalWorkouts.toFloat()
             } else {
-                0f // Avoid division by zero
+                0f
+            }
+
+            // Locking logic
+            val isPreviousDayFinished = if (dayNum > 1) {
+                val previousRoutines = groupedRoutines[dayNum - 1] ?: emptyList()
+                previousRoutines.all { it.isFinished } // Check if all previous day routines are finished
+            } else {
+                true // Day 1 is never locked
+            }
+
+            // Determine if the current day is a rest day (no workouts)
+            val isRestDay = routines.all { it.workoutInfo?.workout?.name.isNullOrEmpty() }
+
+            // Use var to allow reassignment of the isDayLocked variable
+            var isDayLocked = (dayNum > 1 && !isPreviousDayFinished) && !isRestDay
+
+            // Specifically check if Day 2 is finished to unlock Day 4
+            if (dayNum == 4) {
+                val day2Routines = groupedRoutines[2] ?: emptyList()
+                if (day2Routines.all { it.isFinished }) {
+                    isDayLocked = false // Unlock Day 4 if Day 2 is finished
+                }
+            }
+
+            // Unlock the current day if the previous workout day is finished
+            if (dayNum > 2) {
+                val previousRoutines = groupedRoutines[dayNum - 1] ?: emptyList()
+                if (previousRoutines.all { it.isFinished }) {
+                    isDayLocked = false // Unlock the current day if the previous workout day is finished
+                }
             }
 
             Box(
@@ -471,7 +496,7 @@ fun WorkoutRoutinesList(navController: NavController, workoutRoutines: List<Work
                     .fillMaxWidth()
                     .height(250.dp)
                     .background(DirtyWhite.copy(alpha = containerOpacity), RoundedCornerShape(8.dp))
-                    .clickable {
+                    .clickable(enabled = !isDayLocked) {
                         if (isRestDay) {
                             // Show a flash message for rest day
                             Toast
@@ -482,18 +507,17 @@ fun WorkoutRoutinesList(navController: NavController, workoutRoutines: List<Work
                                 )
                                 .show()
                         } else {
-                            // Navigate to workoutDay
+                            // Navigate to workoutDay if not locked
                             navController.navigate("workoutDay/$dayNum")
                         }
                     }
-                    .padding(16.dp)
             ) {
-
-                Column {
+                // Content of the day container
+                Column(modifier = Modifier.padding(16.dp)) { // Keep content within padding
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween // Arrange items between ends
+                        horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Box(
                             modifier = Modifier
@@ -510,13 +534,12 @@ fun WorkoutRoutinesList(navController: NavController, workoutRoutines: List<Work
                             )
                         }
 
-                        Spacer(modifier = Modifier.padding(start=140.dp))
+                        Spacer(modifier = Modifier.padding(start = 140.dp))
 
-                        if (!isRestDay) {
-                            // Move the progress Row to the rightmost side
+                        if (routines.any { it.workoutInfo?.workout?.name != null }) { // Check for non-rest day
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(8.dp) // Space between label and progress bar
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
                                 Text(
                                     text = "Progress:",
@@ -525,19 +548,17 @@ fun WorkoutRoutinesList(navController: NavController, workoutRoutines: List<Work
                                     color = Slime
                                 )
 
-                                // Create a Box to hold the progress indicator and the count
                                 Box(modifier = Modifier.weight(1f)) {
                                     Column(
                                         horizontalAlignment = Alignment.End,
-                                        verticalArrangement = Arrangement.Top // Align elements to the top
+                                        verticalArrangement = Arrangement.Top
                                     ) {
-                                        // Show the count above the progress bar
                                         Text(
                                             text = "$finishedCount/$totalWorkouts",
                                             fontFamily = alt,
                                             fontSize = 12.sp,
                                             color = Slime,
-                                            modifier = Modifier.padding(bottom = 2.dp) // Add spacing below the count
+                                            modifier = Modifier.padding(bottom = 2.dp)
                                         )
 
                                         LinearProgressIndicator(
@@ -565,11 +586,30 @@ fun WorkoutRoutinesList(navController: NavController, workoutRoutines: List<Work
                         }
                     }
                 }
+
+                // Add the overlay and lock icon if the day is locked
+                if (isDayLocked) {
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(12.dp))
+                            .matchParentSize() // Overlay occupies the entire Box
+                            .background(Color.Gray.copy(alpha = 0.6f)) // Gray overlay with transparency
+                            .align(Alignment.Center)
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.baseline_lock_24),
+                            contentDescription = "Locked",
+                            tint = DirtyWhite,
+                            modifier = Modifier
+                                .size(60.dp)
+                                .align(Alignment.Center) // Center the lock icon
+                        )
+                    }
+                }
             }
         }
     }
 }
-
 
 @Composable
 fun WorkoutRoutineCard(routine: WorkoutRoutineRequest, containerOpacity: Float = 1f) {
