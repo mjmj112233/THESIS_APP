@@ -6,5 +6,8 @@ data class WorkoutRoutineRequest(
     val workoutInfo: WorkoutInfoRequest? = null, // Optional reference to WorkoutInfo
     val dayNum: Int,
     val isRestDay: Boolean,
+    val isFinished: Boolean = false, // New field to track if the workout is finished
     val userProfile: UserProfileRequest
 )
+
+

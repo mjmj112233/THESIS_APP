@@ -20,6 +20,19 @@ interface WorkoutRoutineService {
 
     @GET("/api/workout-routine/my-routines")
     suspend fun getWorkoutRoutines(): List<WorkoutRoutineRequest>
+
+    // New API: Reset all workouts for the user
+    @PUT("/api/workout-routine/reset-all")
+    suspend fun resetAllWorkouts(): Response<String>
+
+    // New API: Reset a specific workout by ID
+    @PUT("/api/workout-routine/reset/{id}")
+    suspend fun resetWorkout(@Path("id") id: Long): Response<String>
+
+    // New API: Mark a workout as finished by ID
+    @PUT("/api/workout-routine/mark-finished/{id}")
+    suspend fun markWorkoutAsFinished(@Path("id") id: Long): Response<String>
 }
+
 
 
