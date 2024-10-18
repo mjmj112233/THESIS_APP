@@ -54,6 +54,9 @@ fun mainPage(navController: NavController) {
     // State to control the visibility of the alert dialog
     var showDialog by remember { mutableStateOf(false) }
 
+    // State to control the visibility of FAB and floating logo
+    val fabAndLogoVisible = remember { derivedStateOf { drawerState.isOpen.not() } }
+
     //----------------------------------------------------------------------------
 
     val context = LocalContext.current
@@ -62,6 +65,7 @@ fun mainPage(navController: NavController) {
     var errorMessage by remember { mutableStateOf<String?>(null) }
     var hasShownError by remember { mutableStateOf(false) }
     var userProfile by remember { mutableStateOf<UserProfile?>(null) }
+
     // Fetch workout routines on launch
     LaunchedEffect(Unit) {
         showDialog = false
@@ -96,12 +100,12 @@ fun mainPage(navController: NavController) {
                         .zIndex(2f)
                 ) {
                     Spacer(modifier = Modifier.padding(top = 50.dp))
-                    Text(
-                        text = "Spot",
-                        color = Slime,
-                        fontFamily = titleFont,
-                        modifier = Modifier.padding(16.dp),
-                        style = MaterialTheme.typography.headlineMedium
+                    Image(
+                        painter = painterResource(id = R.drawable.spot_logo),
+                        contentDescription = "Spot Logo",
+                        modifier = Modifier
+                            .padding(16.dp)
+                            .size(40.dp) // Adjust the size as needed
                     )
 
                     Spacer(modifier = Modifier.height(20.dp))
@@ -117,16 +121,6 @@ fun mainPage(navController: NavController) {
                             .padding(16.dp)
                             .clickable { /* Handle Home click */ }
                     )
-                    Text(
-                        text = "Logout",
-                        color = DirtyWhite,
-                        fontFamily = titleFont,
-                        fontSize = 16.sp,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp)
-                            .clickable { performLogout(context, navController) }
-                    )
 
                     Text(
                         text = "Edit User Profile",
@@ -138,11 +132,22 @@ fun mainPage(navController: NavController) {
                             .padding(16.dp)
                             .clickable { navController.navigate("bmi") }
                     )
+
+                    Text(
+                        text = "Logout",
+                        color = DirtyWhite,
+                        fontFamily = titleFont,
+                        fontSize = 16.sp,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp)
+                            .clickable { performLogout(context, navController) }
+                    )
+
                 }
             },
             content = {
                 Scaffold(
-                    modifier = Modifier,
                     topBar = {
                         Surface(
                             color = Slime,
@@ -209,10 +214,9 @@ fun mainPage(navController: NavController) {
                                     }
                                 }
 
-
                                 if (workoutRoutines.isNotEmpty()) {
-                                        WorkoutRoutinesList(navController, workoutRoutines, containerOpacity = 0.2f)
-                                    } else {
+                                    WorkoutRoutinesList(navController, workoutRoutines, containerOpacity = 0.2f)
+                                } else {
                                     Column(
                                         modifier = Modifier
                                             .padding(bottom = 20.dp)
@@ -232,14 +236,14 @@ fun mainPage(navController: NavController) {
                                                 text = "Tip: Generate your Workout Routine by clicking Spot button below!",
                                                 color = DarkGreen,
                                                 fontFamily = alt,
-                                                textAlign = TextAlign.Justify,
+                                                textAlign = TextAlign.Center,
                                                 fontSize = 18.sp
                                             )
                                         }
                                     }
                                 }
                             }
-                            }
+                        }
                     },
                     bottomBar = {
                         BottomAppBar(
@@ -251,27 +255,30 @@ fun mainPage(navController: NavController) {
             }
         )
 
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .offset(y = 30.dp)
-                .align(Alignment.TopCenter)
-                .padding(start = 20.dp)
-                .zIndex(1f)
-        ) {
+        //FLOATING LOGO - Update visibility based on drawer state
+        if (fabAndLogoVisible.value) {
             Box(
                 modifier = Modifier
-                    .size(100.dp)
-                    .clip(RoundedCornerShape(50.dp))
-                    .background(BlueGreen)
+                    .fillMaxWidth()
+                    .offset(y = 30.dp)
+                    .align(Alignment.TopCenter)
+                    .padding(start = 20.dp)
+                    .zIndex(1f)
             ) {
-                Image(
-                    painter = painterResource(id = R.drawable.spot_logo),
-                    contentDescription = "Spot Logo",
+                Box(
                     modifier = Modifier
-                        .size(60.dp)
-                        .align(Alignment.Center)
-                )
+                        .size(100.dp)
+                        .clip(RoundedCornerShape(50.dp))
+                        .background(BlueGreen)
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.spot_logo),
+                        contentDescription = "Spot Logo",
+                        modifier = Modifier
+                            .size(60.dp)
+                            .align(Alignment.Center)
+                    )
+                }
             }
         }
 
@@ -297,7 +304,7 @@ fun mainPage(navController: NavController) {
                     AlertDialog(
                         onDismissRequest = { showDialog = false },
                         text = {
-                            Row(verticalAlignment = Alignment.CenterVertically){
+                            Row(verticalAlignment = Alignment.CenterVertically) {
                                 Icon(
                                     painter = painterResource(R.drawable.baseline_warning_24),
                                     contentDescription = "Warning",
@@ -324,40 +331,45 @@ fun mainPage(navController: NavController) {
                                 }
                             }
                         },
-                        confirmButton = { TextButton(
-                            onClick = {
-                                showDialog = false
-                                navController.navigate("bmi")
-                            },
-                            modifier = Modifier.background(Slime, shape = RoundedCornerShape(16.dp))
-                        ) {
-                            Text("Proceed", color = DarkGreen, fontFamily = titleFont,)
-                        } })
+                        confirmButton = {
+                            TextButton(
+                                onClick = {
+                                    showDialog = false
+                                    navController.navigate("bmi")
+                                },
+                                modifier = Modifier.background(Slime, shape = RoundedCornerShape(16.dp))
+                            ) {
+                                Text("Proceed", color = DarkGreen, fontFamily = titleFont)
+                            }
+                        }
+                    )
                 }
 
                 // Floating Action Button to generate workout routines
-                FloatingActionButton(
-                    onClick = {
-                        // Handle button click to generate workout routines
-                        hasShownError = false
-                        isLoading = true // Set loading state to true
-                        generateWorkoutRoutine(context) { generatedRoutines, error ->
-                            workoutRoutines = generatedRoutines
-                            errorMessage = error
-                            isLoading = false // Reset loading state
-                        }
-                    },
-                    shape = CircleShape,
-                    containerColor = DirtyWhite,
-                    modifier = Modifier
-                        .size(100.dp)
-                        .offset(y = (-20).dp)
-                ) {
-                    Image(
-                        painter = painterResource(R.drawable.spot_avatar),
-                        contentDescription = "Generate Workout",
-                        modifier = Modifier.size(60.dp) // Adjust size as needed
-                    )
+                if (fabAndLogoVisible.value) { // Check visibility before showing FAB
+                    FloatingActionButton(
+                        onClick = {
+                            // Handle button click to generate workout routines
+                            hasShownError = false
+                            isLoading = true // Set loading state to true
+                            generateWorkoutRoutine(context) { generatedRoutines, error ->
+                                workoutRoutines = generatedRoutines
+                                errorMessage = error
+                                isLoading = false // Reset loading state
+                            }
+                        },
+                        shape = CircleShape,
+                        containerColor = DirtyWhite,
+                        modifier = Modifier
+                            .size(100.dp)
+                            .offset(y = (-20).dp)
+                    ) {
+                        Image(
+                            painter = painterResource(R.drawable.spot_avatar),
+                            contentDescription = "Generate Workout",
+                            modifier = Modifier.size(60.dp) // Adjust size as needed
+                        )
+                    }
                 }
             }
         }

@@ -49,9 +49,11 @@ import androidx.compose.ui.text.input.VisualTransformation
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun signupPage(navController: NavController) {
-
     val context = LocalContext.current
-     // To show Toast messages
+
+    // State to manage password visibility
+    var isPasswordVisible by remember { mutableStateOf(false) }
+    var isConfirmPasswordVisible by remember { mutableStateOf(false) }
 
     Box(
         modifier = Modifier
@@ -108,23 +110,49 @@ fun signupPage(navController: NavController) {
 
                         Spacer(modifier = Modifier.height(17.dp))
 
-                        // Password field
-                        AnimatedTextField(
-                            label = "Password",
-                            value = password,
-                            onValueChange = { password = it },
-                            visualTransformation = PasswordVisualTransformation()
-                        )
+                        // Password field with toggle icon
+                        Box(modifier = Modifier.fillMaxWidth()) {
+                            AnimatedTextField(
+                                label = "Password",
+                                value = password,
+                                onValueChange = { password = it },
+                                visualTransformation = if (isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                            )
+                            IconButton(
+                                onClick = { isPasswordVisible = !isPasswordVisible },
+                                modifier = Modifier.align(Alignment.CenterEnd) // Align icon to the right
+                            ) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.baseline_remove_red_eye_24),
+                                    contentDescription = if (isPasswordVisible) "Hide password" else "Show password",
+                                    tint = DarkGreen,
+                                    modifier = Modifier.size(18.dp)
+                                )
+                            }
+                        }
 
                         Spacer(modifier = Modifier.height(17.dp))
 
-                        // Confirm Password field
-                        AnimatedTextField(
-                            label = "Confirm Password",
-                            value = confirmPassword,
-                            onValueChange = { confirmPassword = it },
-                            visualTransformation = PasswordVisualTransformation()
-                        )
+                        // Confirm Password field with toggle icon
+                        Box(modifier = Modifier.fillMaxWidth()) {
+                            AnimatedTextField(
+                                label = "Confirm Password",
+                                value = confirmPassword,
+                                onValueChange = { confirmPassword = it },
+                                visualTransformation = if (isConfirmPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                            )
+                            IconButton(
+                                onClick = { isConfirmPasswordVisible = !isConfirmPasswordVisible },
+                                modifier = Modifier.align(Alignment.CenterEnd) // Align icon to the right
+                            ) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.baseline_remove_red_eye_24),
+                                    contentDescription = if (isConfirmPasswordVisible) "Hide confirm password" else "Show confirm password",
+                                    tint = DarkGreen,
+                                    modifier = Modifier.size(18.dp)
+                                )
+                            }
+                        }
 
                         Spacer(modifier = Modifier.height(20.dp))
 
@@ -139,13 +167,13 @@ fun signupPage(navController: NavController) {
                             ) {
                                 FloatingActionButton(
                                     onClick = {
-                                        // Check if there's input  username or password
+                                        // Check if there's input username or password
                                         if (username.isEmpty() || password.isEmpty()) {
                                             Toast.makeText(context, "Please enter your Username or Password", Toast.LENGTH_SHORT).show()
                                             return@FloatingActionButton
                                         }
 
-                                        // check if there's no password confirmation
+                                        // Check if there's no password confirmation
                                         if (confirmPassword.isEmpty()) {
                                             Toast.makeText(context, "Please confirm your password", Toast.LENGTH_SHORT).show()
                                             return@FloatingActionButton
@@ -244,6 +272,7 @@ fun signupPage(navController: NavController) {
         }
     }
 }
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AnimatedTextField(
@@ -251,6 +280,7 @@ fun AnimatedTextField(
     value: String,
     onValueChange: (String) -> Unit,
     visualTransformation: VisualTransformation = VisualTransformation.None,
+    modifier: Modifier = Modifier
 ) {
     var isFocused by remember { mutableStateOf(false) }
     val isLabelSmall = isFocused || value.isNotEmpty()
@@ -286,10 +316,11 @@ fun AnimatedTextField(
             containerColor = Ash
         ),
         shape = RoundedCornerShape(20.dp),
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 2.dp)
             .focusRequester(focusRequester)
             .onFocusChanged { focusState -> isFocused = focusState.isFocused }
     )
 }
+

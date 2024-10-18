@@ -26,6 +26,7 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
@@ -54,6 +55,9 @@ fun loginPage(navController: NavController) {
 
     // State for error message
     var errorMessage by remember { mutableStateOf("") } // Error message state
+
+    // State for password visibility
+    var isPasswordVisible by remember { mutableStateOf(false) } // Password visibility state
 
     Box(
         modifier = Modifier
@@ -128,32 +132,53 @@ fun loginPage(navController: NavController) {
 
                         Spacer(modifier = Modifier.height(17.dp))
 
-                        // Password TextField
-                        TextField(
-                            value = password,
-                            onValueChange = { newValue -> password = newValue },
-                            label = {
-                                val labelOffset by animateDpAsState(if (isPasswordFocused || password.isNotEmpty()) 16.dp else 0.dp)
-                                val labelFontSize by animateFloatAsState(if (isPasswordFocused || password.isNotEmpty()) 10f else 16f)
+                        // Password TextField with toggle visibility
+                        Box(modifier = Modifier.fillMaxWidth()) {
+                            TextField(
+                                value = password,
+                                onValueChange = { newValue -> password = newValue },
+                                label = {
+                                    // Ensure we are using ColumnScope here for AnimatedVisibility
+                                    Column {
+                                        val labelOffset by animateDpAsState(if (isPasswordFocused || password.isNotEmpty()) 16.dp else 0.dp)
+                                        val labelFontSize by animateFloatAsState(if (isPasswordFocused || password.isNotEmpty()) 10f else 16f)
 
-                                AnimatedVisibility(visible = true, modifier = Modifier.padding(bottom = labelOffset)) {
-                                    Text(
-                                        text = "Password",
-                                        style = TextStyle(fontFamily = titleFont, fontSize = labelFontSize.sp, color = DarkerAsh)
-                                    )
-                                }
-                            },
-                            colors = TextFieldDefaults.textFieldColors(
-                                focusedIndicatorColor = Color.Transparent,
-                                unfocusedIndicatorColor = Color.Transparent,
-                                containerColor = Ash
-                            ),
-                            shape = RoundedCornerShape(20.dp),
-                            visualTransformation = PasswordVisualTransformation(),
-                            modifier = Modifier.fillMaxWidth().padding(horizontal = 2.dp)
-                                .focusRequester(passwordFocusRequester)
-                                .onFocusChanged { focusState -> isPasswordFocused = focusState.isFocused }
-                        )
+                                        AnimatedVisibility(
+                                            visible = true,
+                                            modifier = Modifier.padding(bottom = labelOffset)
+                                        ) {
+                                            Text(
+                                                text = "Password",
+                                                style = TextStyle(fontFamily = titleFont, fontSize = labelFontSize.sp, color = DarkerAsh)
+                                            )
+                                        }
+                                    }
+                                },
+                                colors = TextFieldDefaults.textFieldColors(
+                                    focusedIndicatorColor = Color.Transparent,
+                                    unfocusedIndicatorColor = Color.Transparent,
+                                    containerColor = Ash
+                                ),
+                                shape = RoundedCornerShape(20.dp),
+                                visualTransformation = if (isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                                modifier = Modifier.fillMaxWidth().padding(horizontal = 2.dp)
+                                    .focusRequester(passwordFocusRequester)
+                                    .onFocusChanged { focusState -> isPasswordFocused = focusState.isFocused }
+                            )
+
+                            // Toggle password visibility icon
+                            IconButton(
+                                onClick = { isPasswordVisible = !isPasswordVisible },
+                                modifier = Modifier.align(Alignment.CenterEnd) // Align icon to the right
+                            ) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.baseline_remove_red_eye_24),
+                                    contentDescription = if (isPasswordVisible) "Hide password" else "Show password",
+                                    tint = DarkGreen,
+                                    modifier = Modifier.size(18.dp) // Adjust the size here (e.g., 24.dp)
+                                )
+                            }
+                        }
 
                         // Login button and functionality
                         Box(modifier = Modifier.height(160.dp), contentAlignment = Alignment.Center) {
@@ -221,6 +246,7 @@ fun loginPage(navController: NavController) {
         }
     }
 }
+
 
 suspend fun handleLogin(
     username: String,

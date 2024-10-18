@@ -45,19 +45,17 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WorkoutDayPage(navController: NavController, selectedDayNum: Int) {
-
     val context = LocalContext.current
     var workoutRoutines by remember { mutableStateOf<List<WorkoutRoutineRequest>>(emptyList()) }
-    var isLoading by remember { mutableStateOf(false) }
+    var isLoading by remember { mutableStateOf(true) } // Set to true initially
     var errorMessage by remember { mutableStateOf<String?>(null) }
 
     // Fetch workout routines on launch
     LaunchedEffect(Unit) {
-        isLoading = true
         fetchWorkoutRoutines(context) { routines, error ->
             workoutRoutines = routines
             errorMessage = error
-            isLoading = false
+            isLoading = false // Set loading to false once data is fetched
         }
     }
 
@@ -94,7 +92,6 @@ fun WorkoutDayPage(navController: NavController, selectedDayNum: Int) {
                             .fillMaxWidth()
                             .padding(top = 60.dp)
                     ) {
-
                         // Group the workout routines by day number
                         val groupedRoutines = workoutRoutines.groupBy { it.dayNum }
                         val routinesForSelectedDay = groupedRoutines[selectedDayNum] ?: emptyList()
@@ -165,7 +162,14 @@ fun WorkoutDayPage(navController: NavController, selectedDayNum: Int) {
                                 }
                             }
                         }
-                        WorkoutItem(workoutRoutines, selectedDayNum, containerOpacity = 1f, navController)
+
+                        // Show a loading indicator while data is being fetched
+                        if (isLoading) {
+                            loadingScreen()
+                        } else {
+                            // Show workout items
+                            WorkoutItem(workoutRoutines, selectedDayNum, containerOpacity = 1f, navController)
+                        }
                     }
                 }
             },
@@ -227,6 +231,7 @@ fun WorkoutDayPage(navController: NavController, selectedDayNum: Int) {
         }
     }
 }
+
 
 private fun fetchWorkoutRoutines(context: Context, onResult: (List<WorkoutRoutineRequest>, String?) -> Unit) {
     val service = RetrofitInstance.WorkoutRoutineService(context)

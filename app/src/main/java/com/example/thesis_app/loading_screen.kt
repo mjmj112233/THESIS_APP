@@ -6,18 +6,15 @@ import android.widget.VideoView
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.navigation.NavController
 import com.example.thesis_app.ui.theme.BlueGreen
-import kotlinx.coroutines.delay
 
 @Composable
-fun loadingScreen(navController: NavController) {
+fun loadingScreen() {
     val context = LocalContext.current
     val videoUri = "android.resource://${context.packageName}/raw/spot_loading"
 
@@ -39,20 +36,24 @@ fun loadingScreen(navController: NavController) {
                 factory = { context ->
                     VideoView(context).apply {
                         setVideoURI(Uri.parse(videoUri))
-                        setMediaController(MediaController(context).also {
-                            it.setAnchorView(this)
-                            it.setMediaPlayer(this)
-                        })
+
+                        // Setup the MediaController
+                        val mediaController = MediaController(context)
+                        mediaController.setAnchorView(this)
+                        setMediaController(mediaController)
+
+                        // Start the video
                         start()
+
+                        // Make sure to loop the video if desired
+                        setOnCompletionListener {
+                            seekTo(0)
+                            start()
+                        }
                     }
                 },
                 modifier = Modifier.fillMaxSize()
             )
         }
-    }
-
-    LaunchedEffect(Unit) {
-        delay(1000)
-        navController.navigate("third")
     }
 }

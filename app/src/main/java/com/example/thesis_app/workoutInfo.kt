@@ -65,7 +65,7 @@ fun WorkoutInfoPage(navController: NavController, workoutName: String) {
 
     // Show loading state or error message if any
     if (isLoading) {
-        CircularProgressIndicator() // Show a loading spinner
+        loadingScreen() // Show custom loading screen
     } else if (errorMessage != null) {
         Text(text = "Error: $errorMessage")
     } else {
@@ -246,7 +246,6 @@ fun WorkoutInfoPage(navController: NavController, workoutName: String) {
                                     Text(
                                         text = String.format("%.0f min", workoutInfo.weight), // Display duration in minutes
                                         style = TextStyle(
-
                                             fontSize = 18.sp,
                                             color = Slime,
                                             fontFamily = alt
@@ -362,7 +361,6 @@ fun WorkoutInfoPage(navController: NavController, workoutName: String) {
     }
 }
 
-
 private fun fetchWorkoutRoutines(context: Context, onResult: (List<WorkoutRoutineRequest>, String?) -> Unit) {
     val service = RetrofitInstance.WorkoutRoutineService(context)
 
@@ -375,4 +373,5 @@ private fun fetchWorkoutRoutines(context: Context, onResult: (List<WorkoutRoutin
         }
     }
 }
+
 
