@@ -533,7 +533,7 @@ fun WorkoutRoutinesList(navController: NavController, workoutRoutines: List<Work
                                     ) {
                                         // Show the count above the progress bar
                                         Text(
-                                            text = "$finishedCount/6",
+                                            text = "$finishedCount/$totalWorkouts",
                                             fontFamily = alt,
                                             fontSize = 12.sp,
                                             color = Slime,
