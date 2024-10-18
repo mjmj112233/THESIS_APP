@@ -273,6 +273,23 @@ fun WorkoutInfoPage(navController: NavController, workoutName: String) {
                             }
                         }
 
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        Text(
+                            text = buildAnnotatedString {
+                                withStyle(style = SpanStyle(color = DirtyWhite, fontFamily = captionFont)) {
+                                    append("Equipment needed: ")
+                                }
+                                append("${workoutInfo.workout.equipment} ")
+                            },
+                            fontFamily = titleFont,
+                            fontSize = 16.sp,
+                            color = Slime,
+                            modifier = Modifier
+                                .padding(top = 20.dp)
+                                .fillMaxWidth()
+                                .align(Alignment.Start)
+                        )
 
                         Spacer(modifier = Modifier.height(8.dp))
 
@@ -352,7 +369,7 @@ fun WorkoutInfoPage(navController: NavController, workoutName: String) {
                                 },
                                 colors = ButtonDefaults.buttonColors(DirtyWhite),
                                 modifier = Modifier
-                                    .width(160.dp)
+                                    .width(220.dp)
                                     .height(60.dp)
                             ) {
                                 Text(
