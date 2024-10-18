@@ -453,7 +453,6 @@ fun WorkoutRoutinesList(navController: NavController, workoutRoutines: List<Work
 
             val isRestDay = routines.all { it.workoutInfo?.workout?.name.isNullOrEmpty() }
 
-
             Box(
                 modifier = Modifier
                     .padding(vertical = 10.dp)
@@ -477,18 +476,31 @@ fun WorkoutRoutinesList(navController: NavController, workoutRoutines: List<Work
             ) {
 
                 Column {
-                    Box(
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(12.dp))
-                            .background(Slime)
-                            .width(75.dp)
-                            .padding(horizontal = 12.dp, vertical = 8.dp)
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween, // Space between elements
+                        verticalAlignment = Alignment.CenterVertically // Align elements vertically
                     ) {
-                        Text(
-                            text = "Day $dayNum",
-                            fontFamily = alt,
-                            fontSize = 16.sp,
-                            color = DarkGreen
+                        Box(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(12.dp))
+                                .background(Slime)
+                                .width(75.dp)
+                                .padding(horizontal = 12.dp, vertical = 8.dp)
+                        ) {
+                            Text(
+                                text = "Day $dayNum",
+                                fontFamily = alt,
+                                fontSize = 16.sp,
+                                color = DarkGreen
+                            )
+                        }
+
+                        LinearProgressIndicator(
+                            progress = 0.5f,
+                            modifier = Modifier
+                                .width(100.dp)
+                                .height(8.dp)
                         )
                     }
 
@@ -506,6 +518,7 @@ fun WorkoutRoutinesList(navController: NavController, workoutRoutines: List<Work
         }
     }
 }
+
 
 
 @Composable
