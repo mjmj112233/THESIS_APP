@@ -41,6 +41,7 @@ import com.example.thesis_app.ui.theme.titleFont
 import com.example.util.TokenManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import androidx.compose.ui.platform.LocalContext
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -281,7 +282,7 @@ fun mainPage(navController: NavController) {
             contentAlignment = Alignment.BottomCenter
         ) {
             if (isLoading) {
-                CircularProgressIndicator()
+                CircularProgressIndicator(color = DarkGreen)
             } else {
                 // Display error message if exists
                 errorMessage?.let {
@@ -445,8 +446,12 @@ fun WorkoutRoutinesList(navController: NavController, workoutRoutines: List<Work
     // Group the workout routines by day number
     val groupedRoutines = workoutRoutines.groupBy { it.dayNum }
 
+    val context = LocalContext.current
+
     LazyColumn(modifier = Modifier.padding(8.dp)) {
         items(groupedRoutines.toList()) { (dayNum, routines) ->
+
+            val isRestDay = routines.all { it.workoutInfo?.workout?.name.isNullOrEmpty() }
 
 
             Box(
@@ -456,7 +461,17 @@ fun WorkoutRoutinesList(navController: NavController, workoutRoutines: List<Work
                     .height(250.dp)
                     .background(DirtyWhite.copy(alpha = containerOpacity), RoundedCornerShape(8.dp))
                     .clickable {
-                        navController.navigate("workoutDay/$dayNum")
+                        if (isRestDay) {
+                            // Show a flash message for rest day
+                            Toast.makeText(
+                                context,
+                                "It's your rest day, please consider taking care of yourself!",
+                                Toast.LENGTH_LONG
+                            ).show()
+                        } else {
+                            // Navigate to workoutDay
+                            navController.navigate("workoutDay/$dayNum")
+                        }
                     }
                     .padding(16.dp)
             ) {

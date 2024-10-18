@@ -104,7 +104,7 @@ fun WorkoutInfoPage(navController: NavController, workoutName: String) {
                                 .height(280.dp)
                                 .padding(top = 30.dp)
                                 .clip(RoundedCornerShape(10.dp))
-                                .background(Color.Gray) // Placeholder background
+                                .background(BlueGreen) // Placeholder background
                         ) {
                             workoutInfo.workout.demoUrl?.let { iframeString ->
                                 AndroidView(
@@ -273,7 +273,7 @@ fun WorkoutInfoPage(navController: NavController, workoutName: String) {
                             horizontalArrangement = Arrangement.Start
                         ) {
                             Button(
-                                onClick = { /*navController.navigate("plank")*/ },
+                                onClick = { navController.popBackStack() },
                                 colors = ButtonDefaults.buttonColors(DirtyWhite),
                                 modifier = Modifier
                                     .width(160.dp)

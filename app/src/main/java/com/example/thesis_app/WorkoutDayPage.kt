@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.api.RetrofitInstance
 import com.example.model.WorkoutRoutineRequest
+import com.example.thesis_app.ui.theme.Blackk
 import com.example.thesis_app.ui.theme.BlueGreen
 import com.example.thesis_app.ui.theme.DarkGreen
 import com.example.thesis_app.ui.theme.DirtyWhite
@@ -212,6 +213,9 @@ fun WorkoutItem(workoutRoutines: List<WorkoutRoutineRequest>, selectedDayNum: In
 
 @Composable
 fun WorkoutCard(routine: WorkoutRoutineRequest, navController: NavController, containerOpacity: Float = 1f ) {
+
+    var isFinished = true;
+
     Box(
         modifier = Modifier
             .padding(vertical = 10.dp)
@@ -282,50 +286,50 @@ fun WorkoutCard(routine: WorkoutRoutineRequest, navController: NavController, co
                     )
 
                     if (workoutInfo.workout.name != "Cardio") {
-                    // Row for sets and reps boxes
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 8.dp, end = 8.dp),
-                        horizontalArrangement = Arrangement.Start
-                    ) {
-                        // Sets box
-                        Box(
+                        // Row for sets and reps boxes
+                        Row(
                             modifier = Modifier
-                                .clip(shape = RoundedCornerShape(20.dp))
-                                .background(Slime)
-                                .padding(horizontal = 8.dp, vertical = 4.dp)
+                                .fillMaxWidth()
+                                .padding(top = 8.dp, end = 8.dp),
+                            horizontalArrangement = Arrangement.Start // Adjust to align elements in row
                         ) {
-                            Text(
-                                text = "${workoutInfo.sets} sets",
-                                style = TextStyle(
-                                    fontSize = 10.sp,
-                                    color = DarkGreen,
-                                    fontFamily = alt
-                                ),
-                            )
-                        }
+                            // Sets box
+                            Box(
+                                modifier = Modifier
+                                    .clip(shape = RoundedCornerShape(20.dp))
+                                    .background(Slime)
+                                    .padding(horizontal = 8.dp, vertical = 4.dp)
+                            ) {
+                                Text(
+                                    text = "${workoutInfo.sets} sets",
+                                    style = TextStyle(
+                                        fontSize = 10.sp,
+                                        color = DarkGreen,
+                                        fontFamily = alt
+                                    ),
+                                )
+                            }
 
-                        // Spacer between sets and reps boxes
-                        Spacer(modifier = Modifier.width(4.dp))
+                            // Spacer between sets and reps boxes
+                            Spacer(modifier = Modifier.width(4.dp))
 
-                        // Reps box
-                        Box(
-                            modifier = Modifier
-                                .clip(shape = RoundedCornerShape(20.dp))
-                                .background(Slime)
-                                .padding(horizontal = 8.dp, vertical = 4.dp)
-                        ) {
-                            Text(
-                                text = "${workoutInfo.reps} reps",
-                                style = TextStyle(
-                                    fontSize = 10.sp,
-                                    color = DarkGreen,
-                                    fontFamily = alt
-                                ),
-                            )
+                            // Reps box
+                            Box(
+                                modifier = Modifier
+                                    .clip(shape = RoundedCornerShape(20.dp))
+                                    .background(Slime)
+                                    .padding(horizontal = 8.dp, vertical = 4.dp)
+                            ) {
+                                Text(
+                                    text = "${workoutInfo.reps} reps",
+                                    style = TextStyle(
+                                        fontSize = 10.sp,
+                                        color = DarkGreen,
+                                        fontFamily = alt
+                                    ),
+                                )
+                            }
                         }
-                    }
                     } else {
                         Row(
                             modifier = Modifier
@@ -333,7 +337,7 @@ fun WorkoutCard(routine: WorkoutRoutineRequest, navController: NavController, co
                                 .padding(top = 8.dp, end = 8.dp),
                             horizontalArrangement = Arrangement.Start
                         ) {
-                            // Sets box
+                            // Sets box for cardio
                             Box(
                                 modifier = Modifier
                                     .clip(shape = RoundedCornerShape(20.dp))
@@ -354,5 +358,44 @@ fun WorkoutCard(routine: WorkoutRoutineRequest, navController: NavController, co
                 }
             }
         }
+
+        if(isFinished == true){
+            Box(
+                modifier = Modifier
+                    .align(Alignment.TopEnd) // Position the box at the top end (right)
+                    .padding(8.dp) // Add padding to avoid touching the edges
+                    .clip(RoundedCornerShape(50.dp))
+                    .background(Slime)
+                    .clickable { /* Handle button click */ }
+                    .size(40.dp),
+                contentAlignment = Alignment.Center // Center the icon inside the box
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.baseline_check_24),
+                    contentDescription = "Run Icon",
+                    modifier = Modifier.size(20.dp),
+                    tint = DarkGreen
+                )
+            }
+        } else {
+            Box(
+                modifier = Modifier
+                    .align(Alignment.TopEnd) // Position the box at the top end (right)
+                    .padding(8.dp) // Add padding to avoid touching the edges
+                    .clip(RoundedCornerShape(50.dp))
+                    .background(Color.Gray)
+                    .clickable { /* Handle button click */ }
+                    .size(40.dp),
+                contentAlignment = Alignment.Center // Center the icon inside the box
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.baseline_check_24),
+                    contentDescription = "Run Icon",
+                    modifier = Modifier.size(20.dp),
+                    tint = Blackk
+                )
+            }
+        }
     }
 }
+
