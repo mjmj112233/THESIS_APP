@@ -1,6 +1,7 @@
 package com.example.thesis_app
 
 import android.content.Context
+import android.widget.Space
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -453,6 +454,17 @@ fun WorkoutRoutinesList(navController: NavController, workoutRoutines: List<Work
 
             val isRestDay = routines.all { it.workoutInfo?.workout?.name.isNullOrEmpty() }
 
+            // Count finished workouts for the day
+            val finishedCount = routines.count { it.isFinished }
+
+            // Calculate the progress
+            val totalWorkouts = routines.size // Get the total number of workouts for the day
+            val progress = if (totalWorkouts > 0) {
+                finishedCount.toFloat() / totalWorkouts.toFloat() // Use the total workouts for progress
+            } else {
+                0f // Avoid division by zero
+            }
+
             Box(
                 modifier = Modifier
                     .padding(vertical = 10.dp)
@@ -462,11 +474,13 @@ fun WorkoutRoutinesList(navController: NavController, workoutRoutines: List<Work
                     .clickable {
                         if (isRestDay) {
                             // Show a flash message for rest day
-                            Toast.makeText(
-                                context,
-                                "It's your rest day, please consider taking care of yourself!",
-                                Toast.LENGTH_LONG
-                            ).show()
+                            Toast
+                                .makeText(
+                                    context,
+                                    "It's your rest day, please consider taking care of yourself!",
+                                    Toast.LENGTH_LONG
+                                )
+                                .show()
                         } else {
                             // Navigate to workoutDay
                             navController.navigate("workoutDay/$dayNum")
@@ -478,8 +492,8 @@ fun WorkoutRoutinesList(navController: NavController, workoutRoutines: List<Work
                 Column {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween, // Space between elements
-                        verticalAlignment = Alignment.CenterVertically // Align elements vertically
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween // Arrange items between ends
                     ) {
                         Box(
                             modifier = Modifier
@@ -496,12 +510,49 @@ fun WorkoutRoutinesList(navController: NavController, workoutRoutines: List<Work
                             )
                         }
 
-                        LinearProgressIndicator(
-                            progress = 0.5f,
-                            modifier = Modifier
-                                .width(100.dp)
-                                .height(8.dp)
-                        )
+                        Spacer(modifier = Modifier.padding(start=140.dp))
+
+                        if (!isRestDay) {
+                            // Move the progress Row to the rightmost side
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(8.dp) // Space between label and progress bar
+                            ) {
+                                Text(
+                                    text = "Progress:",
+                                    fontFamily = alt,
+                                    fontSize = 16.sp,
+                                    color = Slime
+                                )
+
+                                // Create a Box to hold the progress indicator and the count
+                                Box(modifier = Modifier.weight(1f)) {
+                                    Column(
+                                        horizontalAlignment = Alignment.End,
+                                        verticalArrangement = Arrangement.Top // Align elements to the top
+                                    ) {
+                                        // Show the count above the progress bar
+                                        Text(
+                                            text = "$finishedCount/6",
+                                            fontFamily = alt,
+                                            fontSize = 12.sp,
+                                            color = Slime,
+                                            modifier = Modifier.padding(bottom = 2.dp) // Add spacing below the count
+                                        )
+
+                                        LinearProgressIndicator(
+                                            progress = progress,
+                                            color = Slime,
+                                            modifier = Modifier
+                                                .width(100.dp)
+                                                .height(8.dp)
+                                                .background(DirtyWhite)
+                                        )
+                                        Spacer(modifier = Modifier.padding(bottom = 12.dp))
+                                    }
+                                }
+                            }
+                        }
                     }
 
                     LazyRow(
@@ -518,7 +569,6 @@ fun WorkoutRoutinesList(navController: NavController, workoutRoutines: List<Work
         }
     }
 }
-
 
 
 @Composable

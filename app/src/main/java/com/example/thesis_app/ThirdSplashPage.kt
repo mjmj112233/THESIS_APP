@@ -48,6 +48,7 @@ fun thirdPage(navController: NavController) {
 
     Box(
         modifier = Modifier.fillMaxSize()
+            .background(BlueGreen)
     ) {
         // Background image
         Image(

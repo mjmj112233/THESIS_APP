@@ -34,7 +34,10 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import android.widget.Toast
 import androidx.compose.ui.viewinterop.AndroidView
+import com.example.api.WorkoutRoutineService
+import kotlinx.coroutines.withContext
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -44,6 +47,9 @@ fun WorkoutInfoPage(navController: NavController, workoutName: String) {
     var filteredWorkout by remember { mutableStateOf<WorkoutRoutineRequest?>(null) }
     var isLoading by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
+    var isFinished by remember { mutableStateOf(false) }
+
+    val service = RetrofitInstance.WorkoutRoutineService(context)
 
     // Fetch workout routines on launch
     LaunchedEffect(Unit) {
@@ -273,7 +279,34 @@ fun WorkoutInfoPage(navController: NavController, workoutName: String) {
                             horizontalArrangement = Arrangement.Start
                         ) {
                             Button(
-                                onClick = { navController.popBackStack() },
+                                onClick = {
+                                    // Call the API to mark the workout as finished
+                                    if (workout.id > 0) { // Check if workout has a valid ID
+                                        CoroutineScope(Dispatchers.IO).launch {
+                                            try {
+                                                val response = service.markWorkoutAsFinished(workout.id)
+                                                if (response.isSuccessful) {
+                                                    // Switch to the main thread to show the Toast
+                                                    withContext(Dispatchers.Main) {
+                                                        Toast.makeText(context, "Workout marked as finished!", Toast.LENGTH_SHORT).show()
+                                                    }
+                                                    isFinished = true // Update local state if needed
+                                                } else {
+                                                    // Handle API error
+                                                    withContext(Dispatchers.Main) {
+                                                        Toast.makeText(context, "Error marking workout as finished", Toast.LENGTH_SHORT).show()
+                                                    }
+                                                }
+                                            } catch (e: Exception) {
+                                                // Handle exception
+                                                withContext(Dispatchers.Main) {
+                                                    Toast.makeText(context, "Network error: ${e.message}", Toast.LENGTH_SHORT).show()
+                                                }
+                                            }
+                                        }
+                                    }
+                                    navController.popBackStack() // Navigate back
+                                },
                                 colors = ButtonDefaults.buttonColors(DirtyWhite),
                                 modifier = Modifier
                                     .width(160.dp)

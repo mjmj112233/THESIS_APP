@@ -42,6 +42,7 @@ import com.example.thesis_app.ui.theme.titleFont
 fun firstPage(navController: NavController) {
     Box(
         modifier = Modifier.fillMaxSize()
+            .background(BlueGreen)
     ) {
         // Background image
         Image(

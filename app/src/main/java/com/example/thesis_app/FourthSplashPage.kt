@@ -39,6 +39,7 @@ import kotlinx.coroutines.delay
 fun fourthPage(navController: NavController) {
     Box(
         modifier = Modifier.fillMaxSize()
+            .background(BlueGreen)
     ) {
         // Background image
         Image(

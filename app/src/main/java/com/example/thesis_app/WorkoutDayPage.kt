@@ -93,6 +93,20 @@ fun WorkoutDayPage(navController: NavController, selectedDayNum: Int) {
                             .fillMaxWidth()
                             .padding(top = 60.dp)
                     ) {
+
+                        // Group the workout routines by day number
+                        val groupedRoutines = workoutRoutines.groupBy { it.dayNum }
+                        val routinesForSelectedDay = groupedRoutines[selectedDayNum] ?: emptyList()
+
+                        // Count finished workouts for the selected day
+                        val finishedCount = routinesForSelectedDay.count { it.isFinished }
+                        val totalWorkouts = routinesForSelectedDay.size
+                        val progress = if (totalWorkouts > 0) {
+                            finishedCount.toFloat() / totalWorkouts.toFloat()
+                        } else {
+                            0f // Avoid division by zero
+                        }
+
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -107,6 +121,48 @@ fun WorkoutDayPage(navController: NavController, selectedDayNum: Int) {
                                 color = DirtyWhite,
                                 textAlign = TextAlign.Center
                             )
+                            // Progress section
+                            if (totalWorkouts > 0) {
+                                // Box to hold the progress label, count, and progress bar
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp) // Space between elements
+                                ) {
+                                    Text(
+                                        text = "Progress:",
+                                        fontFamily = alt,
+                                        fontSize = 16.sp,
+                                        color = Slime
+                                    )
+
+                                    // Box for the count and progress bar
+                                    Box {
+                                        Column(
+                                            horizontalAlignment = Alignment.End,
+                                            verticalArrangement = Arrangement.Top
+                                        ) {
+                                            // Show the count above the progress bar
+                                            Text(
+                                                text = "$finishedCount/$totalWorkouts",
+                                                fontFamily = alt,
+                                                fontSize = 12.sp,
+                                                color = Slime,
+                                                modifier = Modifier.padding(bottom = 2.dp)
+                                            )
+
+                                            LinearProgressIndicator(
+                                                progress = progress,
+                                                color = Slime,
+                                                modifier = Modifier
+                                                    .width(100.dp)
+                                                    .height(8.dp)
+                                                    .background(DirtyWhite)
+                                            )
+                                            Spacer(modifier = Modifier.padding(bottom = 12.dp))
+                                        }
+                                    }
+                                }
+                            }
                         }
                         WorkoutItem(workoutRoutines, selectedDayNum, containerOpacity = 1f, navController)
                     }
@@ -214,7 +270,7 @@ fun WorkoutItem(workoutRoutines: List<WorkoutRoutineRequest>, selectedDayNum: In
 @Composable
 fun WorkoutCard(routine: WorkoutRoutineRequest, navController: NavController, containerOpacity: Float = 1f ) {
 
-    var isFinished = true;
+    var isFinished = routine.isFinished;
 
     Box(
         modifier = Modifier

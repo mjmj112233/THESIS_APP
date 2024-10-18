@@ -29,9 +29,8 @@ interface WorkoutRoutineService {
     @PUT("/api/workout-routine/reset/{id}")
     suspend fun resetWorkout(@Path("id") id: Long): Response<String>
 
-    // New API: Mark a workout as finished by ID
     @PUT("/api/workout-routine/mark-finished/{id}")
-    suspend fun markWorkoutAsFinished(@Path("id") id: Long): Response<String>
+    suspend fun markWorkoutAsFinished(@Path("id") id: Long): Response<Void>
 }
 
 
