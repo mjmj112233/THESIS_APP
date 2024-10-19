@@ -47,6 +47,8 @@ fun plank(
     var started by remember { mutableStateOf(false) } // Control if the timer has started
     var showDialog by remember { mutableStateOf(false) } // Control the visibility of the dialog
     var showPlankTime by remember { mutableStateOf(0L) }
+    var countdownTime by remember { mutableStateOf(3) } // Starting countdown from 3
+    var showCountdown by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
 
@@ -190,98 +192,151 @@ fun plank(
 
             Spacer(modifier = Modifier.height(20.dp))
 
-        // Start Stopwatch Button
-        if (!started) {
-            Button(
-                onClick = { showDialog = true }, // Open the dialog when the button is clicked
-                colors = ButtonDefaults.buttonColors(Slime),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(shape = CircleShape)
-            ) {
-                Text(
-                    text = "Start Test",
-                    color = DarkGreen,
-                    fontFamily = titleFont,
-                    fontSize = 20.sp
-                )
-            }
-            // display the plank time after the stopwatch stops
-            if (!started && showPlankTime > 0) {
-                Text(
-                    text = "You held the plank for ${showPlankTime} seconds!",
-                    style = TextStyle(fontSize = 20.sp, color = Slime, fontFamily = alt),
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.fillMaxWidth().padding(top = 20.dp)
-                )
-            }
-        }
-        }
+            // Start Stopwatch Button
+            if (!started) {
+                Button(
+                    onClick = {
+                        showCountdown = true // Show the countdown when the button is clicked
+                        showDialog = true // Open the dialog
+                    },
+                    colors = ButtonDefaults.buttonColors(Slime),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(shape = CircleShape)
+                ) {
+                    Text(
+                        text = "Start Test",
+                        color = DarkGreen,
+                        fontFamily = titleFont,
+                        fontSize = 20.sp
+                    )
+                }
 
-// Stopwatch Dialog
-        if (showDialog) {
-            AlertDialog(
-                onDismissRequest = { /* Optionally handle dismiss if needed */ },
-                confirmButton = {
-                    if (!started) {
-                        Button(
-                            onClick = {
-                                started = true // Start the stopwatch
-                            },
-                            colors = ButtonDefaults.buttonColors(Slime),
-                            modifier = Modifier
-                                .fillMaxWidth()
-                        ) {
-                            Text("Start", color = DarkGreen, fontFamily = alt, fontSize = 16.sp)
-                        }
-                    } else {
-                        Button(
-                            onClick = {
-                                started = false // Stop the stopwatch
-                                showDialog = false // Close the dialog when the user clicks stop
-                                showPlankTime = timeElapsed // Save the total plank time
-                            },
-                            colors = ButtonDefaults.buttonColors(Slime),
-                            modifier = Modifier
-                                .fillMaxWidth()
-                        ) {
-                            Text("Stop", color = DarkGreen, fontFamily = alt, fontSize = 16.sp)
-                        }
+                // Display plank time after the stopwatch stops
+                if (!started && showPlankTime > 0) {
+                    Text(
+                        text = "You held the plank for ${showPlankTime} seconds!",
+                        style = TextStyle(fontSize = 20.sp, color = Slime, fontFamily = alt),
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth().padding(top = 20.dp)
+                    )
+                }
+            }
+
+            // Countdown logic
+            LaunchedEffect(showCountdown) {
+                if (showCountdown) {
+                    while (countdownTime > 0) {
+                        delay(1000L) // Delay for 1 second
+                        countdownTime-- // Decrease countdown time
                     }
-                },
-                text = {
-                    Box(
-                        modifier = Modifier
-                            .background(DirtyWhite)
-                            .padding(top = 16.dp)
-                            .clip(RoundedCornerShape(16.dp))
-                    ) {
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.baseline_timer_24),
-                                contentDescription = "Stopwatch",
-                                tint = DarkGreen,
-                                modifier = Modifier.size(60.dp)
-                            )
-                            Spacer(modifier = Modifier.height(10.dp))
-                            Text(
-                                text = "${timeElapsed}s", // Display the time elapsed
-                                style = TextStyle(
-                                    fontSize = 20.sp,
-                                    color = DarkGreen,
-                                    fontFamily = alt
-                                ),
-                                textAlign = TextAlign.Center
-                            )
+                    // Countdown finished, start the stopwatch
+                    countdownTime = 0 // Set countdown to 0 to show "Go!"
+                    delay(1000L) // Hold "Go!" for 1 second before starting the stopwatch
+                    showCountdown = false // Hide the countdown
+                    started = true // Start the stopwatch after countdown
+                }
+            }
+
+            // Stopwatch Dialog
+            if (showDialog) {
+                AlertDialog(
+                    onDismissRequest = { /* Optionally handle dismiss if needed */ },
+                    confirmButton = {
+                        if (showCountdown) {
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                modifier = Modifier.fillMaxWidth() // Center the content horizontally
+                            ) {
+                                Text(
+                                    text = "Please get into your plank position",
+                                    style = TextStyle(
+                                        fontSize = 18.sp,
+                                        color = DarkGreen,
+                                        fontFamily = alt
+                                    ),
+                                    textAlign = TextAlign.Center,
+                                    modifier = Modifier.padding(bottom = 10.dp) // Add padding between the message and the countdown
+                                )
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth(),
+                                    contentAlignment = Alignment.Center // Center the countdown text
+                                ) {
+                                    Text(
+                                        text = if (countdownTime > 0) "$countdownTime" else "Go!",
+                                        style = TextStyle(
+                                            fontSize = 24.sp,
+                                            color = DarkGreen,
+                                            fontFamily = alt
+                                        ),
+                                        textAlign = TextAlign.Center
+                                    )
+                                }
+                            }
+                        } else if (!started) {
+                            Button(
+                                onClick = {
+                                    showCountdown = true // Trigger countdown before stopwatch
+                                },
+                                colors = ButtonDefaults.buttonColors(Slime),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                            ) {
+                                Text("Start", color = DarkGreen, fontFamily = alt, fontSize = 16.sp)
+                            }
+                        } else {
+                            Button(
+                                onClick = {
+                                    started = false // Stop the stopwatch
+                                    showDialog = false // Close the dialog when the user clicks stop
+                                    showPlankTime = timeElapsed // Save the total plank time
+                                },
+                                colors = ButtonDefaults.buttonColors(Slime),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                            ) {
+                                Text("Stop", color = DarkGreen, fontFamily = alt, fontSize = 16.sp)
+                            }
                         }
-                    }
-                },
-                containerColor = DirtyWhite,
-                modifier = Modifier.clip(RoundedCornerShape(16.dp))
-            )
+                    },
+                    text = {
+                        Box(
+                            modifier = Modifier
+                                .background(DirtyWhite)
+                                .padding(top = 16.dp)
+                                .clip(RoundedCornerShape(16.dp))
+                        ) {
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.baseline_timer_24),
+                                    contentDescription = "Stopwatch",
+                                    tint = DarkGreen,
+                                    modifier = Modifier.size(60.dp)
+                                )
+                                Spacer(modifier = Modifier.height(10.dp))
+
+                                if (!showCountdown) {
+                                    Text(
+                                        text = "${timeElapsed}s", // Display the time elapsed
+                                        style = TextStyle(
+                                            fontSize = 20.sp,
+                                            color = DarkGreen,
+                                            fontFamily = alt
+                                        ),
+                                        textAlign = TextAlign.Center
+                                    )
+                                }
+                            }
+                        }
+                    },
+                    containerColor = DirtyWhite,
+                    modifier = Modifier.clip(RoundedCornerShape(16.dp))
+                )
+            }
         }
 
         // Input Section
