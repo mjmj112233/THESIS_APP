@@ -312,8 +312,18 @@ fun plank(
                                 modifier = Modifier.fillMaxWidth()
                             ) {
                                 Icon(
-                                    painter = painterResource(id = R.drawable.baseline_timer_24),
-                                    contentDescription = "Stopwatch",
+                                    painter = painterResource(
+                                        id = if (showCountdown && countdownTime > 0) {
+                                            R.drawable.baseline_warning_24 // Show warning icon during countdown
+                                        } else {
+                                            R.drawable.baseline_timer_24 // Show timer icon after countdown
+                                        }
+                                    ),
+                                    contentDescription = if (showCountdown && countdownTime > 0) {
+                                        "Warning"
+                                    } else {
+                                        "Stopwatch"
+                                    },
                                     tint = DarkGreen,
                                     modifier = Modifier.size(60.dp)
                                 )
