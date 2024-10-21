@@ -184,7 +184,7 @@ fun pushUp(
                 )
             }
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(10.dp))
 
             if (!started) {
                 Button(
@@ -296,7 +296,7 @@ fun pushUp(
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Spacer(modifier = Modifier.height(500.dp))
+                Spacer(modifier = Modifier.height(350.dp))
 
                 Button(
                     onClick = {
@@ -315,7 +315,7 @@ fun pushUp(
                         .fillMaxWidth()
                 ) {
                     Text(
-                        text = "Proceed",
+                        text = "Submit",
                         color = DarkGreen,
                         fontSize = 18.sp,
                         fontFamily = titleFont
@@ -342,11 +342,11 @@ fun pushUp(
                     },
                     colors = ButtonDefaults.buttonColors(Slime),
                     modifier = Modifier
-                        .padding(bottom = 50.dp)
+                        .padding(bottom = 20.dp)
                         .fillMaxWidth()
                 ) {
                     Text(
-                        text = "Submit",
+                        text = "Proceed",
                         color = DarkGreen,
                         fontFamily = titleFont,
                         fontSize = 18.sp
