@@ -61,6 +61,8 @@ fun SquatScreen(
     var errorMessage by remember { mutableStateOf("") }
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
+    var countdownTime by remember { mutableStateOf(3) } // Starting countdown from 3
+    var showCountdown by remember { mutableStateOf(false) }
 
     // Function to check if the profile exists
     suspend fun checkProfileExists(): Boolean {
@@ -258,7 +260,10 @@ fun SquatScreen(
             // Start Timer Button
             if (!started) {
                 Button(
-                    onClick = { showDialog = true },
+                    onClick = {
+                        showCountdown = true // Show the countdown when the button is clicked
+                        showDialog = true // Open the dialog
+                    },
                     colors = ButtonDefaults.buttonColors(Slime),
                     modifier = Modifier
                         .fillMaxWidth()
@@ -272,52 +277,127 @@ fun SquatScreen(
                     )
                 }
             }
-        }
 
-        // Timer Dialog
-        if (showDialog) {
-            AlertDialog(
-                onDismissRequest = { /* Handle dismiss */ },
-                confirmButton = {
-                    Button(
-                        onClick = {
-                            started = true
-                        },
-                        colors = ButtonDefaults.buttonColors(Slime),
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text("Start Timer", color = DarkGreen, fontFamily = alt, fontSize = 16.sp)
+            // Countdown logic
+            LaunchedEffect(showCountdown) {
+                if (showCountdown) {
+                    while (countdownTime > 0) {
+                        delay(1000L) // Delay for 1 second
+                        countdownTime-- // Decrease countdown time
                     }
-                },
-                text = {
-                    Box(
-                        modifier = Modifier
-                            .background(DirtyWhite)
-                            .padding(top = 16.dp)
-                            .clip(RoundedCornerShape(16.dp))
-                    ) {
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.baseline_timer_24),
-                                contentDescription = "Timer",
-                                tint = DarkGreen,
-                                modifier = Modifier.size(60.dp)
-                            )
-                            Spacer(modifier = Modifier.height(10.dp))
-                            Text(
-                                text = "${timeLeft}s",
-                                style = TextStyle(fontSize = 20.sp, color = DarkGreen, fontFamily = alt),
-                                textAlign = TextAlign.Center
-                            )
+                    // Countdown finished, start the timer
+                    countdownTime = 0 // Set countdown to 0 to show "Go!"
+                    delay(500L) // Hold "Go!" before starting the timer
+                    showCountdown = false // Hide the countdown
+                    started = true // Start the timer after countdown
+                }
+            }
+
+            // Timer Dialog
+            if (showDialog) {
+                AlertDialog(
+                    onDismissRequest = { /* Handle dismiss */ },
+                    confirmButton = {
+                        if (showCountdown) {
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                modifier = Modifier.fillMaxWidth() // Center the content horizontally
+                            ) {
+                                Text(
+                                    text = "Please get into your squat position",
+                                    style = TextStyle(
+                                        fontSize = 18.sp,
+                                        color = DarkGreen,
+                                        fontFamily = alt
+                                    ),
+                                    textAlign = TextAlign.Center,
+                                    modifier = Modifier.padding(bottom = 10.dp) // Add padding between the message and the countdown
+                                )
+                                Box(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    contentAlignment = Alignment.Center // Center the countdown text
+                                ) {
+                                    Text(
+                                        text = if (countdownTime > 0) "$countdownTime" else "Go!",
+                                        style = TextStyle(
+                                            fontSize = 24.sp,
+                                            color = DarkGreen,
+                                            fontFamily = alt
+                                        ),
+                                        textAlign = TextAlign.Center
+                                    )
+                                }
+                            }
+                        } else if (!started) {
+                            Button(
+                                onClick = {
+                                    showCountdown = true // Trigger countdown before timer
+                                },
+                                colors = ButtonDefaults.buttonColors(Slime),
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Text("Start", color = DarkGreen, fontFamily = alt, fontSize = 16.sp)
+                            }
+                        } else {
+                            Button(
+                                onClick = {
+                                    started = false // Stop the timer
+                                    showDialog = false // Close the dialog when the user clicks stop
+                                },
+                                colors = ButtonDefaults.buttonColors(Slime),
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Text("Stop", color = DarkGreen, fontFamily = alt, fontSize = 16.sp)
+                            }
                         }
-                    }
-                },
-                containerColor = DirtyWhite,
-                modifier = Modifier.clip(RoundedCornerShape(16.dp))
-            )
+                    },
+                    text = {
+                        Box(
+                            modifier = Modifier
+                                .background(DirtyWhite)
+                                .padding(top = 16.dp)
+                                .clip(RoundedCornerShape(16.dp))
+                        ) {
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Icon(
+                                    painter = painterResource(
+                                        id = if (showCountdown && countdownTime > 0) {
+                                            R.drawable.baseline_warning_24 // Show warning icon during countdown
+                                        } else {
+                                            R.drawable.baseline_timer_24 // Show timer icon after countdown
+                                        }
+                                    ),
+                                    contentDescription = if (showCountdown && countdownTime > 0) {
+                                        "Warning"
+                                    } else {
+                                        "Timer"
+                                    },
+                                    tint = DarkGreen,
+                                    modifier = Modifier.size(60.dp)
+                                )
+                                Spacer(modifier = Modifier.height(10.dp))
+
+                                if (!showCountdown) {
+                                    Text(
+                                        text = "${timeLeft}s", // Display the time elapsed
+                                        style = TextStyle(
+                                            fontSize = 20.sp,
+                                            color = DarkGreen,
+                                            fontFamily = alt
+                                        ),
+                                        textAlign = TextAlign.Center
+                                    )
+                                }
+                            }
+                        }
+                    },
+                    containerColor = DirtyWhite,
+                    modifier = Modifier.clip(RoundedCornerShape(16.dp))
+                )
+            }
         }
 
         // Show input field after stopping the timer

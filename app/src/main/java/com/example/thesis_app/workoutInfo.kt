@@ -116,7 +116,7 @@ fun WorkoutInfoPage(navController: NavController, workoutName: String) {
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(280.dp)
+                                .height(275.dp)
                                 .padding(top = 30.dp)
                                 .background(BlueGreen)
                         ) {

@@ -546,7 +546,7 @@ fun thirdPage(navController: NavController) {
                                 text = "I agree to Spot's Terms and Conditions",
                                 fontFamily = captionFont,
                                 fontSize = 14.sp,
-                                color = DarkGreen
+                                color = Blackk
                             )
                         }
 
@@ -565,7 +565,7 @@ fun thirdPage(navController: NavController) {
                                 text = "I agree to Spot's Privacy Policy",
                                 fontFamily = captionFont,
                                 fontSize = 14.sp,
-                                color = DarkGreen
+                                color = Blackk
                             )
                         }
 

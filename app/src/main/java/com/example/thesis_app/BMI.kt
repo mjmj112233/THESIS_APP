@@ -168,21 +168,28 @@ fun BMIScreen(navController: NavController) {
                 // Calculate Button
                 Button(
                     onClick = {
-                        val height = heightInput.trim().toFloatOrNull()?.div(100) // Convert cm to meters
-                        val weight = weightInput.trim().toFloatOrNull()
+                        val floatRegex = """^\d+(\.\d+)?$""".toRegex()
 
-                        // Check if both inputs are valid integers
-                        val isHeightValid = height != null
-                        val isWeightValid = weight != null
-
-                        if (!isHeightValid || !isWeightValid) {
-                            // Show a toast message if either input is not a valid integer
-                            Toast.makeText(context,
-                                "Please enter your height and weight in number.", Toast.LENGTH_SHORT).show()
+                        // Validate inputs with regex
+                        if (!floatRegex.matches(heightInput.trim()) || !floatRegex.matches(weightInput.trim())) {
+                            Toast.makeText(context, "Please enter your height and weight as numbers only.", Toast.LENGTH_SHORT).show()
                             return@Button
                         }
 
-                        if (height != null && weight != null && height > 0) {
+                        val height = heightInput.trim().toFloatOrNull()?.div(100) // Convert cm to meters
+                        val weight = weightInput.trim().toFloatOrNull()
+
+                        // Check if both inputs are valid floats
+                        val isHeightValid = height != null && height > 0
+                        val isWeightValid = weight != null && weight > 0
+
+                        if (!isHeightValid || !isWeightValid) {
+                            // Show a toast message if either input is not a valid float
+                            Toast.makeText(context, "Please enter valid numbers for height and weight.", Toast.LENGTH_SHORT).show()
+                            return@Button
+                        }
+
+                        if (height != null && weight != null) {
                             val bmi = weight / (height * height)
                             bmiResult = String.format("%.2f", bmi)
                             isBmiCalculated = true
@@ -191,9 +198,8 @@ fun BMIScreen(navController: NavController) {
                             bmiCategory = getBMICategory(bmi.toDouble())
                             fitnessGoal = determineFitnessGoal(bmiCategory)
                         } else {
-                            println("Invalid input. Height: $height, Weight: $weight")
+                            Toast.makeText(context, "Invalid input. Height and weight must be greater than zero", Toast.LENGTH_SHORT).show()
                         }
-
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = Slime),
                     modifier = Modifier
@@ -207,7 +213,6 @@ fun BMIScreen(navController: NavController) {
                         textAlign = TextAlign.Center
                     )
                 }
-
             } else {
                 // BMI Result Display
                 Box(
@@ -235,7 +240,11 @@ fun BMIScreen(navController: NavController) {
                 Box {
                     Text(
                         text = "Press the reload button to re-calculate your BMI.",
-                        style = TextStyle(fontSize = 12.sp, color = DirtyWhite, fontFamily = captionFont),
+                        style = TextStyle(
+                            fontSize = 12.sp,
+                            color = DirtyWhite,
+                            fontFamily = captionFont
+                        ),
                         modifier = Modifier
                     )
                 }
@@ -258,10 +267,28 @@ fun BMIScreen(navController: NavController) {
                 // First FAB
                 FloatingActionButton(
                     onClick = {
+                        val floatRegex = """^\d+(\.\d+)?$""".toRegex()
+
+                        // Validate inputs with regex
+                        if (!floatRegex.matches(heightInput.trim()) || !floatRegex.matches(weightInput.trim())) {
+                            Toast.makeText(context, "Please enter your height and weight as numbers only.", Toast.LENGTH_SHORT).show()
+                            return@FloatingActionButton
+                        }
+
                         val height = heightInput.trim().toFloatOrNull()?.div(100) // Convert cm to meters
                         val weight = weightInput.trim().toFloatOrNull()
 
-                        if (height != null && weight != null && height > 0) {
+                        // Check if both inputs are valid floats
+                        val isHeightValid = height != null && height > 0
+                        val isWeightValid = weight != null && weight > 0
+
+                        if (!isHeightValid || !isWeightValid) {
+                            // Show a toast message if either input is not a valid float
+                            Toast.makeText(context, "Please enter valid numbers for height and weight.", Toast.LENGTH_SHORT).show()
+                            return@FloatingActionButton
+                        }
+
+                        if (height != null && weight != null) {
                             val bmi = weight / (height * height)
                             bmiResult = String.format("%.2f", bmi)
                             isBmiCalculated = true
@@ -270,9 +297,8 @@ fun BMIScreen(navController: NavController) {
                             bmiCategory = getBMICategory(bmi.toDouble())
                             fitnessGoal = determineFitnessGoal(bmiCategory)
                         } else {
-                            println("Invalid input. Height: $height, Weight: $weight")
+                            Toast.makeText(context, "Invalid input. Height and weight must be greater than zero", Toast.LENGTH_SHORT).show()
                         }
-
                     },
                     containerColor = Slime,
                     contentColor = DarkGreen,
@@ -289,7 +315,9 @@ fun BMIScreen(navController: NavController) {
                     onClick = {
                         if (isBmiCalculated) {
                             navController.navigate("muscleGroup?height=${heightInput}&weight=${weightInput}&bmiCategory=${bmiCategory}&fitnessGoal=${fitnessGoal}") {
-                                popUpTo("bmi") { inclusive = true }  // Remove BMI screen from backstack
+                                popUpTo("bmi") {
+                                    inclusive = true
+                                }  // Remove BMI screen from backstack
                                 launchSingleTop = true
                             }
                         }
