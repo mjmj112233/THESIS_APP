@@ -343,7 +343,7 @@ fun thirdPage(navController: NavController) {
                             )
                             Text(
                                 text = "When you use Spot, we may collect the following types of information:\n\n" +
-                                        "• Personal Information: This may include data such as your name, email address, age, height, weight, fitness goals, and other demographic information.\n" +
+                                        "• Personal Information: This may include data such as your name, age, height, weight, fitness goals, and other demographic information.\n" +
                                         "• Health and Fitness Data: Information related to your workout routines, fitness assessments, and any preferences you provide while using the application.\n" +
                                         "• Device Information: We may collect information about your mobile device, including IP address, operating system, and browser type.\n" +
                                         "• Usage Data: We may collect information on how you interact with the app, including which features you use and the duration of your sessions.",

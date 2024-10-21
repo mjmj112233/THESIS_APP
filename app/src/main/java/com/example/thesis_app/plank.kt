@@ -232,7 +232,7 @@ fun plank(
                     }
                     // Countdown finished, start the stopwatch
                     countdownTime = 0 // Set countdown to 0 to show "Go!"
-                    delay(1000L) // Hold "Go!" for 1 second before starting the stopwatch
+                    delay(500L) // Hold "Go!" before starting the stopwatch
                     showCountdown = false // Hide the countdown
                     started = true // Start the stopwatch after countdown
                 }

@@ -35,6 +35,7 @@ import kotlinx.coroutines.launch
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.Toast
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.viewinterop.AndroidView
 import com.example.api.WorkoutRoutineService
 import kotlinx.coroutines.withContext
@@ -48,6 +49,7 @@ fun WorkoutInfoPage(navController: NavController, workoutName: String) {
     var isLoading by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
     var isFinished by remember { mutableStateOf(false) } // State to track if workout is finished
+    var showDialog by remember { mutableStateOf(false) }
 
     val service = RetrofitInstance.WorkoutRoutineService(context)
 
@@ -272,6 +274,54 @@ fun WorkoutInfoPage(navController: NavController, workoutName: String) {
                                 }
                             }
                         }
+                        // Automatically show dialog if the equipment is "Barbell"
+                        LaunchedEffect(workoutInfo.workout.equipment) {
+                            if (workoutInfo.workout.equipment.equals("Barbell", ignoreCase = true)) {
+                                showDialog = true
+                            }
+                        }
+
+                        if (showDialog) {
+                            AlertDialog(
+                                onDismissRequest = { showDialog = false },
+                                text = {
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Icon(
+                                            painter = painterResource(R.drawable.baseline_warning_24),
+                                            contentDescription = "Warning",
+                                            tint = DarkGreen,
+                                            modifier = Modifier
+                                                .padding(end = 24.dp)
+                                                .size(40.dp)
+                                        )
+                                        Column {
+                                            Text(
+                                                text = buildAnnotatedString {
+                                                    append("For afety, only use the barbell bar without any weight plates.")
+                                                },
+                                                color = DarkGreen,
+                                                fontFamily = titleFont,
+                                                textAlign = TextAlign.Justify
+                                            )
+                                        }
+                                    }
+                                },
+                                confirmButton = {
+                                    Button(
+                                        onClick = { showDialog = false },
+                                        colors = ButtonDefaults.buttonColors(Slime),
+                                    ) {
+                                        Text(
+                                            text = "OK",
+                                            color = DarkGreen,
+                                            fontFamily = titleFont
+                                        )
+                                    }
+                                }
+                            )
+                        }
 
                         Spacer(modifier = Modifier.height(8.dp))
 
@@ -369,7 +419,7 @@ fun WorkoutInfoPage(navController: NavController, workoutName: String) {
                                 },
                                 colors = ButtonDefaults.buttonColors(DirtyWhite),
                                 modifier = Modifier
-                                    .width(220.dp)
+                                    .width(180.dp)
                                     .height(60.dp)
                             ) {
                                 Text(
