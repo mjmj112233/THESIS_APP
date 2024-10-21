@@ -43,6 +43,7 @@ fun pullup(
     var isTestComplete by remember { mutableStateOf(false) }
     var pullUpScore by remember { mutableStateOf(0) }  // Store calculated pull-up score
     val context = LocalContext.current
+    val isButtonVisible = false
 
     // Function to calculate the pull-up score based on count
     fun calculatePullUpScore(count: Int): Int {
@@ -230,7 +231,7 @@ fun pullup(
         }
 
         // Next Button
-        if (isTestComplete) {
+        if (isButtonVisible && !isTestComplete) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()

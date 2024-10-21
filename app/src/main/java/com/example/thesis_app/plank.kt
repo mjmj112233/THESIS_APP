@@ -41,7 +41,7 @@ fun plank(
     var plankTime by remember { mutableStateOf("") }
     var isTestComplete by remember { mutableStateOf(false) }
     var plankScore by remember { mutableStateOf(0) }  // Store calculated plank score
-
+    val isButtonVisible = false
     //timer
     var timeElapsed by remember { mutableStateOf(0L) }  // Timer starting at 0 seconds (stopwatch)
     var started by remember { mutableStateOf(false) } // Control if the timer has started
@@ -387,7 +387,7 @@ fun plank(
         }
 
         // Next Button
-        if (isTestComplete) {
+        if (isButtonVisible && !isTestComplete) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()

@@ -116,7 +116,7 @@ fun WorkoutInfoPage(navController: NavController, workoutName: String) {
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(305.dp)
+                                .height(280.dp)
                                 .padding(top = 30.dp)
                                 .background(BlueGreen)
                         ) {
@@ -299,7 +299,7 @@ fun WorkoutInfoPage(navController: NavController, workoutName: String) {
                                         Column {
                                             Text(
                                                 text = buildAnnotatedString {
-                                                    append("For afety, only use the barbell bar without any weight plates.")
+                                                    append("For safety, only use the barbell bar without any weight plates.")
                                                 },
                                                 color = DarkGreen,
                                                 fontFamily = titleFont,

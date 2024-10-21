@@ -366,8 +366,7 @@ fun thirdPage(navController: NavController) {
                                 text = "The information we collect from you may be used in the following ways:\n\n" +
                                         "• Personalized Fitness Recommendations: To generate 7-day workout routines based on your demographics and fitness assessments.\n" +
                                         "• Service Improvements: To improve the app’s features, functionality, and user experience based on aggregate user data.\n" +
-                                        "• Algorithm Development: To enhance our algorithm by using anonymized data for training purposes, helping us provide better and more accurate fitness recommendations in the future.\n" +
-                                        "• Communication: To send notifications, updates, or important information about the app.",
+                                        "• Algorithm Development: To enhance our algorithm by using anonymized data for training purposes, helping us provide better and more accurate fitness recommendations in the future.\n",
                                 fontFamily = captionFont,
                                 fontSize = 13.sp,
                                 lineHeight = 25.sp,
@@ -465,26 +464,9 @@ fun thirdPage(navController: NavController) {
                                 color = Blackk
                             )
 
-// Section Title: Cookies and Tracking Technologies
-                            Text(
-                                text = "8. Cookies and Tracking Technologies",
-                                fontFamily = titleFont,
-                                fontSize = 16.sp,
-                                color = DarkGreen,
-                                modifier = Modifier.padding(vertical = 8.dp)
-                            )
-                            Text(
-                                text = "Spot may use cookies and similar technologies to track your usage and provide a better user experience. These technologies help us analyze traffic and understand user behavior, enabling us to improve our services.",
-                                fontFamily = captionFont,
-                                fontSize = 13.sp,
-                                lineHeight = 25.sp,
-                                textAlign = TextAlign.Justify,
-                                color = Blackk
-                            )
-
 // Section Title: Children’s Privacy
                             Text(
-                                text = "9. Children’s Privacy",
+                                text = "8. Children’s Privacy",
                                 fontFamily = titleFont,
                                 fontSize = 16.sp,
                                 color = DarkGreen,
@@ -501,7 +483,7 @@ fun thirdPage(navController: NavController) {
 
 // Section Title: Changes to the Privacy Policy
                             Text(
-                                text = "10. Changes to the Privacy Policy",
+                                text = "9. Changes to the Privacy Policy",
                                 fontFamily = titleFont,
                                 fontSize = 16.sp,
                                 color = DarkGreen,
@@ -518,7 +500,7 @@ fun thirdPage(navController: NavController) {
 
 // Section Title: Contact Us
                             Text(
-                                text = "11. Contact Us",
+                                text = "10. Contact Us",
                                 fontFamily = titleFont,
                                 fontSize = 16.sp,
                                 color = DarkGreen,

@@ -296,7 +296,7 @@ fun pushUp(
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Spacer(modifier = Modifier.height(350.dp))
+                Spacer(modifier = Modifier.height(400.dp))
 
                 Button(
                     onClick = {
