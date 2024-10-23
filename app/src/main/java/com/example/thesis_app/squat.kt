@@ -51,7 +51,7 @@ fun SquatScreen(
     muscleGroup: String,
     fitnessScore: Int // Total fitness score accumulated from previous assessments
 ) {
-    var timeLeft by remember { mutableStateOf(10) }
+    var timeLeft by remember { mutableStateOf(60) }
     var started by remember { mutableStateOf(false) }
     var showDialog by remember { mutableStateOf(false) }
     var showInputField by remember { mutableStateOf(false) }
