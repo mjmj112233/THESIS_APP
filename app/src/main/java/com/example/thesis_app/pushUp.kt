@@ -421,9 +421,16 @@ fun pushUp(
             ) {
                 Button(
                     onClick = {
+                        val pushUps = pushUpCount.toIntOrNull()
+                        if (pushUps != null && pushUps >= 0) {
+                            pushUpScore = calculatePushUpScore(pushUps)
+                            isTestComplete = true
                         navController.navigate("plank?height=$height&weight=$weight&bmiCategory=$bmiCategory&fitnessGoal=$fitnessGoal&muscleGroup=$muscleGroup&pushUpScore=$pushUpScore") {
                             popUpTo("pushup") { inclusive = true }  // Remove Push-up screen from backstack
                             launchSingleTop = true
+                        }
+                        } else {
+                            Toast.makeText(context, "Invalid input, please enter a number only", Toast.LENGTH_SHORT).show()
                         }
                     },
                     colors = ButtonDefaults.buttonColors(Slime),
