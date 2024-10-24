@@ -121,16 +121,6 @@ fun mainPage(navController: NavController) {
                     Spacer(modifier = Modifier.height(20.dp))
 
                     Text(
-                        text = "About the Devs",
-                        color = DirtyWhite,
-                        fontFamily = titleFont,
-                        fontSize = 16.sp,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp)
-                            .clickable { /* Handle Home click */ }
-                    )
-                    Text(
                         text = "Edit User Profile",
                         color = DirtyWhite,
                         fontFamily = titleFont,
