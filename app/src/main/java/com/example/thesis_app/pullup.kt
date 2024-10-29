@@ -201,7 +201,7 @@ fun pullup(
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Spacer(modifier = Modifier.height(700.dp))
+                Spacer(modifier = Modifier.height(500.dp))
 
                 Button(
                     onClick = {

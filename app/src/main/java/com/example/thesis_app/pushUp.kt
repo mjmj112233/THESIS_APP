@@ -43,7 +43,7 @@ fun pushUp(
     val context = LocalContext.current
 
     //timer
-    var timeLeft by remember { mutableStateOf(60) }  // Timer starting at 60 seconds
+    var timeLeft by remember { mutableStateOf(3) }  // Timer starting at 60 seconds
     var started by remember { mutableStateOf(false) } // Control if the timer has started
     var showDialog by remember { mutableStateOf(false) } // Control the visibility of the dialog
     var showInputField by remember { mutableStateOf(false) } // Control visibility of the input field
@@ -341,7 +341,7 @@ fun pushUp(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(bottom = 220.dp),
+                    .padding(bottom = 300.dp),
                 contentAlignment = Alignment.BottomCenter
             ) {
                 Column(

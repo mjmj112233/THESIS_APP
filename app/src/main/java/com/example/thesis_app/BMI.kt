@@ -132,7 +132,7 @@ fun BMIScreen(navController: NavController) {
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
-                .padding(start = 40.dp, top = 200.dp, end = 40.dp, bottom = 100.dp)
+                .padding(start = 40.dp, top = 150.dp, end = 40.dp, bottom = 100.dp)
                 .fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
@@ -162,7 +162,7 @@ fun BMIScreen(navController: NavController) {
                 )
             }
 
-            Spacer(modifier = Modifier.height(40.dp))
+            Spacer(modifier = Modifier.height(10.dp))
 
             if (!isBmiCalculated) {
                 // Calculate Button
@@ -235,7 +235,7 @@ fun BMIScreen(navController: NavController) {
                     )
                 }
 
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(1.dp))
 
                 Box {
                     Text(
@@ -257,7 +257,7 @@ fun BMIScreen(navController: NavController) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(bottom = 60.dp),
+                .padding(bottom = 20.dp),
             contentAlignment = Alignment.BottomCenter
         ) {
             Row(

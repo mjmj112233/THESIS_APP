@@ -10,6 +10,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -21,6 +23,7 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
@@ -43,7 +46,8 @@ import kotlinx.coroutines.withContext
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -52,6 +56,7 @@ fun loginPage(navController: NavController) {
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
     val authRepository = AuthRepository(context) // Adjusted to not require context
+    val keyboardController = LocalSoftwareKeyboardController.current
 
     // State for error message
     var errorMessage by remember { mutableStateOf("") } // Error message state
@@ -127,7 +132,15 @@ fun loginPage(navController: NavController) {
                             shape = RoundedCornerShape(20.dp),
                             modifier = Modifier.fillMaxWidth().padding(horizontal = 2.dp)
                                 .focusRequester(usernameFocusRequester)
-                                .onFocusChanged { focusState -> isUsernameFocused = focusState.isFocused }
+                                .onFocusChanged { focusState -> isUsernameFocused = focusState.isFocused },
+                            keyboardOptions = KeyboardOptions.Default.copy(
+                                imeAction = ImeAction.Done
+                        ),
+                            keyboardActions = KeyboardActions(
+                                onDone = {
+                                    keyboardController?.hide() // Hide the keyboard when done is pressed
+                                }
+                            )
                         )
 
                         Spacer(modifier = Modifier.height(17.dp))
@@ -163,7 +176,15 @@ fun loginPage(navController: NavController) {
                                 visualTransformation = if (isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                                 modifier = Modifier.fillMaxWidth().padding(horizontal = 2.dp)
                                     .focusRequester(passwordFocusRequester)
-                                    .onFocusChanged { focusState -> isPasswordFocused = focusState.isFocused }
+                                    .onFocusChanged { focusState -> isPasswordFocused = focusState.isFocused },
+                                keyboardOptions = KeyboardOptions.Default.copy(
+                                    imeAction = ImeAction.Done
+                                ),
+                                keyboardActions = KeyboardActions(
+                                    onDone = {
+                                        keyboardController?.hide() // Hide the keyboard when done is pressed
+                                    }
+                                )
                             )
 
                             // Toggle password visibility icon
