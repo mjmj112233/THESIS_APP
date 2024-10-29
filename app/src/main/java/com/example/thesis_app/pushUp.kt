@@ -43,7 +43,7 @@ fun pushUp(
     val context = LocalContext.current
 
     //timer
-    var timeLeft by remember { mutableStateOf(3) }  // Timer starting at 60 seconds
+    var timeLeft by remember { mutableStateOf(60) }  // Timer starting at 60 seconds
     var started by remember { mutableStateOf(false) } // Control if the timer has started
     var showDialog by remember { mutableStateOf(false) } // Control the visibility of the dialog
     var showInputField by remember { mutableStateOf(false) } // Control visibility of the input field
@@ -109,7 +109,7 @@ fun pushUp(
                         Text(
                             text = "Strength and Endurance Test",
                             color = DirtyWhite,
-                            style = TextStyle(fontFamily = titleFont, fontSize = 16.sp),
+                            style = TextStyle(fontFamily = titleFont, fontSize = 13.sp),
                             textAlign = TextAlign.Center
                         )
                     }
@@ -192,7 +192,7 @@ fun pushUp(
                 )
             }
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(10.dp))
 
             // Start Timer Button
             if (!started) {
@@ -341,7 +341,7 @@ fun pushUp(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(bottom = 300.dp),
+                    .padding(bottom = 135.dp),
                 contentAlignment = Alignment.BottomCenter
             ) {
                 Column(

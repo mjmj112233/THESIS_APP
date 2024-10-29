@@ -51,7 +51,7 @@ fun SquatScreen(
     muscleGroup: String,
     fitnessScore: Int // Total fitness score accumulated from previous assessments
 ) {
-    var timeLeft by remember { mutableStateOf(3) }
+    var timeLeft by remember { mutableStateOf(60) }
     var started by remember { mutableStateOf(false) }
     var showDialog by remember { mutableStateOf(false) }
     var showInputField by remember { mutableStateOf(false) }
@@ -177,7 +177,7 @@ fun SquatScreen(
                         Text(
                             text = "Strength and Endurance Test",
                             color = DirtyWhite,
-                            style = TextStyle(fontFamily = titleFont, fontSize = 16.sp),
+                            style = TextStyle(fontFamily = titleFont, fontSize = 13.sp),
                             textAlign = TextAlign.Center
                         )
                     }
@@ -405,7 +405,7 @@ fun SquatScreen(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(bottom = 300.dp),
+                    .padding(bottom = 120.dp),
                 contentAlignment = Alignment.BottomCenter
             ) {
                 Column(

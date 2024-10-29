@@ -80,7 +80,7 @@ fun BMIScreen(navController: NavController) {
                     Text(
                         text = "Calculate your BMI",
                         color = DirtyWhite,
-                        style = TextStyle(fontFamily = titleFont, fontSize = 24.sp),
+                        style = TextStyle(fontFamily = titleFont, fontSize = 20.sp),
                         textAlign = TextAlign.Center
                     )
                 }
@@ -132,7 +132,7 @@ fun BMIScreen(navController: NavController) {
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
-                .padding(start = 40.dp, top = 150.dp, end = 40.dp, bottom = 100.dp)
+                .padding(start = 40.dp, top = 230.dp, end = 40.dp, bottom = 100.dp)
                 .fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
@@ -162,7 +162,7 @@ fun BMIScreen(navController: NavController) {
                 )
             }
 
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(2.dp))
 
             if (!isBmiCalculated) {
                 // Calculate Button
@@ -203,7 +203,7 @@ fun BMIScreen(navController: NavController) {
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = Slime),
                     modifier = Modifier
-                        .height(56.dp)
+                        .height(46.dp)
                         .fillMaxWidth()
                         .clip(CircleShape)
                 ) {
@@ -219,7 +219,7 @@ fun BMIScreen(navController: NavController) {
                     modifier = Modifier
                         .clip(shape = CircleShape)
                         .background(Slime)
-                        .height(56.dp)
+                        .height(46.dp)
                         .fillMaxWidth(),
                     contentAlignment = Alignment.Center
                 ) {
@@ -235,13 +235,13 @@ fun BMIScreen(navController: NavController) {
                     )
                 }
 
-                Spacer(modifier = Modifier.height(1.dp))
+                Spacer(modifier = Modifier.height(50.dp))
 
                 Box {
                     Text(
                         text = "Press the reload button to re-calculate your BMI.",
                         style = TextStyle(
-                            fontSize = 12.sp,
+                            fontSize = 14.sp,
                             color = DirtyWhite,
                             fontFamily = captionFont
                         ),

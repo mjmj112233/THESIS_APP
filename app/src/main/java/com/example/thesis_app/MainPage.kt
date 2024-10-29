@@ -661,7 +661,7 @@ fun WorkoutRoutinesList(navController: NavController, workoutRoutines: List<Work
                             modifier = Modifier
                                 .clip(RoundedCornerShape(12.dp))
                                 .background(Slime)
-                                .width(75.dp)
+                                .width(73.dp)
                                 .padding(horizontal = 12.dp, vertical = 8.dp)
                         ) {
                             Text(
@@ -672,7 +672,7 @@ fun WorkoutRoutinesList(navController: NavController, workoutRoutines: List<Work
                             )
                         }
 
-                        Spacer(modifier = Modifier.padding(start = 140.dp))
+                        Spacer(modifier = Modifier.padding(start = 70.dp))
 
                         if (routines.any { it.workoutInfo?.workout?.name != null }) { // Check for non-rest day
                             Row(

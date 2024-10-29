@@ -90,7 +90,7 @@ fun pullup(
                         Text(
                             text = "Strength and Endurance Test",
                             color = DirtyWhite,
-                            style = TextStyle(fontFamily = titleFont, fontSize = 16.sp),
+                            style = TextStyle(fontFamily = titleFont, fontSize = 13.sp),
                             textAlign = TextAlign.Center
                         )
                     }

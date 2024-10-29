@@ -116,7 +116,7 @@ fun WorkoutInfoPage(navController: NavController, workoutName: String) {
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(275.dp)
+                                .height(240.dp)
                                 .padding(top = 30.dp)
                                 .background(BlueGreen)
                         ) {
@@ -160,7 +160,7 @@ fun WorkoutInfoPage(navController: NavController, workoutName: String) {
                         if (workoutInfo.workout.name != "Cardio") {
                             Row(
                                 modifier = Modifier
-                                    .padding(top = 14.dp)
+                                    .padding(top = 10.dp)
                                     .fillMaxWidth()
                                     .padding(top = 8.dp, end = 8.dp),
                                 horizontalArrangement = Arrangement.Start
@@ -170,12 +170,12 @@ fun WorkoutInfoPage(navController: NavController, workoutName: String) {
                                     modifier = Modifier
                                         .clip(shape = RoundedCornerShape(20.dp))
                                         .background(Slime)
-                                        .padding(horizontal = 10.dp, vertical = 8.dp)
+                                        .padding(horizontal = 8.dp, vertical = 8.dp)
                                 ) {
                                     Text(
                                         text = "${workoutInfo.sets} sets",
                                         style = TextStyle(
-                                            fontSize = 16.sp,
+                                            fontSize = 14.sp,
                                             color = DarkGreen,
                                             fontFamily = alt
                                         ),
@@ -183,26 +183,26 @@ fun WorkoutInfoPage(navController: NavController, workoutName: String) {
                                 }
 
                                 // Spacer between sets and reps boxes
-                                Spacer(modifier = Modifier.width(4.dp))
+                                Spacer(modifier = Modifier.width(3.dp))
 
                                 // Reps box
                                 Box(
                                     modifier = Modifier
                                         .clip(shape = RoundedCornerShape(20.dp))
                                         .background(Slime)
-                                        .padding(horizontal = 10.dp, vertical = 8.dp)
+                                        .padding(horizontal = 8.dp, vertical = 8.dp)
                                 ) {
                                     Text(
                                         text = "${workoutInfo.reps} reps",
                                         style = TextStyle(
-                                            fontSize = 16.sp,
+                                            fontSize = 14.sp,
                                             color = DarkGreen,
                                             fontFamily = alt
                                         ),
                                     )
                                 }
 
-                                Spacer(modifier = Modifier.width(4.dp))
+                                Spacer(modifier = Modifier.width(3.dp))
 
                                 OutlinedCard(
                                     colors = CardDefaults.cardColors(
@@ -215,16 +215,16 @@ fun WorkoutInfoPage(navController: NavController, workoutName: String) {
                                     Text(
                                         text = "${workoutInfo.weight} kg",
                                         style = TextStyle(
-                                            fontSize = 16.sp,
+                                            fontSize = 14.sp,
                                             color = Slime,
                                             fontFamily = alt
                                         ),
                                         modifier = Modifier
-                                            .padding(horizontal = 10.dp, vertical = 8.dp)
+                                            .padding(horizontal = 8.dp, vertical = 8.dp)
                                             .clip(shape = RoundedCornerShape(20.dp))
                                     )
                                 }
-                                Spacer(modifier = Modifier.width(4.dp))
+                                Spacer(modifier = Modifier.width(3.dp))
 
                                 OutlinedCard(
                                     colors = CardDefaults.cardColors(
@@ -237,12 +237,12 @@ fun WorkoutInfoPage(navController: NavController, workoutName: String) {
                                     Text(
                                         text = "${workoutInfo.workout.classification.name}",
                                         style = TextStyle(
-                                            fontSize = 16.sp,
+                                            fontSize = 14.sp,
                                             color = Slime,
                                             fontFamily = alt
                                         ),
                                         modifier = Modifier
-                                            .padding(horizontal = 10.dp, vertical = 8.dp)
+                                            .padding(horizontal = 8.dp, vertical = 8.dp)
                                             .clip(shape = RoundedCornerShape(20.dp))
                                     )
                                 }
@@ -346,7 +346,7 @@ fun WorkoutInfoPage(navController: NavController, workoutName: String) {
                         Text(
                             text = "${workoutInfo.workout.description} ",
                             fontFamily = captionFont,
-                            fontSize = 16.sp,
+                            fontSize = 13.sp,
                             color = DirtyWhite,
                             textAlign = TextAlign.Justify,
                             modifier = Modifier
@@ -419,7 +419,7 @@ fun WorkoutInfoPage(navController: NavController, workoutName: String) {
                                 },
                                 colors = ButtonDefaults.buttonColors(DirtyWhite),
                                 modifier = Modifier
-                                    .width(180.dp)
+                                    .width(130.dp)
                                     .height(60.dp)
                             ) {
                                 Text(
