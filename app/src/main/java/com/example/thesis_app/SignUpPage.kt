@@ -35,6 +35,9 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import android.widget.Toast
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import com.example.thesis_app.ui.theme.Ash
 import com.example.thesis_app.ui.theme.Blackk
 import com.example.thesis_app.ui.theme.BlueGreen
@@ -46,11 +49,13 @@ import com.example.thesis_app.ui.theme.captionFont
 import com.example.thesis_app.ui.theme.titleFont
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.input.ImeAction
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun signupPage(navController: NavController) {
     val context = LocalContext.current
+    val keyboardController = LocalSoftwareKeyboardController.current
 
     // State to manage password visibility
     var isPasswordVisible by remember { mutableStateOf(false) }
@@ -106,7 +111,14 @@ fun signupPage(navController: NavController) {
                         AnimatedTextField(
                             label = "Username",
                             value = username,
-                            onValueChange = { username = it }
+                            onValueChange = { username = it },
+                            keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done
+                            ),
+                            keyboardActions = KeyboardActions(
+                                onDone = {
+                                    keyboardController?.hide()
+                                }
+                            )
                         )
 
                         Spacer(modifier = Modifier.height(17.dp))
@@ -118,6 +130,14 @@ fun signupPage(navController: NavController) {
                                 value = password,
                                 onValueChange = { password = it },
                                 visualTransformation = if (isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                                keyboardOptions = KeyboardOptions.Default.copy(
+                                    imeAction = ImeAction.Done
+                                ),
+                                keyboardActions = KeyboardActions(
+                                    onDone = {
+                                        keyboardController?.hide()
+                                    }
+                                )
                             )
                             IconButton(
                                 onClick = { isPasswordVisible = !isPasswordVisible },
@@ -148,6 +168,14 @@ fun signupPage(navController: NavController) {
                                 value = confirmPassword,
                                 onValueChange = { confirmPassword = it },
                                 visualTransformation = if (isConfirmPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                                keyboardOptions = KeyboardOptions.Default.copy(
+                                    imeAction = ImeAction.Done
+                                ),
+                                keyboardActions = KeyboardActions(
+                                    onDone = {
+                                        keyboardController?.hide()
+                                    }
+                                )
                             )
                             IconButton(
                                 onClick = { isConfirmPasswordVisible = !isConfirmPasswordVisible },
@@ -340,6 +368,8 @@ fun AnimatedTextField(
     label: String,
     value: String,
     onValueChange: (String) -> Unit,
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    keyboardActions: KeyboardActions = KeyboardActions.Default,
     visualTransformation: VisualTransformation = VisualTransformation.None,
     modifier: Modifier = Modifier
 ) {
@@ -354,6 +384,8 @@ fun AnimatedTextField(
     TextField(
         value = value,
         onValueChange = { newValue -> onValueChange(newValue) },
+        keyboardOptions = keyboardOptions,
+        keyboardActions = keyboardActions,
         label = {
             // Animated label
             AnimatedVisibility(
